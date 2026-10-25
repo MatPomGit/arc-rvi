@@ -1,0 +1,4 @@
+# Synthetic example; replace only with cleared experiment configurations.
+required_regions: [front, left, right, rear]
+mode: fixture
+accept_incomplete_coverage: false
