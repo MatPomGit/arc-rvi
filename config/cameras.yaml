@@ -1,0 +1,5 @@
+# Illustrative calibration targets, not measured device parameters.
+camera_frame: camera_optical
+min_laplacian_variance: 100.0
+exposure_mean_min: 40.0
+exposure_mean_max: 215.0

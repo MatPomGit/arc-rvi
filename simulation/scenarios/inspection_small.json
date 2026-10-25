@@ -1,0 +1,13 @@
+{
+  "scenario_id": "synthetic_asset_001",
+  "evidence_type": "synthetic_fixture",
+  "start_xy": [0.0, 0.0],
+  "required_regions": ["front", "left", "right", "rear"],
+  "viewpoints": [
+    {"id": "v_front_left", "x": 1.0, "y": 0.0, "regions": ["front", "left"]},
+    {"id": "v_front", "x": 1.1, "y": 0.4, "regions": ["front"]},
+    {"id": "v_right", "x": 3.0, "y": 0.0, "regions": ["right"]},
+    {"id": "v_rear_right", "x": 3.2, "y": 1.0, "regions": ["rear", "right"]},
+    {"id": "v_rear", "x": 3.4, "y": 1.4, "regions": ["rear"]}
+  ]
+}

@@ -1,0 +1,5 @@
+# Template only. Hardware integration requires an approved adapter and safety review.
+frame_id: map
+adapter: not_configured
+max_linear_speed_mps: 0.1
+require_manual_enable: true
