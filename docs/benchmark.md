@@ -1,6 +1,6 @@
 # Paired fixture benchmark
 
-Application version: 1.3.0
+Application version: 1.4.0
 
 ## Run
 
@@ -115,4 +115,7 @@ first rejected action; exhausted candidates yield `unreachable_regions`.
 execution status of `rvi simulate`. Summary denominators include failed trials.
 Reports retain per-scene hashes, actual observations, partial coverage, time and distance.
 The included far-first scene verifies a known budget trade-off, not comparative research merit.
-No random scene generation, inferential analysis or confirmation dataset is supplied yet.
+The [seeded condition generator](conditions.md) now emits exploratory geometry
+families, matched nominal/occluded conditions and disjoint development/pilot/holdout
+suites with SHA-256 manifests. It provides no inferential analysis or frozen
+confirmation dataset.

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "study_id": "01",
+  "master_seed": 20261026,
+  "replicates_per_family": 3,
+  "conditions": ["nominal", "occluded"],
+  "partitions": {
+    "development": ["parallel_pair", "staggered_pair"],
+    "pilot": ["stacked_triple", "offset_triple"],
+    "holdout": ["narrow_quad", "stepped_quad"]
+  }
+}

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
+from .conditions import generate_conditions
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
 
@@ -24,6 +25,9 @@ def make_parser() -> argparse.ArgumentParser:
     simulate = sub.add_parser("simulate", help="evaluate a route in a planar geometric scene")
     simulate.add_argument("--scene", required=True, type=Path)
     simulate.add_argument("--output", required=True, type=Path)
+    conditions = sub.add_parser("conditions", help="generate paired study01 geometric scenes and split manifests")
+    conditions.add_argument("--spec", required=True, type=Path)
+    conditions.add_argument("--output-dir", required=True, type=Path)
     return parser
 
 
@@ -31,6 +35,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = make_parser()
     arguments = parser.parse_args(argv)
     try:
+        if arguments.command == "conditions":
+            manifest = generate_conditions(arguments.spec, arguments.output_dir)
+            print(f"Saved {len(manifest['scenes'])} exploratory scenes to {arguments.output_dir}")
+            return 0
         if arguments.command in ("benchmark", "simulate"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
