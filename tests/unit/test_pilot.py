@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
 from pathlib import Path
 import tempfile
 import unittest
+import json
 
 from rvi.pilot import _intervals, analyze_pilot, summarize_pilot
 
@@ -108,6 +111,26 @@ class PilotAnalysisTests(unittest.TestCase):
             scene_path.write_bytes(scene_path.read_bytes() + b" ")
             with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
                 analyze_pilot(generated / "manifest.json")
+
+
+    def test_cli_pilot_report_is_saved_once(self):
+        from rvi.conditions import generate_conditions
+        from rvi.cli import main
+        with tempfile.TemporaryDirectory() as temp:
+            generated = Path(temp) / "generated"
+            output = Path(temp) / "pilot.json"
+            generate_conditions(SPEC, generated)
+            args = ["pilot", "--manifest", str(generated / "manifest.json"),
+                    "--output", str(output)]
+            with redirect_stdout(StringIO()):
+                self.assertEqual(main(args), 0)
+            report = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(report["families"], 2)
+            previous = output.read_bytes()
+            with redirect_stderr(StringIO()), self.assertRaises(SystemExit) as raised:
+                main(args)
+            self.assertEqual(raised.exception.code, 2)
+            self.assertEqual(output.read_bytes(), previous)
 
 
 if __name__ == "__main__":
