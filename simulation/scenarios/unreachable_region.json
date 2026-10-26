@@ -1,0 +1,9 @@
+{
+  "scenario_id": "unreachable_roof",
+  "evidence_type": "fixture",
+  "start_xy": [0.0, 0.0],
+  "required_regions": ["front", "roof"],
+  "viewpoints": [
+    {"id": "front_only", "x": 1.0, "y": 0.0, "regions": ["front"]}
+  ]
+}

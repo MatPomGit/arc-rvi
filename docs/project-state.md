@@ -6,7 +6,9 @@ Updated: 2026-10-26
 
 - Standard-library planar greedy coverage planner and synthetic `rvi plan` command
 - Mission transition and quality-threshold helpers, path-safe image hashes
-- 23 offline tests passing on the initial code revision `521756961946bd0eff4618c328c43d38071574cc`
+- Application version 1.1.0: paired fixture benchmark with three deterministic baselines,
+  partial outcomes, distance budgets, strict input validation and source/input hashes
+- 40 offline tests, including paired scoring, provenance, replay and CLI errors
 - Eight prospective protocols, shared analysis plan and publication boundaries, version 1.1.0
 
 ## Unresolved scientific gates
@@ -19,16 +21,14 @@ not literature-backed claims of method superiority.
 
 ## Next work package
 
-Implement study 01's fixture-level paired benchmark runner and trial records in the
-shared library. Keep a single CLI command and standard-library dependencies.
-Start with fixed-order, coverage-only greedy and distance-penalized greedy baselines.
-Record actual selected views, coverage, travel and failures, including impossible scenes.
-Use explicit fixture evidence labels and source/configuration hashes.
-Verify pairing, deterministic reruns and scoring against hand-calculable scenes.
-Do not interpret these fixtures as a physics benchmark.
+Add study 01's simulator adapter and independently verified reference scoring.
+Define a minimal scene, sensor and observation interface before selecting an engine.
+Verify coordinate frames, surface visibility, collision and elapsed-time measurements
+against analytic scenes. Keep fixture and physics evidence separate.
+Then implement condition sampling, held-out geometry families and pilot analysis.
 
-Estimated software work before a simulation pilot: 3 to 5 coherent PRs for the runner,
-validated simulator adapter, reference scoring, baselines and pilot analysis.
+Estimated software work before a simulation pilot: 2 to 4 coherent PRs for the adapter,
+reference scoring, simulator baselines and pilot analysis.
 Physical readiness depends on equipment access and calibration; no reliable PR count
 can be assigned yet.
 

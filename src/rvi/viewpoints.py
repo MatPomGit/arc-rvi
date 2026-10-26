@@ -1,26 +1,38 @@
-"""Deterministic greedy set-cover baseline with a travel-distance penalty.
+"""Deterministic planar coverage baselines with explicit partial outcomes.
 
-This baseline operates on known candidate views and planar distances. It does
-not model kinematics, occlusion, collision checking or unknown geometry.
+Visibility is supplied by fixtures. No kinematics or collision model is used.
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import dataclass
 from math import hypot, isfinite
 
 from .models import InspectionPlan, Viewpoint
+
+METHODS = ("fixed_order", "greedy_coverage", "greedy_distance")
 
 
 class PlanningError(ValueError):
     """The supplied candidates cannot satisfy the coverage requirements."""
 
 
-def plan_viewpoints(
+@dataclass(frozen=True)
+class PlanningOutcome:
+    plan: InspectionPlan
+    failure_reason: str | None
+
+
+def evaluate_viewpoints(
     candidates: Iterable[Viewpoint],
     required_regions: Iterable[str],
     start_xy: tuple[float, float] = (0.0, 0.0),
-) -> InspectionPlan:
+    *,
+    method: str = "greedy_distance",
+    max_travel_distance_m: float | None = None,
+) -> PlanningOutcome:
+    """Execute a fixture route; retain coverage before failure or budget exhaustion."""
     candidates = tuple(candidates)
     required = tuple(required_regions)
     if not required or any(not isinstance(x, str) or not x.strip() for x in required):
@@ -28,34 +40,70 @@ def plan_viewpoints(
     if len(set(required)) != len(required):
         raise ValueError("required_regions must be unique")
     if len(start_xy) != 2 or any(
-        not isinstance(x, (float, int)) or not isfinite(x) for x in start_xy
+        type(x) not in (float, int) or not isfinite(x) for x in start_xy
     ):
         raise ValueError("start_xy must contain finite coordinates")
     if len({view.identifier for view in candidates}) != len(candidates):
         raise ValueError("duplicate viewpoint identifiers")
+    if method not in METHODS:
+        raise ValueError("unknown planning method")
+    if max_travel_distance_m is not None and (
+        type(max_travel_distance_m) not in (float, int)
+        or not isfinite(max_travel_distance_m) or max_travel_distance_m < 0
+    ):
+        raise ValueError("travel budget must be finite and nonnegative")
 
     uncovered = set(required)
     position = start_xy
     selected: list[str] = []
     travel = 0.0
-    unused = sorted(candidates, key=lambda view: view.identifier)
-
+    # Fixed shot lists retain input order. Greedy ties use ascending identifiers.
+    unused = list(candidates) if method == "fixed_order" else sorted(
+        candidates, key=lambda view: view.identifier)
+    reason = None
     while uncovered:
-        eligible = [view for view in unused if uncovered.intersection(view.visible_regions)]
+        eligible = unused if method == "fixed_order" else [
+            view for view in unused if uncovered.intersection(view.visible_regions)]
         if not eligible:
-            raise PlanningError(f"uncovered regions: {', '.join(sorted(uncovered))}")
+            reason = "unreachable_regions"
+            break
 
-        def rank(view: Viewpoint) -> tuple[float, int, float]:
+        def distance(view):
+            return hypot(position[0] - view.x, position[1] - view.y)
+
+        def rank(view):
             gain = len(uncovered.intersection(view.visible_regions))
-            distance = hypot(position[0] - view.x, position[1] - view.y)
-            return (gain / (1.0 + distance), gain, -distance)
+            if method == "greedy_coverage":
+                return (gain,)
+            return (gain / (1.0 + distance(view)), gain, -distance(view))
 
-        best = max(eligible, key=rank)
-        distance = hypot(position[0] - best.x, position[1] - best.y)
-        travel += distance
+        best = eligible[0] if method == "fixed_order" else max(eligible, key=rank)
+        step = distance(best)
+        if not isfinite(step) or not isfinite(travel + step):
+            raise ValueError("coordinates produce a non-finite route distance")
+        # A rejected move acquires no view and consumes no partial travel.
+        if max_travel_distance_m is not None and travel + step > max_travel_distance_m:
+            reason = "distance_budget_exceeded"
+            break
+        travel += step
         selected.append(best.identifier)
         uncovered.difference_update(best.visible_regions)
         position = (best.x, best.y)
         unused.remove(best)
 
-    return InspectionPlan(tuple(selected), tuple(sorted(required)), travel)
+    covered = tuple(sorted(set(required) - uncovered))
+    return PlanningOutcome(InspectionPlan(tuple(selected), covered, travel), reason)
+
+
+def plan_viewpoints(
+    candidates: Iterable[Viewpoint],
+    required_regions: Iterable[str],
+    start_xy: tuple[float, float] = (0.0, 0.0),
+) -> InspectionPlan:
+    """Preserve the original complete-plan API and distance-penalized baseline."""
+    required = tuple(required_regions)
+    outcome = evaluate_viewpoints(candidates, required, start_xy)
+    if outcome.failure_reason:
+        missing = sorted(set(required) - set(outcome.plan.covered_regions))
+        raise PlanningError(f"uncovered regions: {', '.join(missing)}")
+    return outcome.plan

@@ -29,9 +29,13 @@ Requires Python 3.11+; core tooling uses the standard library.
 python -m pip install -e .
 python scripts/validate.py
 rvi plan --scenario simulation/scenarios/inspection_small.json --output results/plan.json
+rvi benchmark --suite simulation/suites/fixture_smoke.json --output results/benchmark.json
 ```
 
 The `plan` command operates on a **synthetic fixture**, not a real robot or physics simulator. It provides a reproducible baseline greedy coverage planner, not an optimality claim. Real robot and simulator integrations are intentionally not implemented yet.
+
+The [paired benchmark](docs/benchmark.md) compares three deterministic planning methods
+and records partial coverage, route length, failures and source/input hashes.
 
 ## Research integrity
 
