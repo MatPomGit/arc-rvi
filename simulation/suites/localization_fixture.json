@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "fixture",
+  "suite_id": "study02_handcheck",
+  "threshold": 0.45,
+  "ambiguity_margin": 0,
+  "requests": [
+    {
+      "request_id": "present",
+      "ground_truth_id": "target_a",
+      "candidates": [
+        {
+          "id": "target_a",
+          "visual_distance": 0.1,
+          "spatial_distance": 0.2
+        },
+        {
+          "id": "distractor_b",
+          "visual_distance": 0.8,
+          "spatial_distance": 0.7
+        }
+      ]
+    },
+    {
+      "request_id": "absent",
+      "ground_truth_id": null,
+      "candidates": [
+        {
+          "id": "distractor_c",
+          "visual_distance": 0.8,
+          "spatial_distance": 0.75
+        }
+      ]
+    },
+    {
+      "request_id": "ambiguous",
+      "ground_truth_id": "target_d",
+      "candidates": [
+        {
+          "id": "target_d",
+          "visual_distance": 0.3,
+          "spatial_distance": 0.2
+        },
+        {
+          "id": "distractor_e",
+          "visual_distance": 0.3,
+          "spatial_distance": 0.35
+        }
+      ]
+    }
+  ]
+}

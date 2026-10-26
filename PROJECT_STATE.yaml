@@ -11,7 +11,7 @@ repository:
   manuscript_root: papers
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
-  documentation: README.md
+  documentation: mkdocs.yml
 research_phase: seeded_exploratory_geometric_simulation
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
@@ -20,12 +20,16 @@ implemented:
   - "Input/source hashes, partial outcomes and repeatable JSON reports"
   - "Eight prospective protocols and shared statistical design"
   - "Seeded paired geometric conditions, disjoint family partitions and hash manifests"
+  - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
+  - "MkDocs source staging and GitHub Pages workflow (deployment unverified)"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
   policy_visibility: known_geometry_oracle_not_unknown_surface_perception
   collected_research_dataset: absent
   seeded_conditions: exploratory_generator_only
+  instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
+  pages_deployment: unverified_requires_pages_source_and_successful_workflow
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   physical_robot_adapter: not_implemented
@@ -44,6 +48,8 @@ verification_commands:
   - "python scripts/validate.py"
   - "rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json"
   - "rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions"
+  - "rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json"
+  - "python scripts/build_docs.py && python -m mkdocs build --strict"
 publication_portfolio:
   status: eight_candidate_studies_not_submitted
   protocol_index: experiments/README.md

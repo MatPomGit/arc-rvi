@@ -21,7 +21,7 @@ wrong object.
 
 ## Initial deterministic reference methods
 
-The planned fixture-level API accepts **precomputed, normalized distances**
+The implemented fixture-level API accepts **precomputed, normalized distances**
 in \([0,1]\). They are not extracted from images by ARC-RVI.
 
 | Method | Lower-is-better score | Meaning |
@@ -40,6 +40,29 @@ The scores intentionally encode the ranking problem but not vision, temporal
 association, perspective projection, identity embeddings, occlusion handling,
 camera calibration or sensor uncertainty. Better performance on constructed
 scores cannot establish the proposed scientific fusion hypothesis.
+
+## Reproduce the software fixture
+
+From the repository root, after `python -m pip install -e .`:
+
+```bash
+rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json
+```
+
+The input is a versioned JSON fixture with `schema_version`,
+`evidence_type: fixture`, a suite identifier, `threshold`,
+`ambiguity_margin` and a nonempty `requests` array.
+Each request has a unique `request_id`, evaluator-only
+`ground_truth_id` (nullable) and candidate records with `id`,
+`visual_distance` and `spatial_distance`. IDs must be unique within
+each request. The parser rejects duplicate JSON keys, NaN, Infinity,
+nonfinite or out-of-range scores and unexpected schema fields.
+
+The report records the original fixture-byte SHA-256, package source hashes,
+one prediction per method/request, explicit abstention reasons, and risk
+denominators including absent-target requests. The output file is never
+overwritten. The three-request hand-check demonstrates arithmetic and
+error handling only; it is not a sample for inference.
 
 ## Research outcomes
 
