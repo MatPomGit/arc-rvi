@@ -1,0 +1,98 @@
+# Planar geometric simulation
+
+Application version: 1.2.0
+
+```bash
+rvi simulate --scene simulation/worlds/planar_inspection.json --output results/simulation.json
+```
+
+The command evaluates the supplied route and writes a reproducible JSON report.
+Existing output files are preserved. Invalid scenes exit with code 2. A rejected
+route action is recorded in the report; the command still exits successfully.
+
+## Model and interface
+
+`PlanarSimulator` implements `SimulatorAdapter`: `reset()` restores the initial pose
+and counters, and `acquire(CameraPose)` requests one move/turn/capture action.
+Observations contain the actual pose, visible patch IDs, cumulative simulated time,
+cumulative travel and any rejection reason. No device connection is opened.
+The external physics connector `connect_simulator()` remains unavailable.
+
+The model identifier is `planar_geometry_kinematics_v1`. World coordinates use metres:
++x is forward at yaw zero, +y is left, and positive yaw rotates counterclockwise.
+Pose yaw and patch outward-normal angles use radians in `[-pi, pi]`.
+The camera is located at the centre of a circular robot footprint.
+
+Each action translates along a straight segment at constant linear speed, rotates
+through the shortest yaw change at constant angular speed, then captures.
+Translation, rotation and capture occur sequentially. The circular footprint does
+not change during rotation. Movement is holonomic; there are no steering, gait,
+stability, acceleration or articulated-body constraints.
+
+## Visibility and coverage
+
+Each surface patch has a representative point, outward normal and positive area weight.
+A patch is visible when all these conditions hold:
+
+- Its point is within the inclusive camera minimum and maximum range.
+- Its bearing is within half the horizontal field of view about the camera yaw.
+- Its outward normal faces the camera within `max_incidence_rad`.
+- The camera-to-point segment does not intersect a circular obstacle.
+
+A point coincident with the camera is not visible. Angular comparisons allow
+`1e-12` radians of numerical tolerance. Obstacle intersection includes tangency
+and expands the radius by `1e-10` metres for conservative numerical comparisons.
+Only explicit obstacles occlude; patch-to-patch self-occlusion is not represented.
+
+`sampled_surface_coverage` is the sum of area weights of observed patches divided
+by total declared area weight. Repeated observations count a patch once.
+Visibility of a representative point assigns its whole patch weight. This is a
+sampling approximation, not polygon clipping or an exact visible mesh-area measure.
+Refine the patch sampling before interpreting area estimates on a real surface.
+The model does not generate images, focus metrics, lighting or sensor noise.
+
+## Collision, budget and termination
+
+For motion, each circular obstacle is expanded by the robot footprint radius.
+The minimum distance from its centre to the entire move segment determines collision,
+including both endpoints. An intersecting initial footprint is an invalid scene.
+
+The simulator first checks whether the complete action fits the time budget, then
+checks its swept footprint. It rejects an action with `time_budget_exceeded` or
+`path_collision`. A rejected action consumes no partial distance or time and captures
+nothing. Previous accepted coverage remains. Reset before making another request.
+These are preflight rejections, not simulated impacts or partially executed motion.
+
+Time equals segment length / linear speed + shortest yaw change / angular speed
++ capture duration. An exact budget boundary is accepted, allowing at most eight
+floating-point ULPs of accumulated rounding slack. Reported time is not clamped.
+Elapsed time is model time, not measured CPU runtime.
+
+Route evaluation stops on the first rejection. `route_complete` means every supplied
+action was accepted. `coverage_complete` independently indicates that all declared
+patches were observed. An empty route completes with zero coverage and zero time.
+`status: completed` describes route execution, not successful inspection.
+
+## Scene and report
+
+The example scene specifies schema `1.0.0`, `evidence_type: simulation`, a start pose,
+camera parameters, motion parameters, obstacles, patches and a route.
+Unknown or missing fields, non-finite numbers, boolean numeric parameters, invalid
+ranges, nonpositive speeds/areas/radii and duplicate patch IDs are rejected.
+Robot radius and capture duration may be zero. The time budget may be zero.
+
+Each report records its scene SHA-256, model ID and shared package/runtime provenance.
+Each observation includes its step number, requested pose and actual pose.
+Input files and matching source snapshots are required to archive a reproducible run.
+The report is a deterministic model evaluation; it has no wall-clock timestamp or
+independent replicate ID. It does not implement the full experimental run contract.
+
+The included scene has patches of 1 and 3 square metres and one occluding circle.
+The initial capture observes only the first patch. Moving one metre laterally reveals
+the second. With 1 m/s travel and 1 s per capture, the route takes 3 s and travels 1 m.
+The analytic tests also check angle wrap, incidence/range boundaries, tangent occlusion,
+mid-segment collision, weighted coverage, partial outcomes and action timing.
+
+Next: generate paired scene conditions and connect candidate selection to geometric
+observations. Physics/sensor calibration is required before transferring this model
+to an articulated or physical robot study.

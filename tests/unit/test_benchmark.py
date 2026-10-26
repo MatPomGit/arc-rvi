@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -73,7 +74,7 @@ class BenchmarkTests(unittest.TestCase):
 
     def test_package_provenance_includes_new_modules(self):
         source = software_provenance()
-        self.assertEqual(source["package_version"], "1.1.0")
+        self.assertEqual(source["package_version"], tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"])
         self.assertIn("benchmark.py", source["package_files"])
         self.assertEqual(len(source["package_source_sha256"]), 64)
 

@@ -14,7 +14,7 @@ Independent research software for autonomous perception, mobile inspection, view
 
 - `src/rvi/`: shared research library; hardware adapters are separate.
 - `config/`: neutral configuration templates, not device credentials.
-- `simulation/`: scenario fixtures and future simulator environments.
+- `simulation/`: scenario fixtures and planar geometric worlds.
 - `experiments/exp01_...exp08_/`: eight independent research protocols.
 - `papers/paper01/...paper08/`: manuscripts and citation material.
 - `datasets/`: data governance; large/raw/private datasets live outside Git.
@@ -30,12 +30,15 @@ python -m pip install -e .
 python scripts/validate.py
 rvi plan --scenario simulation/scenarios/inspection_small.json --output results/plan.json
 rvi benchmark --suite simulation/suites/fixture_smoke.json --output results/benchmark.json
+rvi simulate --scene simulation/worlds/planar_inspection.json --output results/simulation.json
 ```
 
-The `plan` command operates on a **synthetic fixture**, not a real robot or physics simulator. It provides a reproducible baseline greedy coverage planner, not an optimality claim. Real robot and simulator integrations are intentionally not implemented yet.
+The `plan` command operates on a **synthetic fixture**, not a real robot or physics simulator. It provides a reproducible baseline greedy coverage planner, not an optimality claim. Real robot and external physics-engine integrations remain unavailable.
 
 The [paired benchmark](docs/benchmark.md) compares three deterministic planning methods
 and records partial coverage, route length, failures and source/input hashes.
+The [planar simulator](docs/simulation.md) computes visibility, swept-footprint collision
+and model time from a geometric scene and a supplied route.
 
 ## Research integrity
 
