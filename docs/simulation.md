@@ -1,6 +1,6 @@
 # Planar geometric simulation
 
-Application version: 1.2.0
+Application version: 1.3.0
 
 ```bash
 rvi simulate --scene simulation/worlds/planar_inspection.json --output results/simulation.json
@@ -93,6 +93,6 @@ the second. With 1 m/s travel and 1 s per capture, the route takes 3 s and trave
 The analytic tests also check angle wrap, incidence/range boundaries, tangent occlusion,
 mid-segment collision, weighted coverage, partial outcomes and action timing.
 
-Next: generate paired scene conditions and connect candidate selection to geometric
-observations. Physics/sensor calibration is required before transferring this model
+Candidate selection is connected through the [paired geometric benchmark](benchmark.md).
+Next: generate paired scene conditions and disjoint geometry families. Physics/sensor calibration is required before transferring this model
 to an articulated or physical robot study.
