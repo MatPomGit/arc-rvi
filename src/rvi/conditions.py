@@ -163,11 +163,37 @@ def generate_conditions(spec_path: Path, output_dir: Path) -> dict:
             "path": suite_relative, "sha256": _hash(suite_content),
         }
     files["manifest.json"] = _encoded(manifest)
-    # Validate/encode all files before creating the directory.
-    output_dir.mkdir(parents=True, exist_ok=False)
-    for relative, content in files.items():
-        destination = output_dir / relative
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        with destination.open("xb") as stream:
-            stream.write(content)
+    # Validate/encode all files before creating the directory. On write
+    # failure, remove only artifacts made by this invocation; never delete
+    # an existing result directory or unrelated files.
+    created_files: list[Path] = []
+    generated_dirs: set[Path] = set()
+    created_output = False
+    try:
+        output_dir.mkdir(parents=True, exist_ok=False)
+        created_output = True
+        for relative, content in files.items():
+            destination = output_dir / relative
+            parent = destination.parent
+            while parent != output_dir:
+                generated_dirs.add(parent)
+                parent = parent.parent
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("xb") as stream:
+                created_files.append(destination)
+                stream.write(content)
+    except BaseException:
+        if created_output:
+            for destination in reversed(created_files):
+                destination.unlink(missing_ok=True)
+            for directory in sorted(generated_dirs, key=lambda p: len(p.parts), reverse=True):
+                try:
+                    directory.rmdir()
+                except OSError:
+                    pass  # Never remove a directory with unrelated contents.
+            try:
+                output_dir.rmdir()
+            except OSError:
+                pass
+        raise
     return manifest
