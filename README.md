@@ -33,6 +33,7 @@ rvi benchmark --suite simulation/suites/fixture_smoke.json --output results/benc
 rvi simulate --scene simulation/worlds/planar_inspection.json --output results/simulation.json
 rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json
 rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions
+rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json
 ```
 
 The `plan` command operates on a **synthetic fixture**, not a real robot or physics simulator. It provides a reproducible baseline greedy coverage planner, not an optimality claim. Real robot and external physics-engine integrations remain unavailable.
@@ -56,3 +57,21 @@ The canonical [project state](PROJECT_STATE.yaml) lists current evidence and nex
 The [ARC plan](AUTOPILOT_PLAN.md) defines its portfolio role and proposed sensor interfaces.
 
 For contribution rules, see `AGENTS.md`.
+
+
+## Research documentation (MkDocs)
+
+The canonical documentation can be assembled into a navigable MkDocs site
+without duplicating the eight experiment protocols:
+
+```bash
+python -m pip install mkdocs==1.6.1
+python scripts/build_docs.py
+python -m mkdocs build --strict
+```
+
+The intended GitHub Pages URL is https://matpomgit.github.io/arc-rvi/.
+See [site publication instructions](docs/website.md) and the
+[Study 02 localization specification](docs/localization.md).
+Public availability depends on enabling GitHub Actions as the Pages source
+and observing a successful deploy; do not interpret the URL alone as proof.
