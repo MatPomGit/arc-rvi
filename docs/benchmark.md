@@ -1,6 +1,6 @@
 # Paired fixture benchmark
 
-Application version: 1.2.0
+Application version: 1.3.0
 
 ## Run
 
@@ -89,3 +89,30 @@ remain feasible; one makes the roof unreachable. The distance-aware method succe
 in two of three cases; the other methods in one of three. These deliberately constructed
 cases verify scoring and failure accounting. They do not estimate comparative research
 performance or provide confirmation data for study 01.
+
+## Paired geometric simulation
+
+```bash
+rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json
+```
+
+A simulation suite declares `schema_version: 1.0.0`, a `suite_id`,
+`evidence_type: simulation` and a nonempty `scenes` list of relative world paths.
+Each world's route is the common ordered candidate set, not a prescribed executed path.
+All three policies use the same start, camera, obstacles, surface patches and time budget.
+Candidate IDs follow input order. Duplicate scene IDs or files are rejected.
+
+Visibility is derived from the [geometric model](simulation.md), not supplied region labels.
+This baseline exposes known reference geometry to every method and reports
+`visibility_access: known_geometry_oracle`. It does not evaluate perception of an
+unknown surface. Greedy gains count uncovered patch IDs; distance scoring uses metres.
+The final metric weights acquired patches by declared area, not by the planner's count.
+Rotation and capture time are enforced by the simulator but are not in the greedy score.
+
+Only accepted acquisitions contribute coverage. Methods stop at full coverage or their
+first rejected action; exhausted candidates yield `unreachable_regions`.
+`completed` in these trial records means all patches were acquired, unlike the supplied-route
+execution status of `rvi simulate`. Summary denominators include failed trials.
+Reports retain per-scene hashes, actual observations, partial coverage, time and distance.
+The included far-first scene verifies a known budget trade-off, not comparative research merit.
+No random scene generation, inferential analysis or confirmation dataset is supplied yet.

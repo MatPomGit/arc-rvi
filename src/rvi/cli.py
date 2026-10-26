@@ -1,4 +1,4 @@
-"""Offline command-line baseline for synthetic inspection view planning."""
+"""Offline planning, paired comparison and geometric inspection simulation."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ def make_parser() -> argparse.ArgumentParser:
     plan = sub.add_parser("plan", help="plan candidate views from a synthetic JSON scenario")
     plan.add_argument("--scenario", required=True, type=Path)
     plan.add_argument("--output", required=True, type=Path)
-    benchmark = sub.add_parser("benchmark", help="compare three methods on paired fixtures")
+    benchmark = sub.add_parser("benchmark", help="compare three methods on paired fixtures or geometric scenes")
     benchmark.add_argument("--suite", required=True, type=Path)
     benchmark.add_argument("--output", required=True, type=Path)
     simulate = sub.add_parser("simulate", help="evaluate a route in a planar geometric scene")

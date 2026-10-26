@@ -1,0 +1,87 @@
+version: 1
+updated: "2026-10-26"
+purpose: "Canonical scientific and implementation status for arc-rvi and the ARC portfolio"
+repository:
+  canonical_branch: main
+  source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
+  software_version_source: pyproject.toml
+  software_version: 1.3.0
+  shared_code_root: src/rvi
+  experiment_root: experiments
+  manuscript_root: papers
+  research_programme: experiments/README.md
+  plan: AUTOPILOT_PLAN.md
+  documentation: README.md
+research_phase: geometric_simulation_and_prospective_protocols
+implemented:
+  - "Three deterministic coverage baselines and paired fixture evaluation"
+  - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
+  - "Paired simulation policy evaluation with geometry-derived oracle visibility"
+  - "Input/source hashes, partial outcomes and repeatable JSON reports"
+  - "Eight prospective protocols and shared statistical design"
+evidence_state:
+  fixtures: software_correctness_checks_only
+  planar_simulation: analytic_geometry_and_kinematics_checks_only
+  policy_visibility: known_geometry_oracle_not_unknown_surface_perception
+  collected_research_dataset: absent
+  external_physics_adapter: not_implemented
+  physical_robot_adapter: not_implemented
+  physical_measurements: absent
+  manuscripts: templates_not_results
+  literature_and_novelty_review: pending
+  confirmation_protocols: not_frozen_or_preregistered
+verification_history:
+  - source_tree_sha: "4ae7456aae602ecbf07a19cddeab19947d5a8ca6"
+    corresponding_main_commit: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
+    command: "python scripts/validate.py"
+    outcome: PASS
+    tests_passed: 57
+    scope: "Prior planar-simulation source tree; does not certify later revisions"
+verification_commands:
+  - "python scripts/validate.py"
+  - "rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json"
+publication_portfolio:
+  status: eight_candidate_studies_not_submitted
+  protocol_index: experiments/README.md
+  analysis_plan: experiments/analysis/README.md
+  lines:
+    - {id: P01, question: "Simulation benchmark robustness", protocol: experiments/exp01_benchmark/protocol.md}
+    - {id: P02, question: "Instance-level localization", protocol: experiments/exp02_localization/protocol.md}
+    - {id: P03, question: "Coupled feasible viewpoint and path planning", protocol: experiments/exp03_viewpoint_planning/protocol.md}
+    - {id: P04, question: "Coverage under incomplete geometry", protocol: experiments/exp04_active_coverage/protocol.md}
+    - {id: P05, question: "Acquisition repeatability", protocol: experiments/exp05_repeatability/protocol.md}
+    - {id: P06, question: "Quality-guided recovery", protocol: experiments/exp06_quality_control/protocol.md}
+    - {id: P07, question: "Simulation-to-physical prediction", protocol: experiments/exp07_transfer/protocol.md}
+    - {id: P08, question: "End-to-end documentation evaluation", protocol: experiments/exp08_field_validation/protocol.md}
+current_blockers:
+  - "Representative scene families, held-out partitions and seeded condition generation"
+  - "Frozen thresholds, baseline revisions and sample-size calculations"
+  - "Literature verification and distinct publication contributions"
+  - "Calibrated physical reference measurements and authorized equipment access"
+next_actions:
+  - order: 1
+    id: RVI01_CONDITIONS
+    action: "Add seeded scene-condition generation and disjoint geometry-family splits"
+    done_when: "Paired inputs and source/configuration hashes reproduce across methods without split leakage"
+  - order: 2
+    id: RVI02_PILOT
+    action: "Run a declared geometric-simulation pilot and implement clustered analysis"
+    done_when: "Independent units, failures and uncertainty are explicit; fixtures are excluded from confirmation evidence"
+  - order: 3
+    id: RVI03_CALIBRATION
+    action: "Select and validate physics/sensor models only when required by the frozen study"
+    done_when: "Coordinate, visibility, timing and sensor error models have independent reference checks"
+ai_handoff:
+  read_first: [AGENTS.md, PROJECT_STATE.yaml, AUTOPILOT_PLAN.md, experiments/README.md]
+  never_infer:
+    - "physical_robot_safety_or_sensor_performance_from_planar_geometry"
+    - "unknown_surface_perception_from_oracle_visibility"
+    - "scientific_superiority_from_the_hand_constructed_smoke_suite"
+    - "completed_research_from_protocol_or_manuscript_templates"
+portfolio_control:
+  manager: MatPomGit/research-autopilot
+  registry: registry/projects.json
+  state_authority: this_file_and_referenced_scientific_protocols
+  registration_authority: manager_registry_at_its_current_revision
+  operational_cost_policy: zero_paid_apis_local_or_authorized_self_hosted
+  execution_policy: "Registration does not add a trigger policy, schedule, deployment or robot permission"

@@ -31,6 +31,7 @@ python scripts/validate.py
 rvi plan --scenario simulation/scenarios/inspection_small.json --output results/plan.json
 rvi benchmark --suite simulation/suites/fixture_smoke.json --output results/benchmark.json
 rvi simulate --scene simulation/worlds/planar_inspection.json --output results/simulation.json
+rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json
 ```
 
 The `plan` command operates on a **synthetic fixture**, not a real robot or physics simulator. It provides a reproducible baseline greedy coverage planner, not an optimality claim. Real robot and external physics-engine integrations remain unavailable.
@@ -48,6 +49,7 @@ No client identities, proprietary data, credentials, real vehicle identifiers, r
 
 Start with the [research program](experiments/README.md), then read the study-specific
 protocol and [shared analysis plan](experiments/analysis/README.md).
-The [project state](docs/project-state.md) lists implemented features and the next work package.
+The canonical [project state](PROJECT_STATE.yaml) lists current evidence and next actions.
+The [ARC plan](AUTOPILOT_PLAN.md) defines its portfolio role and proposed sensor interfaces.
 
 For contribution rules, see `AGENTS.md`.

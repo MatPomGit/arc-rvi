@@ -17,6 +17,10 @@ This is an independently maintained academic research repository.
 - Do not run untrusted code on persistent hosts; do not enable paid hosted automation.
 - Develop in a feature branch and open a PR. Run local offline tests and review diffs before merge. Do not invent approvals or results.
 
+## Project state
+- Read `PROJECT_STATE.yaml` and `AUTOPILOT_PLAN.md` before continuing work.
+- Update canonical state after verified changes; do not copy state into parallel status files.
+
 ## Experiments and publications
 - Every experiment defines hypothesis, baselines, outcomes, independent sampling units, splits, provenance, failure criteria and analysis before data collection.
 - Avoid data leakage: when multiple images belong to the same physical object, use group-separated splits.
