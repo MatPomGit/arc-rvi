@@ -45,6 +45,8 @@ jobs:
           python-version: "3.12"
       - name: Install MkDocs
         run: python -m pip install --disable-pip-version-check mkdocs==1.6.1
+      - name: Offline software regression tests
+        run: python scripts/validate.py
       - name: Stage canonical sources
         run: python scripts/build_docs.py
       - name: Strict site build

@@ -3,7 +3,7 @@ site_description: Reproducible autonomous robotic visual inspection research
 site_url: https://matpomgit.github.io/arc-rvi/
 repo_url: https://github.com/MatPomGit/arc-rvi
 repo_name: MatPomGit/arc-rvi
-edit_uri: edit/main/
+edit_uri: '' # staged sources have different locations in Git
 docs_dir: .build/mkdocs-src
 site_dir: .build/site
 strict: true
