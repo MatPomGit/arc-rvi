@@ -1,31 +1,58 @@
 # Study 01: Reproducible Simulation Benchmark for Autonomous Robotic Visual Inspection
 
-**Status:** planned; no results or data collected by this repository.
+Protocol version: 1.1.0
 
-## Research question
-Can a diverse, repeatable benchmark expose robustness differences hidden by a single nominal scene?
+Status: prospective design, not preregistered or frozen
 
-## Pre-registered hypotheses
-- H0: Robustness ranking across baseline methods is unchanged by scenario diversity.
-- H1: Scenario diversity reveals reproducible method-by-condition differences.
+## Question and primary contrast
+Does scenario diversity expose a larger loss of task success than nominal testing?
+For each method, compare nominal success with success in a balanced challenge suite.
+The primary contrast is the difference in these losses between two frozen methods.
+Select the reference method on development data before the confirmation split is opened.
 
-## Baselines
-Single nominal scenario; randomized but undocumented scenario sampling.
+Proposed hypothesis: Challenge conditions cause different success degradation across the two frozen methods.
 
-## Primary endpoint
-Within-method success degradation across pre-specified conditions, with confidence intervals.
+## Design and baselines
+Use a nominal condition and a crossed challenge design: geometry family, occlusion,
+illumination and clutter. Define measurable levels in the simulator configuration,
+including visible surface fraction, light intensity and obstacle density.
+Use equal condition weights, independent scene draws and paired scenario seeds across methods.
+Reserve complete geometry families for confirmation; repeated seeds from one geometry
+remain in the same partition.
 
-## Design and independent unit
-Factorial synthetic scenes covering object geometry, occlusion, illumination and clutter; multiple independent seeds and held-out scenario families.
+Compare a fixed shot list, greedy coverage with a separate route, and the existing
+distance-penalized greedy baseline. Give each method the same candidate generator,
+observations, motion constraints and mission budget. For the planning-only benchmark,
+supply the correct target to every method and label identity assignment as controlled.
+Do not infer localization performance from these runs. Record any oracle information.
+An undocumented random sampler is not an acceptable experimental baseline.
 
-## Research controls
-- Freeze task definitions, baseline code and primary outcome before confirmation studies.
-- Stratify held-out objects and sessions; no train/test leakage across repeated images.
-- Replicate seeds and independently sampled scenarios; report negative trials too.
-- Choose sample size from pilot variance or an explicit power/precision calculation.
-- Version raw data, metadata, analysis code, calibration and commit hashes.
-- Document uncertainty, effect sizes, confidence intervals, multiple-comparison policy and limitations.
+## Endpoint and failure
+Define task success as correct target assignment, required valid coverage achieved,
+no collision or interlock violation, and completion within the frozen budget.
+Freeze the coverage threshold, quality tests and budget after the pilot.
+Success degradation is nominal success proportion minus challenge success proportion,
+in percentage points. Negative values are possible and must be retained.
+Also report each condition separately, route length, runtime and failure category.
 
-## Publication and data
-Corresponding manuscript: `papers/paper01/manuscript.tex`.
-A benchmark is publishable only after diverse external algorithms and tasks have been validated; fixture-only results are insufficient.
+## Unit, analysis and acceptance
+The independent unit is a generated scene instance, grouped by geometry family.
+Seeds are paired computational replicates, not independent physical objects.
+Estimate the paired difference in degradation with a family-clustered interval.
+Method-by-condition interactions and ranking changes are secondary analyses.
+If too few families support cluster inference, report descriptive estimates only.
+
+Before confirmation, implement scenario generation, simulator ground truth and all
+baselines; verify collision and coverage calculations on known geometries.
+A fixture suite can check the analysis pipeline but cannot establish simulator robustness.
+
+## Provenance and confirmation gate
+
+Apply the [shared analysis plan](../analysis/README.md) and
+[run-record contract](../../docs/reproducibility.md). Retain failures and deviations.
+Before confirmation, record numeric thresholds, sample-size justification, dataset
+partitions, exact baseline revisions and the analysis implementation in an immutable
+protocol release. No confirmation data may be used to tune these choices.
+
+Manuscript: [paper 01](../../papers/paper01/manuscript.tex).
+Publication boundaries: [research program](../README.md).

@@ -1,31 +1,53 @@
 # Study 04: Uncertainty-Aware Active Visual Coverage of Partially Unknown Objects
 
-**Status:** planned; no results or data collected by this repository.
+Protocol version: 1.1.0
 
-## Research question
-Does epistemic uncertainty improve next-view choice for incomplete 3-D surfaces?
+Status: prospective design, not preregistered or frozen
 
-## Pre-registered hypotheses
-- H0: Uncertainty-conditioned next-view selection does not reduce observations for matched coverage.
-- H1: Adaptive information-gain planning achieves target coverage with fewer costly views.
+## Question and primary contrast
+Does uncertainty-guided next-view selection reach a fixed coverage target at lower
+acquisition cost than a frozen next-best-view reference?
+Both methods start with the same partial observation and sensor budget.
 
-## Baselines
-Static coverage path; nearest unseen surface; classic next-best-view.
+Proposed hypothesis: Uncertainty-guided selection reduces budget-capped acquisition time at the frozen coverage threshold.
 
-## Primary endpoint
-Number and motion cost of accepted views to reach a pre-registered surface coverage threshold.
+## Design and baselines
+Use held-out shape families, controlled initial visible fractions and several
+occluder arrangements. Keep the true surface available only to the evaluator.
+Compare a static path, nearest unseen estimated surface, a specified geometric
+next-best-view method and uncertainty-guided selection.
+Freeze the reference acquisition function and its implementation before confirmation.
+Ablate uncertainty weighting and online surface updates independently.
+Keep uncertainty calibration data separate from evaluation shapes and sessions.
 
-## Design and independent unit
-Compare partially observed geometries and occlusions, with blind held-out shapes; measure calibration of uncertainty.
+## Endpoint and failure
+The primary endpoint is budget-capped time to first reach the true valid-coverage
+threshold. Use elapsed acquisition and movement time, not a freely weighted cost.
+For runs that never reach the target, assign the full time budget and record failure.
+This capped measure is a resource endpoint; it is not uncensored completion time.
+Report success probability, accepted view count and travelled distance separately.
 
-## Research controls
-- Freeze task definitions, baseline code and primary outcome before confirmation studies.
-- Stratify held-out objects and sessions; no train/test leakage across repeated images.
-- Replicate seeds and independently sampled scenarios; report negative trials too.
-- Choose sample size from pilot variance or an explicit power/precision calculation.
-- Version raw data, metadata, analysis code, calibration and commit hashes.
-- Document uncertainty, effect sizes, confidence intervals, multiple-comparison policy and limitations.
+Freeze threshold and budget after pilot sensitivity analysis. Compute true coverage
+from reference geometry. Log estimated online coverage separately to quantify premature
+stopping. Reaching an estimated threshold without reaching the true threshold is failure.
+Report uncertainty calibration against a defined surface-error event on held-out data.
 
-## Publication and data
-Corresponding manuscript: `papers/paper04/manuscript.tex`.
-Ground-truth surface coverage in simulation must be separated from estimated online coverage.
+## Unit, analysis and acceptance
+The independent unit is a shape/occlusion instance, clustered by shape family.
+Pair initial observations and noise streams across methods where causally compatible.
+Estimate paired capped-time differences with clustered intervals; give success and
+final coverage to interpret budget-capped failures.
+Before confirmation, check that hidden geometry cannot enter the planner, define
+physical reference-scan registration uncertainty, and validate stopping logic.
+Do not equate a heuristic score with epistemic uncertainty without a defined model.
+
+## Provenance and confirmation gate
+
+Apply the [shared analysis plan](../analysis/README.md) and
+[run-record contract](../../docs/reproducibility.md). Retain failures and deviations.
+Before confirmation, record numeric thresholds, sample-size justification, dataset
+partitions, exact baseline revisions and the analysis implementation in an immutable
+protocol release. No confirmation data may be used to tune these choices.
+
+Manuscript: [paper 04](../../papers/paper04/manuscript.tex).
+Publication boundaries: [research program](../README.md).

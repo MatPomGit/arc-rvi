@@ -1,31 +1,53 @@
 # Study 06: Closed-Loop Quality-Aware Image Acquisition for Autonomous Robotic Inspection
 
-**Status:** planned; no results or data collected by this repository.
+Protocol version: 1.1.0
 
-## Research question
-Can quality-aware reacquisition improve accepted coverage without excessive mission delay?
+Status: prospective design, not preregistered or frozen
 
-## Pre-registered hypotheses
-- H0: Quality-triggered resampling provides no benefit under matched motion/time budget.
-- H1: Closed-loop focus/exposure/coverage checks improve valid documentation completion.
+## Question and primary contrast
+Does quality-guided reacquisition increase valid surface coverage at a fixed mission
+time compared with quality-triggered retries that do not change viewpoint?
+This isolates recovery policy from the repeatability mechanism studied in study 05.
 
-## Baselines
-One-shot fixed views; fixed multiple exposures; quality-only retry without replanning.
+Proposed hypothesis: Quality-guided replanning increases valid coverage relative to same-view retries at the same time budget.
 
-## Primary endpoint
-Valid image-region coverage at a fixed mission-time budget.
+## Design and baselines
+Inject controlled focus, exposure and occlusion perturbations in held-out scenes.
+For physical trials, use measured perturbations within the approved operating envelope.
+Compare one-shot acquisition, fixed exposure brackets, same-view quality retries and
+quality-guided viewpoint replanning. Give all methods equal total mission time.
+Ablate focus, exposure and visibility feedback separately.
 
-## Design and independent unit
-Blind perturbations to focus, lighting and occlusion with tracked retry counts, failure rates and energy/time cost.
+Calibrate quality thresholds on development images using an independent reference
+criterion. The evaluator must not simply reuse the policy's own acceptance flag.
+Freeze processing scale and units for focus and exposure features; thresholds depend
+on that processing definition.
 
-## Research controls
-- Freeze task definitions, baseline code and primary outcome before confirmation studies.
-- Stratify held-out objects and sessions; no train/test leakage across repeated images.
-- Replicate seeds and independently sampled scenarios; report negative trials too.
-- Choose sample size from pilot variance or an explicit power/precision calculation.
-- Version raw data, metadata, analysis code, calibration and commit hashes.
-- Document uncertainty, effect sizes, confidence intervals, multiple-comparison policy and limitations.
+## Endpoint and failure
+The primary endpoint is area-weighted coverage whose images pass the frozen independent
+quality criterion by the deadline. Count a surface element once even after many retries.
+Report rejected-image rate, false acceptance, retry count, time and unresolved regions.
 
-## Publication and data
-Corresponding manuscript: `papers/paper06/manuscript.tex`.
-Quality feature computation and actual reacquisition are future integrations; threshold helper alone is not the method.
+Freeze retry limits, per-action timeouts and stopping policy before confirmation.
+Retry exhaustion, no reachable replacement view and deadline expiry are recorded failures.
+A missing or corrupted image contributes no valid coverage. Retain previous valid
+coverage after an abort and report the abort reason separately.
+Record every attempt, including failed attempts, to expose resource consumption.
+
+## Unit, analysis and acceptance
+The independent unit is an object/session scene, with paired perturbation schedules.
+Estimate paired valid-coverage differences with object/session clustering appropriate
+to the sampling design. Do not treat retries or frames as independent trials.
+Before confirmation, verify perturbation strength, evaluator calibration, action timing
+and retry accounting. The existing threshold helper is not an implemented feedback loop.
+
+## Provenance and confirmation gate
+
+Apply the [shared analysis plan](../analysis/README.md) and
+[run-record contract](../../docs/reproducibility.md). Retain failures and deviations.
+Before confirmation, record numeric thresholds, sample-size justification, dataset
+partitions, exact baseline revisions and the analysis implementation in an immutable
+protocol release. No confirmation data may be used to tune these choices.
+
+Manuscript: [paper 06](../../papers/paper06/manuscript.tex).
+Publication boundaries: [research program](../README.md).

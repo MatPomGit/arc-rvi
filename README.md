@@ -37,4 +37,10 @@ The `plan` command operates on a **synthetic fixture**, not a real robot or phys
 
 No client identities, proprietary data, credentials, real vehicle identifiers, raw imagery or confidential project documents are committed. Any article using external material must first clear its publication and licensing rights. Existing source code is subject to the repository's `LICENSE`; manuscript rights and third-party content must be reviewed separately.
 
+## Research development
+
+Start with the [research program](experiments/README.md), then read the study-specific
+protocol and [shared analysis plan](experiments/analysis/README.md).
+The [project state](docs/project-state.md) lists implemented features and the next work package.
+
 For contribution rules, see `AGENTS.md`.

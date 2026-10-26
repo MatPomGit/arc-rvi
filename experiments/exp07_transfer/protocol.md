@@ -1,31 +1,55 @@
 # Study 07: Closing the Sim-to-Real Gap in Autonomous Humanoid Visual Inspection
 
-**Status:** planned; no results or data collected by this repository.
+Protocol version: 1.1.0
 
-## Research question
-Which calibrated stochastic simulator factors predict real inspection performance?
+Status: prospective design, not preregistered or frozen
 
-## Pre-registered hypotheses
-- H0: Sensor/actuation calibration and targeted randomization do not improve physical transfer.
-- H1: Identifiable physical parameters with bounded randomization reduce real-world performance loss.
+## Question and primary contrast
+Does calibrated bounded randomization improve prediction of physical valid coverage
+compared with nominal simulation? Keep the inspection policy fixed in this study.
+Study 07 concerns predictive transfer, not a second evaluation of policy improvement.
 
-## Baselines
-Nominal simulation only; naive wide domain randomization; calibrated parameters without randomization.
+Proposed hypothesis: Calibrated bounded randomization reduces physical-coverage prediction error relative to nominal simulation.
 
-## Primary endpoint
-Real-vs-sim error in localization, coverage and run success on matched scenarios.
+## Design and baselines
+Separate physical sessions into calibration, model selection and held-out confirmation.
+Keep object instances and sessions disjoint between calibration and confirmation.
+Estimate camera, pose and actuation error distributions only on calibration sessions.
+Compare nominal simulation, predeclared wide randomization, calibrated deterministic
+parameters and calibrated bounded randomization. Give each the same simulation budget.
+Ablate sensor, localization and actuation error models separately.
 
-## Design and independent unit
-Use separate calibration and held-out physical sessions; ablate actuator, localization and camera error models.
+Create matched scenario descriptions from information available before the physical
+outcome is observed. Generate simulated predictions before opening held-out results.
+Freeze the number of simulator replicates per physical scenario; report Monte Carlo
+uncertainty separately from variation among physical sessions.
 
-## Research controls
-- Freeze task definitions, baseline code and primary outcome before confirmation studies.
-- Stratify held-out objects and sessions; no train/test leakage across repeated images.
-- Replicate seeds and independently sampled scenarios; report negative trials too.
-- Choose sample size from pilot variance or an explicit power/precision calculation.
-- Version raw data, metadata, analysis code, calibration and commit hashes.
-- Document uncertainty, effect sizes, confidence intervals, multiple-comparison policy and limitations.
+## Endpoint and failure
+The primary endpoint is absolute error between predicted mean valid coverage and
+observed physical valid coverage, computed per held-out matched scenario.
+Report signed error, prediction-interval coverage and interval width as secondary
+endpoints. Also report physical success, localization and timing discrepancies.
+Good predictive agreement does not itself demonstrate acceptable physical performance.
 
-## Publication and data
-Corresponding manuscript: `papers/paper07/manuscript.tex`.
-Requires sufficient robot access, safety sign-off and independently held-out physical trials.
+Physical aborts remain outcomes under the common coverage rule. Missing reference
+measurements are marked unavailable and counted; they are not replaced by simulator
+output. Explain any unmatched scenarios and report a sensitivity analysis.
+
+## Unit, analysis and acceptance
+The independent unit is a physical object/session scenario. Simulated replicates
+estimate its prediction and do not increase the physical sample size.
+Compare paired absolute errors with intervals clustered by physical session and object
+as required by the design. Freeze parameter identifiability checks, bounds, budget
+and held-out partition before confirmation. Requires a validated simulator, authorized
+robot access and reference measurements; fixtures cannot test transfer.
+
+## Provenance and confirmation gate
+
+Apply the [shared analysis plan](../analysis/README.md) and
+[run-record contract](../../docs/reproducibility.md). Retain failures and deviations.
+Before confirmation, record numeric thresholds, sample-size justification, dataset
+partitions, exact baseline revisions and the analysis implementation in an immutable
+protocol release. No confirmation data may be used to tune these choices.
+
+Manuscript: [paper 07](../../papers/paper07/manuscript.tex).
+Publication boundaries: [research program](../README.md).
