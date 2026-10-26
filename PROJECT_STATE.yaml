@@ -5,25 +5,28 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.3.0
+  software_version: 1.4.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
   documentation: README.md
-research_phase: geometric_simulation_and_prospective_protocols
+research_phase: seeded_exploratory_geometric_simulation
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
   - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
   - "Paired simulation policy evaluation with geometry-derived oracle visibility"
   - "Input/source hashes, partial outcomes and repeatable JSON reports"
   - "Eight prospective protocols and shared statistical design"
+  - "Seeded paired geometric conditions, disjoint family partitions and hash manifests"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
   policy_visibility: known_geometry_oracle_not_unknown_surface_perception
   collected_research_dataset: absent
+  seeded_conditions: exploratory_generator_only
+  independent_family_sample: not_established
   external_physics_adapter: not_implemented
   physical_robot_adapter: not_implemented
   physical_measurements: absent
@@ -40,6 +43,7 @@ verification_history:
 verification_commands:
   - "python scripts/validate.py"
   - "rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json"
+  - "rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions"
 publication_portfolio:
   status: eight_candidate_studies_not_submitted
   protocol_index: experiments/README.md
@@ -54,15 +58,15 @@ publication_portfolio:
     - {id: P07, question: "Simulation-to-physical prediction", protocol: experiments/exp07_transfer/protocol.md}
     - {id: P08, question: "End-to-end documentation evaluation", protocol: experiments/exp08_field_validation/protocol.md}
 current_blockers:
-  - "Representative scene families, held-out partitions and seeded condition generation"
+  - "Representative independent scene sampling, blinded confirmation partition and full crossed conditions"
   - "Frozen thresholds, baseline revisions and sample-size calculations"
   - "Literature verification and distinct publication contributions"
   - "Calibrated physical reference measurements and authorized equipment access"
 next_actions:
   - order: 1
     id: RVI01_CONDITIONS
-    action: "Add seeded scene-condition generation and disjoint geometry-family splits"
-    done_when: "Paired inputs and source/configuration hashes reproduce across methods without split leakage"
+    action: "Validate generated partitions end-to-end and freeze a separate confirmatory design"
+    done_when: "Independent benchmark replay is verified, then a distinct confirmatory protocol is frozen"
   - order: 2
     id: RVI02_PILOT
     action: "Run a declared geometric-simulation pilot and implement clustered analysis"
