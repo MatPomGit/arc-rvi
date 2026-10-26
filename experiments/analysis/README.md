@@ -1,8 +1,12 @@
 # Shared statistical analysis plan
 
-Version: 1.1.0
+Version: 1.2.0
 
-Status: prospective specification; analysis software is not implemented
+Status: prospective confirmation specification; an exploratory geometric pilot analyzer is available.
+The [pilot implementation](../../docs/pilot-analysis.md) uses family-level paired
+contrasts on the software-generated nominal/occluded geometry only. It cannot
+implement the broader confirmatory analysis until study conditions and sampling
+are frozen.
 
 ## Estimands and denominators
 
