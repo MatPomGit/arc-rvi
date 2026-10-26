@@ -5,7 +5,7 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.4.0
+  software_version: 1.5.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
@@ -29,7 +29,7 @@ evidence_state:
   collected_research_dataset: absent
   seeded_conditions: exploratory_generator_only
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
-  pages_deployment: unverified_requires_pages_source_and_successful_workflow
+  pages_deployment: verified_success_main_502127a3e906a162cf13764ef08b8d328a423c95
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   physical_robot_adapter: not_implemented
@@ -38,6 +38,13 @@ evidence_state:
   literature_and_novelty_review: pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "502127a3e906a162cf13764ef08b8d328a423c95"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 76
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40418374958"
+    scope: "Offline tests and MkDocs build on merged main; no scientific or physical validation"
   - source_tree_sha: "4ae7456aae602ecbf07a19cddeab19947d5a8ca6"
     corresponding_main_commit: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
     command: "python scripts/validate.py"

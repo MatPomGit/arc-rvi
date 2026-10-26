@@ -70,8 +70,8 @@ python scripts/build_docs.py
 python -m mkdocs build --strict
 ```
 
-The intended GitHub Pages URL is https://matpomgit.github.io/arc-rvi/.
-See [site publication instructions](docs/website.md) and the
+Documentation is published at https://matpomgit.github.io/arc-rvi/.
+See [publication instructions](docs/website.md) and the
 [Study 02 localization specification](docs/localization.md).
-Public availability depends on enabling GitHub Actions as the Pages source
-and observing a successful deploy; do not interpret the URL alone as proof.
+The initial deployment is verified by GitHub Actions run 40418374958;
+future changes must pass the strict site build before release.
