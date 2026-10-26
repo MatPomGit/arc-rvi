@@ -6,6 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
@@ -20,6 +21,9 @@ def make_parser() -> argparse.ArgumentParser:
     benchmark = sub.add_parser("benchmark", help="compare three methods on paired fixtures")
     benchmark.add_argument("--suite", required=True, type=Path)
     benchmark.add_argument("--output", required=True, type=Path)
+    simulate = sub.add_parser("simulate", help="evaluate a route in a planar geometric scene")
+    simulate.add_argument("--scene", required=True, type=Path)
+    simulate.add_argument("--output", required=True, type=Path)
     return parser
 
 
@@ -27,17 +31,18 @@ def main(argv: list[str] | None = None) -> int:
     parser = make_parser()
     arguments = parser.parse_args(argv)
     try:
-        if arguments.command == "benchmark":
+        if arguments.command in ("benchmark", "simulate"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
-            payload = run_benchmark(arguments.suite)
+            payload = (run_benchmark(arguments.suite) if arguments.command == "benchmark"
+                       else run_simulation(arguments.scene))
             serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
                                     indent=2, allow_nan=False) + "\n"
             arguments.output.parent.mkdir(parents=True, exist_ok=True)
             # Exclusive creation also prevents a late overwrite of an input or result.
             with arguments.output.open("x", encoding="utf-8") as stream:
                 stream.write(serialized)
-            print(f"Saved {len(payload['trials'])} fixture trials to {arguments.output}")
+            print(f"Saved {payload['evidence_type']} report to {arguments.output}")
             return 0
         if arguments.command == "plan":
             scenario, _ = load_scenario(arguments.scenario)

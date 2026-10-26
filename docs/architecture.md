@@ -13,7 +13,9 @@ acquisition, quality control and evidence generation via one adapter boundary.
 7. Store a versioned package of images, hashes, provenance and outcomes.
 
 Current implementation: deterministic planar greedy viewpoint baseline, mission
-state guards, threshold decisions on supplied measurements and file hashing.
+state guards, threshold decisions on supplied measurements, file hashing, paired fixture
+benchmarking and a planar geometric simulator. The simulator has a separate observation
+contract and never implements physical-device motion. See [the model](simulation.md).
 Not implemented: perception, motion control, image feature extraction, real
 camera capture, actual physics simulator integration and closed-loop operation.
 

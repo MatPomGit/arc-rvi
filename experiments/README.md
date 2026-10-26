@@ -38,8 +38,9 @@ support distinct scientific contributions. Novelty requires a verified literatur
 1. Fixture-level paired runner and scoring implemented in application 1.1.0.
    [Usage and limits](../docs/benchmark.md): hand-calculable successes, partial outcomes
    and failures reproduce exactly across three methods.
-2. Add the simulator adapter, reference surfaces and benchmark baselines.
-   Acceptance: documented coordinate, visibility, collision and timing checks pass.
+2. The [planar geometric adapter](../docs/simulation.md) now computes visibility,
+   collision and timing, with analytic checks. Next connect paired policies and condition
+   sampling. An external physics model still needs its own calibration and validation.
 3. Pilot studies 02 and 03 on the benchmark; add partial geometry for study 04.
    Acceptance: hold-out partitions are fixed and evaluator data cannot enter the methods.
 4. Calibrate physical acquisition for study 05; implement independent quality scoring
