@@ -8,6 +8,7 @@ from pathlib import Path
 import random
 import tempfile
 import unittest
+from unittest import mock
 
 from rvi.conditions import generate_conditions
 
@@ -78,6 +79,27 @@ class ConditionGenerationTests(unittest.TestCase):
             dup.write_text('{"schema_version":"1.0.0","schema_version":"1.0.0"}')
             with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
                 generate_conditions(dup, Path(temp) / "dup_output")
+
+    def test_write_failure_removes_only_new_artifacts(self):
+        original_open = Path.open
+
+        def fail_after_partial_generation(path, mode="r", *args, **kwargs):
+            if path.name == "pilot.json" and path.parent.name == "suites" and mode == "xb":
+                raise OSError("simulated storage failure")
+            return original_open(path, mode, *args, **kwargs)
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            output = root / "generated"
+            sentinel = root / "keep.txt"
+            sentinel.write_text("unrelated")
+            with mock.patch.object(Path, "open", fail_after_partial_generation):
+                with self.assertRaisesRegex(OSError, "simulated storage failure"):
+                    generate_conditions(SPEC, output)
+            self.assertFalse(output.exists())
+            self.assertEqual(sentinel.read_text(), "unrelated")
+            # The same target can be safely used after the failure.
+            self.assertEqual(len(generate_conditions(SPEC, output)["scenes"]), 36)
 
     def test_existing_output_is_untouched(self):
         with tempfile.TemporaryDirectory() as temp:
