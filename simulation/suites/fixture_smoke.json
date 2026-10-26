@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "suite_id": "paired_fixture_smoke",
+  "evidence_type": "fixture",
+  "max_travel_distance_m": 10.0,
+  "scenarios": [
+    "../scenarios/inspection_small.json",
+    "../scenarios/coverage_tradeoff.json",
+    "../scenarios/unreachable_region.json"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "scenario_id": "coverage_distance_tradeoff",
+  "evidence_type": "fixture",
+  "start_xy": [0.0, 0.0],
+  "required_regions": ["front", "rear"],
+  "viewpoints": [
+    {"id": "far_all", "x": 11.0, "y": 0.0, "regions": ["front", "rear"]},
+    {"id": "near_front", "x": 1.0, "y": 0.0, "regions": ["front"]},
+    {"id": "near_rear", "x": 2.0, "y": 0.0, "regions": ["rear"]}
+  ]
+}

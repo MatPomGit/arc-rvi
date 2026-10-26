@@ -35,8 +35,9 @@ support distinct scientific contributions. Novelty requires a verified literatur
 
 ## Implementation order and acceptance
 
-1. Implement study 01's fixture-level trial recorder, paired method runner and scoring.
-   Acceptance: hand-calculable successes, partial outcomes and failures reproduce exactly.
+1. Fixture-level paired runner and scoring implemented in application 1.1.0.
+   [Usage and limits](../docs/benchmark.md): hand-calculable successes, partial outcomes
+   and failures reproduce exactly across three methods.
 2. Add the simulator adapter, reference surfaces and benchmark baselines.
    Acceptance: documented coordinate, visibility, collision and timing checks pass.
 3. Pilot studies 02 and 03 on the benchmark; add partial geometry for study 04.

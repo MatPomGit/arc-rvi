@@ -4,7 +4,7 @@ Version: 1.1.0
 
 ## Run and trial records
 
-The following fields specify the proposed research record. No current CLI command
+The following fields specify the proposed research record. The [fixture benchmark](benchmark.md) implements a documented subset; no CLI command
 implements this complete contract. Keep private measurements and large assets outside Git.
 Use anonymous technical identifiers in public manifests.
 
