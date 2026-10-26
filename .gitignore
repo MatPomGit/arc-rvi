@@ -25,3 +25,5 @@ data/
 Thumbs.db
 .vscode/
 .idea/
+
+.build/

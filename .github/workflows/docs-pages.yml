@@ -1,0 +1,74 @@
+name: Documentation (MkDocs + Pages)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/docs-pages.yml"
+      - "mkdocs.yml"
+      - "scripts/build_docs.py"
+      - "docs/**"
+      - "experiments/**"
+      - "papers/**"
+      - "README.md"
+      - "AUTOPILOT_PLAN.md"
+      - "PROJECT_STATE.yaml"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/docs-pages.yml"
+      - "mkdocs.yml"
+      - "scripts/build_docs.py"
+      - "docs/**"
+      - "experiments/**"
+      - "papers/**"
+      - "README.md"
+      - "AUTOPILOT_PLAN.md"
+      - "PROJECT_STATE.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arc-rvi-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Validate and build documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install MkDocs
+        run: python -m pip install --disable-pip-version-check mkdocs==1.6.1
+      - name: Stage canonical sources
+        run: python scripts/build_docs.py
+      - name: Strict site build
+        run: python -m mkdocs build --strict
+      - name: Configure Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .build/site
+
+  deploy:
+    name: Publish GitHub Pages
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,40 @@
+site_name: ARC-RVI | Research documentation
+site_description: Reproducible autonomous robotic visual inspection research
+site_url: https://matpomgit.github.io/arc-rvi/
+repo_url: https://github.com/MatPomGit/arc-rvi
+repo_name: MatPomGit/arc-rvi
+edit_uri: edit/main/
+docs_dir: .build/mkdocs-src
+site_dir: .build/site
+strict: true
+theme:
+  name: mkdocs
+  locale: en
+nav:
+  - Home: index.md
+  - Research programme:
+      - Study index: experiments/README.md
+      - Study 01 - Benchmark: experiments/exp01_benchmark/protocol.md
+      - Study 02 - Localization: docs/localization.md
+      - Study 02 - Protocol: experiments/exp02_localization/protocol.md
+      - Study 03 - Viewpoint planning: experiments/exp03_viewpoint_planning/protocol.md
+      - Study 04 - Active coverage: experiments/exp04_active_coverage/protocol.md
+      - Study 05 - Repeatability: experiments/exp05_repeatability/protocol.md
+      - Study 06 - Quality control: experiments/exp06_quality_control/protocol.md
+      - Study 07 - Transfer: experiments/exp07_transfer/protocol.md
+      - Study 08 - Field evaluation: experiments/exp08_field_validation/protocol.md
+      - Shared analysis: experiments/analysis/README.md
+  - Software and models:
+      - Architecture: docs/architecture.md
+      - Paired benchmark: docs/benchmark.md
+      - Geometric simulator: docs/simulation.md
+      - Seeded conditions: docs/conditions.md
+      - Data interface: docs/data-interface.md
+  - Research integrity:
+      - Methodology: docs/methodology.md
+      - Reproducibility: docs/reproducibility.md
+      - Safety: docs/safety.md
+  - Project:
+      - Current state: docs/project-state.md
+      - Roadmap: AUTOPILOT_PLAN.md
+      - Documentation build: docs/website.md

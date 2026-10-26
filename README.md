@@ -56,3 +56,21 @@ The canonical [project state](PROJECT_STATE.yaml) lists current evidence and nex
 The [ARC plan](AUTOPILOT_PLAN.md) defines its portfolio role and proposed sensor interfaces.
 
 For contribution rules, see `AGENTS.md`.
+
+
+## Research documentation (MkDocs)
+
+The canonical documentation can be assembled into a navigable MkDocs site
+without duplicating the eight experiment protocols:
+
+```bash
+python -m pip install mkdocs==1.6.1
+python scripts/build_docs.py
+python -m mkdocs build --strict
+```
+
+The intended GitHub Pages URL is https://matpomgit.github.io/arc-rvi/.
+See [site publication instructions](docs/website.md) and the
+[Study 02 localization specification](docs/localization.md).
+Public availability depends on enabling GitHub Actions as the Pages source
+and observing a successful deploy; do not interpret the URL alone as proof.
