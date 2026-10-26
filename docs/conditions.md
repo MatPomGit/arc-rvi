@@ -13,6 +13,7 @@ Python 3.11+ and the standard library suffice:
 rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions
 rvi benchmark --suite results/study01_conditions/suites/development.json --output results/study01_development.json
 rvi benchmark --suite results/study01_conditions/suites/pilot.json --output results/study01_pilot.json
+rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json
 ```
 
 The generator refuses an existing output directory. Delete an **unneeded**
@@ -47,7 +48,8 @@ This design tests code pathways for reproducible scenarios, reporting and
 partition discipline. It neither implements illumination or clutter factors
 required by the prospective study protocol nor validates a physical sensor.
 Geometry families are chosen by hand; perturbations do not make them an
-independent population sample. Even the `holdout` partition is preliminary:
+independent population sample. The [pilot analyzer](pilot-analysis.md)
+validates paired provenance and performs descriptive family-level contrasts. Even the `holdout` partition is preliminary:
 freeze thresholds, sampling rules and baseline versions **before** opening
 confirmation data. Retain failures and perform family-clustered uncertainty
 analysis only after that protocol is finalized. See the
