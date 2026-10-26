@@ -9,6 +9,7 @@ from pathlib import Path
 from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
 from .conditions import generate_conditions
+from .pilot import analyze_pilot
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
 
@@ -28,6 +29,12 @@ def make_parser() -> argparse.ArgumentParser:
     conditions = sub.add_parser("conditions", help="generate paired study01 geometric scenes and split manifests")
     conditions.add_argument("--spec", required=True, type=Path)
     conditions.add_argument("--output-dir", required=True, type=Path)
+    pilot = sub.add_parser("pilot", help="exploratory family-clustered study01 pilot analysis")
+    pilot.add_argument("--manifest", required=True, type=Path)
+    pilot.add_argument("--output", required=True, type=Path)
+    pilot.add_argument("--reference", default="fixed_order", choices=("fixed_order", "greedy_coverage", "greedy_distance"))
+    pilot.add_argument("--comparator", default="greedy_distance", choices=("fixed_order", "greedy_coverage", "greedy_distance"))
+    pilot.add_argument("--seed", type=int, default=20261026)
     return parser
 
 
@@ -39,11 +46,15 @@ def main(argv: list[str] | None = None) -> int:
             manifest = generate_conditions(arguments.spec, arguments.output_dir)
             print(f"Saved {len(manifest['scenes'])} exploratory scenes to {arguments.output_dir}")
             return 0
-        if arguments.command in ("benchmark", "simulate"):
+        if arguments.command in ("benchmark", "simulate", "pilot"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
-            payload = (run_benchmark(arguments.suite) if arguments.command == "benchmark"
-                       else run_simulation(arguments.scene))
+            if arguments.command == "pilot":
+                payload = analyze_pilot(arguments.manifest, arguments.reference,
+                                        arguments.comparator, seed=arguments.seed)
+            else:
+                payload = (run_benchmark(arguments.suite) if arguments.command == "benchmark"
+                           else run_simulation(arguments.scene))
             serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
                                     indent=2, allow_nan=False) + "\n"
             arguments.output.parent.mkdir(parents=True, exist_ok=True)
