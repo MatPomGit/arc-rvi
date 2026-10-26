@@ -1,31 +1,59 @@
 # Study 08: Experimental Evaluation of Autonomous Humanoid Robots for Standardized Visual Documentation
 
-**Status:** planned; no results or data collected by this repository.
+Protocol version: 1.1.0
 
-## Research question
-How does autonomous acquisition compare with standardized manual documentation under controlled field conditions?
+Status: prospective design, not preregistered or frozen
 
-## Pre-registered hypotheses
-- H0: Autonomous inspection does not change completeness or between-operator variability at matched task requirements.
-- H1: Autonomous acquisition reduces variability while maintaining required coverage; time and intervention trade-offs are measured.
+## Question and primary contrast
+Is autonomous documentation non-inferior to standardized manual documentation in valid
+coverage, while changing variability, duration or intervention requirements?
+Non-inferiority concerns coverage only; do not infer equal speed or effort.
 
-## Baselines
-Human operator using the same shot list; automated static-plan robot where feasible.
+Proposed hypothesis: Autonomous coverage is no lower than manual coverage minus the justified non-inferiority margin.
 
-## Primary endpoint
-Proportion of required image regions meeting predefined quality criteria per independent object/session.
+## Design and baselines
+Use an object/session crossover with randomized balanced method order.
+Compare manual acquisition using the same required shot list, a static robot plan
+when feasible, and the integrated autonomous workflow.
+Use the same camera and quality criteria where feasible; record unavoidable setup
+differences. Cross several operators with several objects and sessions.
+Prevent operators from seeing earlier results before their own acquisition.
 
-## Design and independent unit
-Balanced randomized order, blinded assessment, distinct operators and objects; preregistered mixed-effects analysis and failure reasons.
+Assign coded acquisition packages to assessors blinded to method where possible.
+Remove method metadata and randomize package order. Record whether blinding was
+successful. Obtain independent duplicate ratings for a predeclared subset and report
+agreement under a frozen adjudication rule.
 
-## Research controls
-- Freeze task definitions, baseline code and primary outcome before confirmation studies.
-- Stratify held-out objects and sessions; no train/test leakage across repeated images.
-- Replicate seeds and independently sampled scenarios; report negative trials too.
-- Choose sample size from pilot variance or an explicit power/precision calculation.
-- Version raw data, metadata, analysis code, calibration and commit hashes.
-- Document uncertainty, effect sizes, confidence intervals, multiple-comparison policy and limitations.
+## Endpoint and failure
+The primary endpoint is the paired difference in valid required-region proportion:
+autonomous minus manual. Required regions have equal weight in this study's shot list;
+this endpoint differs from mesh-area coverage in studies 03, 04, 06 and 07.
+Freeze an absolute non-inferiority margin with task-based justification before collection.
+Claim non-inferiority only if the lower bound of the predeclared 95% interval exceeds
+minus that margin. Do not choose the margin from confirmation results.
 
-## Publication and data
-Corresponding manuscript: `papers/paper08/manuscript.tex`.
-A fully integrated physical system and ethics/safety/data approvals are needed before data collection.
+Timeouts, interventions and incomplete packages remain in the assigned-method analysis.
+Report valid regions actually acquired, mission completion, human intervention count
+and duration. A separate complete-case analysis is a sensitivity analysis only.
+
+## Unit, analysis and acceptance
+The independent unit is an object/session block; operators and repeated images are
+crossed or nested factors. Plan sample size for the margin and clustering after the
+pilot. Use a paired model that accounts for object, operator and period effects;
+freeze the exact model and missing-data rules before confirmation.
+
+Requires an integrated physical system, an approved operating procedure, data rights
+and an institutional determination of applicable human-participant requirements before
+operator recruitment. The main inference concerns end-to-end documentation, not the
+mechanistic effects assigned to earlier papers.
+
+## Provenance and confirmation gate
+
+Apply the [shared analysis plan](../analysis/README.md) and
+[run-record contract](../../docs/reproducibility.md). Retain failures and deviations.
+Before confirmation, record numeric thresholds, sample-size justification, dataset
+partitions, exact baseline revisions and the analysis implementation in an immutable
+protocol release. No confirmation data may be used to tune these choices.
+
+Manuscript: [paper 08](../../papers/paper08/manuscript.tex).
+Publication boundaries: [research program](../README.md).
