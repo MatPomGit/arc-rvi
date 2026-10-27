@@ -15,7 +15,6 @@ from pathlib import Path
 
 from .benchmark import run_benchmark
 from .evidence import software_provenance
-from .pilot import _check_hash
 from .scenarios import read_json
 from .viewpoints import METHODS
 
@@ -46,6 +45,15 @@ def _path(root: Path, relative: str) -> Path:
     if candidate.is_symlink():
         raise ValueError("symlinked input files are not permitted")
     return resolved
+
+
+def _check_hash(root: Path, record: dict) -> Path:
+    if not isinstance(record, dict) or not isinstance(record.get("sha256"), str):
+        raise ValueError("invalid input SHA-256 manifest record")
+    path = _path(root, record.get("path"))
+    if _sha(path.read_bytes()) != record["sha256"]:
+        raise ValueError("input SHA-256 mismatch")
+    return path
 
 
 def _validate_manifest(manifest_path: Path, partition: str) -> tuple[dict, dict, Path, str]:
@@ -167,6 +175,12 @@ def _validate_report(report: dict, selected: dict, evidence: str) -> None:
             value = trial.get(metric)
             if type(value) not in (float, int) or not math.isfinite(value) or value < 0:
                 raise ValueError("invalid numerical benchmark result")
+            if metric != "travel_distance_m" and value > 1:
+                raise ValueError("benchmark coverage fraction exceeds 1")
+        if evidence == "simulation":
+            model_time = trial.get("elapsed_time_s")
+            if type(model_time) not in (float, int) or not math.isfinite(model_time) or model_time < 0:
+                raise ValueError("invalid model elapsed time")
     if len(observed) != len(selected) * len(METHODS):
         raise ValueError("missing trial method pairs")
 
