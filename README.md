@@ -37,6 +37,7 @@ rvi localize --fixture simulation/suites/localization_fixture.json --output resu
 rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json
 rvi population --spec simulation/conditions/study01_population_pilot.json --output-dir results/study01_population
 rvi pilot --manifest results/study01_population/manifest.json --output results/study01_population_analysis.json
+rvi precision --spec simulation/conditions/study01_precision_sensitivity.json --output results/study01_precision.json
 ```
 
 The `plan` command operates on a **synthetic fixture**, not a real robot or physics simulator. It provides a reproducible baseline greedy coverage planner, not an optimality claim. Real robot and external physics-engine integrations remain unavailable.
@@ -52,6 +53,9 @@ retains failed trials and summarizes family-paired effects without claiming conf
 The [exploratory population sampler](docs/population.md) draws distinct synthetic
 geometry families with disjoint partitions and paired nominal/occluded conditions;
 it does not establish an independent physical sampling frame.
+The [sample-size sensitivity planner](docs/sample-size.md) computes illustrative
+independent-family counts from explicit SD, effect, precision and missingness
+assumptions; it is not a frozen confirmatory design.
 
 ## Research integrity
 
