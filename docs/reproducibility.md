@@ -58,6 +58,11 @@ thresholds and sample-size calculation under immutable revisions with hashes.
 A protocol draft in Git is not proof of public preregistration.
 Record any registration service and identifier only after registration actually occurs.
 
+For planned Unitree G1 EDU test sessions, include the exact hardware/EDU
+variant, installed actuator and sensor configuration, calibration, firmware/SDK
+versions, robot description/model revision, coordinate frames and safety-check
+receipt. A manufacturer model name alone does not establish reproducibility.
+
 Keep a complete environment record: OS, Python, dependencies, simulator version,
 robot firmware, sensor settings and calibration where applicable.
 A rerun must preserve inputs, pairing and scoring, then regenerate the same tables

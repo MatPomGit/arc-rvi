@@ -7,6 +7,7 @@ This is an independently maintained academic research repository.
 - The repository owner's name may appear where academically appropriate, including manuscript authorship and legitimate copyright notices. Bibliographic citations must remain accurate and preserve source authorship.
 - Do not import proprietary proposals, source code, datasets, confidential correspondence, screenshots or logos. Avoid actual registration numbers and identifiable people in synthetic fixtures.
 - Keep historical third-party license notices intact. Do not rewrite legal attribution to satisfy naming style.
+- **Explicit hardware-reference exception:** name the actual selected robot and vendor accurately in hardware configuration, study protocols and reproducibility records when needed. Keep generic algorithms, shared module identifiers and test fixtures vendor-neutral; selecting a robot does not enable its adapter or authorize motion.
 
 ## Engineering
 - Prefer small, testable modules, Python standard library and simple interfaces.

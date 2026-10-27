@@ -1,4 +1,15 @@
-# Template only. Hardware integration requires an approved adapter and safety review.
+# Declared reference platform only. No live hardware adapter or motion permission.
+reference_platform:
+  manufacturer: Unitree
+  model: G1 EDU
+  purpose: simulation_reference_and_planned_authorized_physical_tests
+  integration_status: not_implemented
+  exact_variant: not_verified
+  installed_sensors: not_verified
+  firmware_revision: not_recorded
+  sdk_revision: not_recorded
+# Existing conservative interface limits are placeholders, not rated G1 EDU limits.
+# Hardware integration requires independently validated models and a safety review.
 frame_id: map
 adapter: not_configured
 max_linear_speed_mps: 0.1

@@ -18,6 +18,12 @@ The controller maintains the portfolio index; scientific claims remain in this r
 | RVI-05 | End-to-end documentation comparison | Frozen margin, assessment rules and applicable physical/participant procedures |
 | RVI-06 | Publication readiness per study | Verified literature, distinct primary analysis and reproducible evidence |
 
+The reference robot for planned simulation-model validation and authorized
+physical tests is **Unitree G1 EDU** (`config/robot.yaml`). This selection
+does not enable hardware control or assert ownership of a specific variant.
+Retain vendor-neutral research algorithms and verify the particular robot,
+sensors, SDK, kinematics, coordinate frames and safety model before deployment.
+
 The software currently supports fixtures and planar geometric/kinematic simulation.
 Candidate visibility comes from known geometry. Physics, physical acquisition and
 unknown-geometry perception require separate implementations and validation.

@@ -10,6 +10,13 @@ Independent research software for autonomous perception, mobile inspection, view
 - Repeatable simulation and physical experiments, statistical analysis and publications.
 - Export of neutral images and metadata to external analytical systems. Defect classification is **out of scope**.
 
+**Reference test robot:** Unitree G1 EDU. This is a declared research-platform
+choice, not an implemented robot integration or confirmation of available
+hardware. The exact EDU variant, sensor payload and firmware must be verified
+before importing a robot model or conducting physical tests. Shared algorithms
+remain hardware-independent; see `config/robot.yaml`
+and [physical test safety gates](docs/safety.md).
+
 ## Repository map
 
 - `src/rvi/`: shared research library; hardware adapters are separate.

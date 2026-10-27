@@ -12,6 +12,15 @@ repository:
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
   documentation: mkdocs.yml
+reference_robot:
+  manufacturer: Unitree
+  model: G1 EDU
+  role: simulation_model_reference_and_future_authorized_physical_tests
+  config: config/robot.yaml
+  selection_status: declared
+  integration_status: not_implemented
+  exact_variant_and_sensor_payload: not_verified
+  firmware_sdk_and_calibration: not_recorded
 research_phase: exploratory_p01_factorial_scene_generation
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"

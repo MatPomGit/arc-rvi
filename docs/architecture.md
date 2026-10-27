@@ -19,5 +19,13 @@ contract and never implements physical-device motion. See [the model](simulation
 Not implemented: perception, motion control, image feature extraction, real
 camera capture, actual physics simulator integration and closed-loop operation.
 
+The baseline hardware target for forthcoming simulation-model integration and
+authorized physical validation is **Unitree G1 EDU**, as declared in
+`config/robot.yaml`. Keep this designation in the
+hardware configuration and experiment provenance, not hard-coded in planning,
+perception or evaluation algorithms. Import and validate the exact delivered
+variant's model, sensors, transforms, firmware and SDK before introducing a
+device adapter. Current planar tests are generic and are not G1 dynamics tests.
+
 External analytical models receive a neutral manifest and images; they do not
 control motion and are not embedded into this research code.
