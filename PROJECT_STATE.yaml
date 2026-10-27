@@ -23,7 +23,7 @@ implemented:
   - "Pilot-only paired geometric analysis with SHA-256 input checks and family aggregation"
   - "Additional seeded family-level synthetic geometry generator with disjoint experimental partitions"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
-  - "MkDocs source staging and GitHub Pages workflow (deployment unverified)"
+  - "MkDocs source staging and verified GitHub Pages deployment"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -33,7 +33,7 @@ evidence_state:
   pilot_analysis: fixed_templates_descriptive_and_sampled_model_exploratory_only
   sampled_families: synthetic_independent_model_draws_not_physical_population
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
-  pages_deployment: verified_success_main_502127a3e906a162cf13764ef08b8d328a423c95
+  pages_deployment: verified_success_main_b519aa122d13bab9cd3d030c6884e232bbfd4c38
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   physical_robot_adapter: not_implemented
@@ -42,6 +42,13 @@ evidence_state:
   literature_and_novelty_review: pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "b519aa122d13bab9cd3d030c6884e232bbfd4c38"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 87
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40456384157"
+    scope: "Merged v1.7.0 exploratory generator tests and published MkDocs; no inferential or physical validation"
   - corresponding_main_commit: "0b25bee674083549558c6e4a0cd61e3f3db8886f"
     command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
     outcome: PASS
