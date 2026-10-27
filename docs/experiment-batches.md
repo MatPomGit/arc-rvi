@@ -10,21 +10,21 @@ confirmation protocol. Remaining cross-study adapters belong to [Issue #16](http
 
 From the repository with an editable installation:
 
-\`\`\`bash
+```bash
 rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/conditions
 rvi batch --manifest results/conditions/manifest.json --partition pilot --output-dir results/study01_batch
 rvi batch --manifest results/conditions/manifest.json --partition pilot --output-dir results/study01_batch --resume
-\`\`\`
+```
 
 For a fixture correctness smoke suite, which is never treated as simulation
 evidence:
 
-\`\`\`bash
+```bash
 rvi batch --suite simulation/suites/fixture_smoke.json --output-dir results/fixture_batch
-\`\`\`
+```
 
-Create the parent \`results/\` directory locally before running these commands.
-The runner refuses existing directories except under \`--resume\`. Resume
+Create the parent `results/` directory locally before running these commands.
+The runner refuses existing directories except under `--resume`. Resume
 **revalidates** the selected input SHA-256 hashes, recomputes the benchmark,
 checks source provenance, receipt and stored artifact hashes. It never writes
 to an existing batch. A mismatched input, corrupted file or extra artifact
@@ -37,17 +37,17 @@ A batch creates three files:
 
 | File | Contract |
 | --- | --- |
-| \`trials.json\` | One row for each registered scene × method with pairing, nested replicate, group identity, condition, terminal status/failure reason, named metrics and model attempts |
-| \`summary.json\` | Independent family/fixture counts, denominators, per-method outcomes, terminal-status totals, model and evidence type |
-| \`receipt.json\` | Input and suite hashes, source/package provenance, artifact byte size/SHA-256, start/end UTC timestamps, missing seed-domain labels and output classification |
+| `trials.json` | One row for each registered scene × method with pairing, nested replicate, group identity, condition, terminal status/failure reason, named metrics and model attempts |
+| `summary.json` | Independent family/fixture counts, denominators, per-method outcomes, terminal-status totals, model and evidence type |
+| `receipt.json` | Input and suite hashes, source/package provenance, artifact byte size/SHA-256, start/end UTC timestamps, missing seed-domain labels and output classification |
 
-\`trials.json\` and \`summary.json\` are byte-for-byte deterministic for an
-unchanged source tree and input. \`receipt.json\` contains measured wall-clock
+`trials.json` and `summary.json` are byte-for-byte deterministic for an
+unchanged source tree and input. `receipt.json` contains measured wall-clock
 timestamps and is *not* byte-identical across separately executed batches.
 Model elapsed time is kept distinct from host wall time.
 
 There are no inferred sensor/method/analysis seeds: absent domains remain
-explicit \`null\` and are listed as uncertified. The source revision,
+explicit `null` and are listed as uncertified. The source revision,
 package-source SHA-256, Python version and environment identify software
 provenance, including local source edits. Neither resume nor hashes replace
 a secure external archival or registry/signature service.
@@ -62,10 +62,10 @@ The current source-level model still exposes known geometry to policy baselines;
 this is **oracle visibility**, not unknown-scene perception.
 
 Incomplete coverage and model action failures are retained, not dropped.
-The current underlying benchmark exposes \`completed\` and
-\`algorithm_failure\` as terminal states; the broader
-\`timeout\`/\`safety_abort\`/\`measurement_missing\`/
-\`infrastructure_failure\` vocabulary is reserved for later study adapters.
+The current underlying benchmark exposes `completed` and
+`algorithm_failure` as terminal states; the broader
+`timeout`/`safety_abort`/`measurement_missing`/
+`infrastructure_failure` vocabulary is reserved for later study adapters.
 A hard process crash does **not** generate a completed trial row. Those gaps,
 plus true runtime budgets, dedicated task-specific schemas, independent scene
 noise streams and secure sealed confirmation, remain outstanding.
