@@ -81,7 +81,7 @@ evidence_state:
   p02_sensor_association: single_scene_proxy_and_grouped_synthetic_pixel_and_range_association
   p02_population: seeded_synthetic_family_draws_descriptive_not_physically_independent
   p02_image_pilot: generated_gray8_8x8_pixel_arrays_not_measured_images_or_calibrated_recognition
-  pages_deployment: verified_success_main_3f65264d062f945c2d6c04e8a7f2abfacecf2773
+  pages_deployment: verified_success_main_b0cbdf0c6ad8c353c5b2e0f0ed3453cad7adde7f
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   robot_description_audit: static_urdf_structure_and_zero_joint_pose_only
@@ -95,6 +95,13 @@ evidence_state:
   literature_and_novelty_review: pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "b0cbdf0c6ad8c353c5b2e0f0ed3453cad7adde7f"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 153
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40558828107"
+    scope: "Study02 synthetic gray8 patch comparison and family-grouped exploratory replay; not real images, physical calibration or confirmation"
   - corresponding_main_commit: "3f65264d062f945c2d6c04e8a7f2abfacecf2773"
     command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
     outcome: PASS
