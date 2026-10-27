@@ -5,14 +5,14 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.11.0
+  software_version: 1.12.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
   documentation: mkdocs.yml
-research_phase: exploratory_synthetic_sensor_features
+research_phase: exploratory_p02_sensor_association
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
   - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
@@ -26,6 +26,7 @@ implemented:
   - "Study01 exploratory batch runner with immutable receipts, trials, metrics and resume verification"
   - "Study01 synthetic family-level Monte Carlo CI coverage/type-I/power and missingness sensitivity checks"
   - "Reusable planar sensor observation features and separate evaluator-only geometric truth"
+  - "Exploratory P02 bearing/range-proxy selection on generated anonymous features"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
   - "MkDocs source staging and verified GitHub Pages deployment"
 evidence_state:
@@ -41,6 +42,7 @@ evidence_state:
   cluster_monte_carlo: uncalibrated_synthetic_assumptions_only
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
   sensor_observations: uncalibrated_horizontal_1d_synthetic_features_only
+  p02_sensor_association: single_toy_scene_proxy_features_not_image_appearance_or_physical_localization
   pages_deployment: verified_success_main_08a62569d407bca3cdcb1646d3ceec4d9060182c
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
@@ -110,6 +112,7 @@ verification_commands:
   - "rvi power-mc --spec simulation/conditions/study01_cluster_mc.json --output results/study01_cluster_mc.json"
   - "rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json"
   - "python -m unittest tests.unit.test_perception"
+  - "rvi localize --sensor-study simulation/suites/localization_sensor_demo.json --output results/study02_sensor.json"
   - "python scripts/build_docs.py && python -m mkdocs build --strict"
 publication_portfolio:
   status: eight_candidate_studies_not_submitted
