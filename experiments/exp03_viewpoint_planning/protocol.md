@@ -90,3 +90,18 @@ testable difference: coupled feasible viewpoint/motion selection under a
 common validated motion budget, with explicit whole-body/stability checks.
 No novelty or improvement claim is established until reproducible
 method-by-method evaluation and full prior-art review.
+
+## Direct comparative baselines and reported evidence
+
+[Staderini et al. (IROS 2024)](https://doi.org/10.1109/IROS58592.2024.10802791)
+already combine camera geometry and robot kinematics for feasible inspection
+viewpoints. [Gemerek et al. (2022)](https://doi.org/10.1109/TRO.2022.3180628)
+address directional sensing with occlusions. The [Bettles et al. (2026)
+preprint](https://arxiv.org/abs/2603.16471) reports **physical trials** on a
+mobile manipulator in a confined pipe-network mock-up with online geometric
+estimation. In contrast, [Ghaleb et al. (2026)](https://doi.org/10.3390/machines14090980)
+report numerical and Gazebo testing, **not physical humanoid trials**.
+The primary proposed difference is a validated Unitree G1 EDU whole-body,
+balance-aware **coupled** viewpoint/motion plan under a common budget,
+not novelty for generic kinematics-aware view planning, NBV in clutter or
+hardware inspection. Full methods review remains outstanding.

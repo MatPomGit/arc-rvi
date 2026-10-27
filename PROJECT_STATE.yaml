@@ -5,7 +5,7 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.21.0
+  software_version: 1.22.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
@@ -66,7 +66,8 @@ implemented:
   - "MkDocs source staging and verified GitHub Pages deployment"
   - "Unverified four-draft literature intake preserved with eight-study claim/gate triage"
   - "Offline 79-row source DOI/numbering inventory with deterministic provenance and four manual external spot checks"
-  - "Cross-study stable DOI candidate catalogue and 10 externally checked bibliographic metadata records; preserves original draft citation mismatches"
+  - "Cross-study stable DOI candidate catalogue and 22 externally checked bibliographic metadata records; preserves original draft citation mismatches"
+  - "Critical prior-art appraisal of 12 P02-P08 candidate works with preprint/simulation/physical-evidence separation"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -97,7 +98,7 @@ evidence_state:
   physical_robot_adapter: not_implemented
   physical_measurements: absent
   manuscripts: templates_not_results
-  literature_and_novelty_review: doi_keyed_77_candidate_works_10_reviewed_metadata_61_unverified_doi_6_unresolved_no_doi_not_systematic_review
+  literature_and_novelty_review: doi_keyed_77_candidate_works_22_reviewed_metadata_49_unverified_doi_6_unresolved_no_doi_not_systematic_review
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
   - corresponding_main_commit: "4d902d78c1b2118ee6dcdaa8f803a66dac9bfb1d"
@@ -223,7 +224,7 @@ current_blockers:
   - "Natural-image appearance, independently repeated sessions, measured camera and pose calibration for P02"
   - "Frozen thresholds, baseline revisions and sample-size calculations"
   - "Literature verification and distinct publication contributions"
-  - "Reconstruct literature screening exports (1908 claimed retrievals vs 240 analyzed vs 79 matrix rows); recover 6 DOI-free works, verify 61 unchecked DOI works and inspect claim-level evidence across P01-P08"
+  - "Reconstruct literature screening exports (1908 claimed retrievals vs 240 analyzed vs 79 matrix rows); recover 6 DOI-free works, verify 49 unchecked DOI works and inspect full methods and claims across P01-P08"
   - "Calibrated physical reference measurements and authorized equipment access"
   - "Identify actual G1 EDU mode_machine, URDF joint layout and measured sensor mount"
 next_actions:

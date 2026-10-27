@@ -37,6 +37,7 @@ nav:
       - Data interface: docs/data-interface.md
   - Research integrity:
       - Literature evidence and publication gates: docs/literature.md
+      - Critical prior-art appraisal: docs/prior-art-critical.md
       - Methodology: docs/methodology.md
       - Reproducibility: docs/reproducibility.md
       - Safety: docs/safety.md

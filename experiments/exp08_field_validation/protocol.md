@@ -81,3 +81,17 @@ claims of the first human-versus-automation inspection study are not justified.
 The distinct intended test is physical, paired, assessor-blinded inspection
 **documentation** against manual capture, with a frozen noninferiority margin,
 common tasks and independent reference quality metrics.
+
+## Actual field precedents and boundary of manual comparison
+
+[Kim et al. (2022)](https://doi.org/10.3390/drones6110355) report a bridge
+inspection field comparison of human inspection with UAS acquisition;
+[Gehring et al. (2021)](https://doi.org/10.1007/978-981-15-9460-1_18)
+report **offshore field testing** of quadruped ANYmal;
+[Seppänen et al. (2022)](https://doi.org/10.1007/s10846-022-01711-3)
+report mobile-robot prototype comparisons for delay-affected
+**teleoperation** rather than assessor-blinded image documentation.
+These precedents preclude general 'first physical robotic inspection' or
+'first human comparison' claims. The proposed original endpoint, if
+validated, is balanced manual versus humanoid **documentation quality**
+under a frozen noninferiority margin and independent judges.

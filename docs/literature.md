@@ -95,11 +95,11 @@ the inclusion criteria, exact overlap or deduplication.
 | [10.1016/j.cacaie.2026.100007](https://doi.org/10.1016/j.cacaie.2026.100007) | *Toward next-generation autonomous structural health monitoring and inspection with humanoid robots*, Wang et al. (2026), publisher page checked | **Material prior art**: RoboInspect reports two physical humanoid inspection case studies; P03/P08 novelty must be narrower than “first humanoid inspection” |
 | [10.7717/peerj.7086](https://pubmed.ncbi.nlm.nih.gov/31328028/) | Ehinger et al. (2019), *PeerJ*: DOI/title checked against PubMed | A test battery for Pupil Labs/EyeLink eye-tracking, not an autonomous robotic inspection benchmark |
 
-The external spot checks cover only these **four individual DOI records**,
+The earlier external spot checks covered only those **four individual DOI records**,
 not the full matrix, all abstracts or any reported quantitative gap rate.
 Do not label the entire bibliography verified based on this table.
 
-## DOI-keyed work catalogue and metadata gate (v1.21)
+## DOI-keyed work catalogue and metadata gate (v1.22)
 
 The machine-readable catalogue **replaces ambiguous bracket numbers in the
 working index**, but **does not silently rewrite the four original drafts**.
@@ -132,21 +132,21 @@ One reviewed alias corrects the P03 matrix's trailing `/pdf`
 repository. Original matrix text remains untouched.
 
 **Current source-derived catalogue:** 79 mentions map to **77 distinct
-candidate keys**: **10 checked-metadata DOI works**, **61 unchecked DOI
+candidate keys**: **22 checked-metadata DOI works**, **49 unchecked DOI
 works** and **6 unresolved DOI-free records**. Two DOI records occur
 twice across studies. The pre-existing **64 legacy number↔DOI conflicts**
 remain documented as defects of the input drafts; the new stable keys bypass
 them in downstream indexing rather than pretending that the draft has been
 repaired.
 
-The curated metadata manifest is
+The 22-record curated metadata manifest is
 [`research/literature/verified_doi_metadata.json`](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/verified_doi_metadata.json).
 Its DOI, title, venue/year, editorial relevance, verification date and
 source URLs are reviewed inputs. The catalogue rejects malformed metadata,
 ambiguous correction aliases and reviewed DOIs missing from the matrix.
 Both the raw drafts and curated manifest are SHA-256 pinned in the report.
 
-### Ten matrix DOI records checked against external bibliographic pages
+### Initial ten matrix DOI records checked against external bibliographic pages
 
 | Study | DOI | Bibliographic record / primary relevance |
 | --- | --- | --- |
@@ -161,12 +161,12 @@ Both the raw drafts and curated manifest are SHA-256 pinned in the report.
 | P06 | [10.1109/tro.2020.2985597](https://snu.elsevierpure.com/en/publications/proactive-camera-attribute-control-using-bayesian-optimization-fo/) | Kim et al., 2020; proactive camera attribute control for navigation |
 | P04 | [10.1109/icra.2018.8461098](https://dblp.org/rec/conf/icra/BorderG018.html) | Border et al., 2018, Surface Edge Explorer, checked via bibliographic index |
 
-**Limit:** these ten records verify *bibliographic identification* against
+**Limit:** these initial ten records verify *bibliographic identification* against
 a named external page, not experimental validity, data independence,
 replication, novelty, a full abstract-by-abstract review or search
 completeness. A separate older checked eye-tracker DOI
 (`10.7717/peerj.7086`) appears in the appended reference list but
-**not** the 79-row evidence matrix; it is not part of the ten-item
+**not** the 79-row evidence matrix; it is not part of the 22-item
 working catalogue.
 
 ### Methodological consequences
@@ -186,6 +186,11 @@ working catalogue.
 Before writing any verified scientific claim, inspect the source's
 methods and measurements separately, not just the DOI metadata.
 The claimed 1,908→240 screening flow remains **unreconstructed**.
+
+For detailed comparison of new directly competing publications, see the
+[critical prior-art appraisal](prior-art-critical.md). This separates
+bibliographic metadata from reported experimental evidence and changes
+P02/P03/P04/P06/P08 novelty boundaries.
 
 ## Research directions and evidence thresholds
 
