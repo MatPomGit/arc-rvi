@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "verification_date": "2026-10-27",
-  "verification_scope": "publisher_or_institutional_metadata_only_no_full_article_claim_verification",
+  "verification_scope": "publisher_institutional_bibliographic_or_preprint_metadata_not_full_article_claim_verification",
   "records": [
     {
       "doi": "10.1007/s11263-021-01469-5",
@@ -113,6 +113,138 @@
       "source_url": "https://dblp.org/rec/conf/icra/BorderG018.html",
       "source_kind": "bibliographic_index",
       "relevance": "P04: next-best-view planning from observations, not robot G1 physical validation",
+      "aliases": []
+    },
+    {
+      "doi": "10.1109/3dv.2018.00015",
+      "title": "Fusion++: Volumetric Object-Level SLAM",
+      "first_author": "John McCormac",
+      "year": 2018,
+      "venue": "2018 International Conference on 3D Vision (3DV)",
+      "source_url": "https://ieeexplore.ieee.org/document/8490953/",
+      "source_kind": "publisher",
+      "relevance": "P02: object-level RGB-D SLAM and instance mapping, not session-held-out inspection identity assignment",
+      "aliases": []
+    },
+    {
+      "doi": "10.48550/arxiv.2509.14966",
+      "title": "RoboEye: Enhancing 2D Robotic Object Identification with Selective 3D Geometric Keypoint Matching",
+      "first_author": "Xingwu Zhang",
+      "year": 2025,
+      "venue": "arXiv preprint",
+      "source_url": "https://arxiv.org/abs/2509.14966",
+      "source_kind": "preprint_repository",
+      "relevance": "P02: selective appearance/geometry re-ranking in clutter; not evidence of calibrated robot inspection pose",
+      "aliases": []
+    },
+    {
+      "doi": "10.1109/iros58592.2024.10802791",
+      "title": "Visual Quality Inspection Planning: A Model-Based Framework for Generating Optimal and Feasible Inspection Poses",
+      "first_author": "Vanessa Staderini",
+      "year": 2024,
+      "venue": "IEEE/RSJ International Conference on Intelligent Robots and Systems",
+      "source_url": "https://publications.ait.ac.at/en/publications/visual-quality-inspection-planning-a-model-based-framework-for-ge/",
+      "source_kind": "institutional_repository",
+      "relevance": "P03: model-based feasible inspection poses integrating camera geometry and robot kinematics; prior simulations and experiments",
+      "aliases": []
+    },
+    {
+      "doi": "10.3390/machines14090980",
+      "title": "Feasibility-Aware Visibility-Risk Navigation for Mobile Robots in Industry 4.0: Visual Servoing, CBF Safety Filtering, and Bounded ELR Replanning",
+      "first_author": "Atef M. Ghaleb",
+      "year": 2026,
+      "venue": "Machines",
+      "source_url": "https://www.mdpi.com/2075-1702/14/9/980",
+      "source_kind": "publisher",
+      "relevance": "P03: collision/visibility-risk trade-offs evaluated in numerical and Gazebo trials, not a physical humanoid execution result",
+      "aliases": []
+    },
+    {
+      "doi": "10.1109/tro.2022.3180628",
+      "title": "Directional Sensor Planning for Occlusion Avoidance",
+      "first_author": "Jake Gemerek",
+      "year": 2022,
+      "venue": "IEEE Transactions on Robotics",
+      "source_url": "https://dblp.org/rec/journals/trob/GemerekFCLZWF22.html",
+      "source_kind": "bibliographic_index",
+      "relevance": "P03: line-of-sight and field-of-view constrained directional sensing, not a bipedal stability experiment",
+      "aliases": []
+    },
+    {
+      "doi": "10.48550/arxiv.2603.16471",
+      "title": "Coverage First Next Best View for Inspection of Cluttered Pipe Networks Using Mobile Manipulators",
+      "first_author": "Joshua Raymond Bettles",
+      "year": 2026,
+      "venue": "arXiv preprint",
+      "source_url": "https://arxiv.org/abs/2603.16471",
+      "source_kind": "preprint_repository",
+      "relevance": "P03/P04: source reports experiments with a mobile manipulator and stochastic geometric constraints in a confined pipe-network mock-up; not a humanoid test",
+      "aliases": []
+    },
+    {
+      "doi": "10.1016/j.rcim.2023.102619",
+      "title": "Predictive exposure control for vision-based robotic disassembly using deep learning and predictive learning",
+      "first_author": "Wupeng Deng",
+      "year": 2024,
+      "venue": "Robotics and Computer-Integrated Manufacturing",
+      "source_url": "https://www.sciencedirect.com/science/article/pii/S0736584523000947",
+      "source_kind": "publisher",
+      "relevance": "P06: real-time exposure tuning for vision-based disassembly, not independent inspection coverage",
+      "aliases": []
+    },
+    {
+      "doi": "10.3390/s22249641",
+      "title": "Automated Camera Exposure Control for Accuracy-Enhanced Stereo-Digital Image Correlation Measurement",
+      "first_author": "Xiaoying Zhang",
+      "year": 2022,
+      "venue": "Sensors",
+      "source_url": "https://www.mdpi.com/1424-8220/22/24/9641",
+      "source_kind": "publisher",
+      "relevance": "P06: synchronized stereo-DIC measurement exposure, not a robotic navigation or inspection recovery study",
+      "aliases": []
+    },
+    {
+      "doi": "10.1109/iros40897.2019.8968590",
+      "title": "Camera Exposure Control for Robust Robot Vision with Noise-Aware Image Quality Assessment",
+      "first_author": "Ukcheol Shin",
+      "year": 2019,
+      "venue": "IEEE/RSJ International Conference on Intelligent Robots and Systems",
+      "source_url": "https://dblp.org/rec/conf/iros/ShinPSRK19.html",
+      "source_kind": "bibliographic_index",
+      "relevance": "P06: exposure/gain control optimizing gradient entropy noise for robotic vision; not inspection-time quality recovery",
+      "aliases": []
+    },
+    {
+      "doi": "10.3390/drones6110355",
+      "title": "A Comparative Study of Bridge Inspection and Condition Assessment between Manpower and a UAS",
+      "first_author": "In-Ho Kim",
+      "year": 2022,
+      "venue": "Drones",
+      "source_url": "https://www.mdpi.com/2504-446X/6/11/355",
+      "source_kind": "publisher",
+      "relevance": "P08: physical bridge comparison against human inspectors using unmanned aerial system, not humanoid acquisition",
+      "aliases": []
+    },
+    {
+      "doi": "10.1007/978-981-15-9460-1_18",
+      "title": "ANYmal in the Field: Solving Industrial Inspection of an Offshore HVDC Platform with a Quadrupedal Robot",
+      "first_author": "Christian Gehring",
+      "year": 2021,
+      "venue": "Field and Service Robotics (Springer Proceedings in Advanced Robotics)",
+      "source_url": "https://link.springer.com/chapter/10.1007/978-981-15-9460-1_18",
+      "source_kind": "publisher",
+      "relevance": "P08: actual offshore quadrupedal robot inspection field tests; not a humanoid or manual noninferiority study",
+      "aliases": []
+    },
+    {
+      "doi": "10.1007/s10846-022-01711-3",
+      "title": "Comparison of Semi-autonomous Mobile Robot Control Strategies in Presence of Large Delay Fluctuation",
+      "first_author": "Alvari Seppänen",
+      "year": 2022,
+      "venue": "Journal of Intelligent & Robotic Systems",
+      "source_url": "https://link.springer.com/article/10.1007/s10846-022-01711-3",
+      "source_kind": "publisher",
+      "relevance": "P08: physical prototype semi-autonomous teleoperation with time-delay perturbations, not image acquisition quality or manual inspection equivalence",
       "aliases": []
     }
   ]
