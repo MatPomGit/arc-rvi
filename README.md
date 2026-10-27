@@ -37,6 +37,7 @@ rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir resu
 rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json
 rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json
 rvi population --spec simulation/conditions/study01_population_pilot.json --output-dir results/study01_population
+rvi population --spec simulation/conditions/study01_factorial_pilot.json --output-dir results/study01_factorial
 rvi pilot --manifest results/study01_population/manifest.json --output results/study01_population_analysis.json
 rvi precision --spec simulation/conditions/study01_precision_sensitivity.json --output results/study01_precision.json
 rvi batch --suite simulation/suites/fixture_smoke.json --output-dir results/study01_fixture_batch
@@ -57,7 +58,8 @@ geometry families and matched nominal/occluded scenes with a SHA-256 manifest.
 The [exploratory paired pilot analysis](docs/pilot-analysis.md) checks input hashes,
 retains failed trials and summarizes family-paired effects without claiming confirmation.
 The [exploratory population sampler](docs/population.md) draws distinct synthetic
-geometry families with disjoint partitions and paired nominal/occluded conditions;
+geometry families with disjoint partitions, paired nominal/occluded conditions,
+and a separately versioned balanced 12-cell geometry/occlusion/light/clutter matrix;
 it does not establish an independent physical sampling frame.
 The [sample-size sensitivity planner](docs/sample-size.md) computes illustrative
 independent-family counts from explicit SD, effect, precision and missingness

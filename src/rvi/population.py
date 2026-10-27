@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import asdict
+from itertools import product
 import json
 import math
 from pathlib import Path
 import random
 
 from .conditions import CONDITIONS, PARTITIONS, VERSION, _encoded, _hash
+from .perception import SensorConfig
+from .scenarios import read_json
 
 DESIGN = "sampled_geometry_v1"
 DISTRIBUTION = {
@@ -22,6 +26,15 @@ DISTRIBUTION = {
 }
 MAX_FAMILIES = 128
 MAX_SCENES = 2048
+FACTORIAL_DESIGN = "sampled_factorial_v1"
+FACTOR_LEVELS = {
+    "occlusion": ("none", "moderate", "strong"),
+    "illumination": ("low", "reference"),
+    "clutter": ("none", "dense"),
+}
+OCCLUDER_RADIUS_M = {"none": 0.0, "moderate": 0.12, "strong": 0.32}
+ILLUMINATION_RELATIVE = {"low": 0.35, "reference": 1.0}
+
 
 
 def _pairs(entries):
@@ -72,10 +85,11 @@ def _seed(master_seed: int, *parts: object) -> int:
     return int.from_bytes(hashlib.sha256(value.encode("ascii")).digest()[:8], "big")
 
 
-def _family_layout(master_seed: int, family: str) -> tuple[tuple[float, float, float], ...]:
+def _family_layout(master_seed: int, family: str,
+                   patch_count: int | None = None) -> tuple[tuple[float, float, float], ...]:
     """One independent *pseudo-random model* draw per family, reused by replicates."""
     rng = random.Random(_seed(master_seed, family, "layout"))
-    count = rng.randint(2, 4)
+    count = rng.randint(2, 4) if patch_count is None else patch_count
     layout = []
     for index in range(count):
         center_y = -0.9 + 1.8 * index / (count - 1)
@@ -115,11 +129,193 @@ def _scene(family: str, repeat: int, replicate_seed: int, condition: str,
     }
 
 
+def _write_artifacts(output_dir: Path, payloads: dict[str, bytes]) -> None:
+    """Exclusively write new results and roll back only this call's artifacts."""
+    output_dir = Path(output_dir)
+    if output_dir.exists() or output_dir.is_symlink():
+        raise ValueError("output directory already exists")
+    written: list[Path] = []
+    directories: set[Path] = set()
+    created = False
+    try:
+        output_dir.mkdir(parents=True, exist_ok=False)
+        created = True
+        for relative, raw_file in payloads.items():
+            destination = output_dir / relative
+            parent = destination.parent
+            while parent != output_dir:
+                directories.add(parent)
+                parent = parent.parent
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("xb") as file:
+                written.append(destination)
+                file.write(raw_file)
+    except BaseException:
+        if created:
+            for path in reversed(written):
+                path.unlink(missing_ok=True)
+            for path in sorted(directories, key=lambda p: len(p.parts), reverse=True):
+                try:
+                    path.rmdir()
+                except OSError:
+                    pass
+            try:
+                output_dir.rmdir()
+            except OSError:
+                pass
+        raise
+
+
+def _factorial_spec(path: Path) -> tuple[dict, bytes]:
+    spec, raw = read_json(path)
+    required = {"schema_version", "study_id", "design", "master_seed",
+                "replicates_per_family", "family_counts", "factors"}
+    if not isinstance(spec, dict) or set(spec) != required:
+        raise ValueError("invalid factorial specification fields")
+    if (spec["schema_version"], spec["study_id"], spec["design"]) != (
+            VERSION, "01", FACTORIAL_DESIGN):
+        raise ValueError("unsupported factorial design")
+    if spec["factors"] != {key: list(levels)
+                          for key, levels in FACTOR_LEVELS.items()}:
+        raise ValueError("unsupported factorial levels or order")
+    seed, repeats, counts = (spec[key] for key in
+                             ("master_seed", "replicates_per_family", "family_counts"))
+    if type(seed) is not int or not 0 <= seed < 2**64:
+        raise ValueError("invalid factorial master_seed")
+    if type(repeats) is not int or not 1 <= repeats <= 4:
+        raise ValueError("factorial replicates must be in [1, 4]")
+    if not isinstance(counts, dict) or set(counts) != set(PARTITIONS):
+        raise ValueError("invalid factorial partitions")
+    if any(type(counts[split]) is not int or not 3 <= counts[split] <= 48
+           or counts[split] % 3 for split in PARTITIONS):
+        raise ValueError("family counts must be multiples of 3 in [3, 48]")
+    total = sum(counts.values())
+    cells = math.prod(len(levels) for levels in FACTOR_LEVELS.values())
+    if total > MAX_FAMILIES or total * repeats * cells > MAX_SCENES:
+        raise ValueError("factorial generation exceeds configured scene limit")
+    return spec, raw
+
+
+def _factorial_obstacles(scene: dict, occlusion: str, clutter: str) -> list[dict]:
+    """Occlude patch one and optionally add two nuisance discs near patch two."""
+    obstacles = []
+    target, candidate = scene["patches"][0], scene["route"][0]
+    radius = OCCLUDER_RADIUS_M[occlusion]
+    if radius:
+        obstacles.append({"x": target["x"] / 2,
+                          "y": (target["y"] + candidate["y"]) / 2,
+                          "radius_m": radius})
+    if clutter == "dense":
+        patch, view = scene["patches"][1], scene["route"][1]
+        for ratio in (0.4, 0.65):
+            obstacles.append({"x": patch["x"] * ratio,
+                              "y": view["y"] + ratio * (patch["y"] - view["y"]),
+                              "radius_m": 0.12})
+    return obstacles
+
+
+def _factor_sensor(seed: int, illumination: str) -> dict:
+    config = SensorConfig(640, ILLUMINATION_RELATIVE[illumination], 1, 1, 0,
+                          0.5, 0.01, 2, 0.05, 0, seed)
+    return {"schema_version": VERSION, "evidence_type": "simulation",
+            "calibration_state": "uncalibrated_synthetic", **asdict(config)}
+
+
+def _factorial_population(spec_path: Path, output_dir: Path) -> dict:
+    """Generate separate crossed pilot/development/holdout *synthetic* suites."""
+    spec, raw = _factorial_spec(spec_path)
+    members: dict[str, list[str]] = {}
+    index = 0
+    for split in PARTITIONS:
+        members[split] = []
+        for _ in range(spec["family_counts"][split]):
+            index += 1
+            members[split].append(f"factor_{index:04d}")
+    cells = []
+    for occlusion, illumination, clutter in product(*FACTOR_LEVELS.values()):
+        cell_id = f"o_{occlusion}__i_{illumination}__c_{clutter}"
+        cells.append((cell_id, {
+            "occlusion": occlusion, "illumination": illumination,
+            "clutter": clutter,
+        }))
+    manifest = {
+        "schema_version": VERSION, "study_id": "01",
+        "design": FACTORIAL_DESIGN, "evidence_type": "simulation",
+        "stage": "exploratory_not_confirmatory",
+        "visibility_access": "evaluator_only_when_sensor_mode_enabled",
+        "master_seed": spec["master_seed"],
+        "sensor_stream_seed": _seed(spec["master_seed"], "sensor_stream"),
+        "replicates_per_family": spec["replicates_per_family"],
+        "partitions": members, "factor_levels": spec["factors"],
+        "geometry_strata_patch_counts": [2, 3, 4],
+        "cells": [{"cell_id": cell, **factors} for cell, factors in cells],
+        "source_generator_sha256": _hash(Path(__file__).read_bytes()),
+        "spec_sha256": _hash(raw), "scenes": [], "suites": {},
+        "sensor_configs": {}, "holdout_state": "generated_not_blinded_or_frozen",
+    }
+    payloads: dict[str, bytes] = {}
+    for illumination in FACTOR_LEVELS["illumination"]:
+        relative = f"sensors/{illumination}.json"
+        encoded = _encoded(_factor_sensor(
+            _seed(spec["master_seed"], "sensor_stream"), illumination))
+        payloads[relative] = encoded
+        manifest["sensor_configs"][illumination] = {
+            "path": relative, "sha256": _hash(encoded),
+            "illumination_relative": ILLUMINATION_RELATIVE[illumination],
+        }
+    for split in PARTITIONS:
+        grouped = {cell: [] for cell, _ in cells}
+        for family_index, family in enumerate(members[split]):
+            patch_count = 2 + family_index % 3
+            layout = _family_layout(spec["master_seed"], family, patch_count)
+            for replicate in range(spec["replicates_per_family"]):
+                seed = _seed(spec["master_seed"], family, replicate, "replicate")
+                pair_id = f"{family}_r{replicate:03d}"
+                base = _scene(family, replicate, seed, "nominal", layout)
+                for cell, factors in cells:
+                    scene = dict(base)
+                    scene["scene_id"] = f"{pair_id}__{cell}"
+                    scene["obstacles"] = _factorial_obstacles(
+                        scene, factors["occlusion"], factors["clutter"])
+                    relative = f"scenes/{split}/{scene['scene_id']}.json"
+                    encoded = _encoded(scene)
+                    payloads[relative] = encoded
+                    grouped[cell].append("../../" + relative)
+                    manifest["scenes"].append({
+                        "path": relative, "scene_id": scene["scene_id"],
+                        "partition": split, "family": family,
+                        "pair_id": pair_id, "replicate": replicate,
+                        "paired_seed": seed, "geometry_patch_count": patch_count,
+                        "cell_id": cell, "factors": dict(factors),
+                        "sha256": _hash(encoded),
+                    })
+        manifest["suites"][split] = {}
+        for cell, factors in cells:
+            relative = f"suites/{split}/{cell}.json"
+            encoded = _encoded({
+                "schema_version": VERSION,
+                "suite_id": f"study01_{split}_{cell}",
+                "evidence_type": "simulation", "scenes": grouped[cell],
+            })
+            payloads[relative] = encoded
+            manifest["suites"][split][cell] = {
+                "path": relative, "sha256": _hash(encoded),
+                "sensor_config": manifest["sensor_configs"][
+                    factors["illumination"]]["path"],
+            }
+    payloads["manifest.json"] = _encoded(manifest)
+    _write_artifacts(output_dir, payloads)
+    return manifest
+
+
 def generate_population(spec_path: Path, output_dir: Path) -> dict:
     """Generate paired, disjoint, synthetic families with hashes and no overwrites.
 
     The public holdout is *not blinded confirmation*. The output is exploratory.
     """
+    design, _ = read_json(Path(spec_path))
+    if isinstance(design, dict) and design.get("design") == FACTORIAL_DESIGN:
+        return _factorial_population(Path(spec_path), output_dir)
     spec, raw = _read_spec(Path(spec_path))
     output_dir = Path(output_dir)
     if output_dir.exists() or output_dir.is_symlink():
@@ -176,36 +372,5 @@ def generate_population(spec_path: Path, output_dir: Path) -> dict:
         manifest["suites"][split] = {"path": relative, "sha256": _hash(encoded)}
     payloads["manifest.json"] = _encoded(manifest)
 
-    # Fail closed on all content errors before making the output directory.
-    # Exclusive file creation; rollback only paths created by this call.
-    written: list[Path] = []
-    directories: set[Path] = set()
-    created = False
-    try:
-        output_dir.mkdir(parents=True, exist_ok=False)
-        created = True
-        for relative, raw_file in payloads.items():
-            destination = output_dir / relative
-            parent = destination.parent
-            while parent != output_dir:
-                directories.add(parent)
-                parent = parent.parent
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            with destination.open("xb") as file:
-                written.append(destination)
-                file.write(raw_file)
-    except BaseException:
-        if created:
-            for path in reversed(written):
-                path.unlink(missing_ok=True)
-            for path in sorted(directories, key=lambda p: len(p.parts), reverse=True):
-                try:
-                    path.rmdir()
-                except OSError:
-                    pass
-            try:
-                output_dir.rmdir()
-            except OSError:
-                pass
-        raise
+    _write_artifacts(output_dir, payloads)
     return manifest
