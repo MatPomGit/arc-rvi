@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "study_id": "01",
+  "design": "sampled_factorial_v1",
+  "master_seed": 20261027,
+  "replicates_per_family": 1,
+  "family_counts": {
+    "development": 6,
+    "pilot": 6,
+    "holdout": 6
+  },
+  "factors": {
+    "occlusion": [
+      "none",
+      "moderate",
+      "strong"
+    ],
+    "illumination": [
+      "low",
+      "reference"
+    ],
+    "clutter": [
+      "none",
+      "dense"
+    ]
+  }
+}
