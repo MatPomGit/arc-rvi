@@ -61,6 +61,9 @@ assumptions; it is not a frozen confirmatory design.
 The [cluster Monte Carlo tool](docs/cluster-monte-carlo.md) explores synthetic
 null rejection, interval coverage and assumed alternative power at the
 **family** level under normal/heavy-tailed effects and missingness stress.
+The [exploratory P02 sensor association](docs/localization.md) reuses the
+existing selector on generated bearing/range detections with separate
+evaluator-only truth; actual appearance recognition is not implemented.
 The [planar feature sensor](docs/simulation.md) provides reusable, seeded
 horizontal camera observations with evaluator-only geometric truth. It is
 uncalibrated and does not change the known-geometry benchmark.
