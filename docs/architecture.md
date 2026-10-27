@@ -20,6 +20,21 @@ machine variant** before choosing a URDF. The manufacturer publishes several
 `mode_machine` identifier. The source reference is
 [Unitree's G1 description repository](https://github.com/unitreerobotics/unitree_ros/tree/7919cba47a3f68888f3b084945b0ffbf3bb3763a/robots/g1_description)
 at commit `7919cba47a3f68888f3b084945b0ffbf3bb3763a`.
+The two locally supplied sources, *Podstawowy opis Robota Unitree G1 EDU*
+(section 1) and *Instrukcja programowania robota humanoidalnego Unitree
+G1 EDU*, v1.8 (sections 2, 5–6, 10–11), describe a candidate **29-DOF**
+configuration with an Intel RealSense D435i, Livox MID360, four microphones,
+a developer computer and a separate low-level locomotion controller.
+These are **document claims**, not a verified inventory, firmware profile,
+URDF choice, measured sensor specifications or calibrated TF transforms.
+The official G1 description index distinguishes 23-/29-DOF variants by
+`mode_machine`; obtain that identifier from the actual robot before
+selecting assets. ROS 2/DDS is a potential integration boundary only:
+the teaching manual's example topic names, driver nodes, IP settings and
+code snippets are illustrative, not a deployed or tested G1 interface.
+In particular, `unitree_guide` discussed in the short description
+targets quadruped examples and is not a validated G1 driver.
+
 The exact hardware variant is **not yet known**. Do not assume a 29-DoF
 robot, a D435 camera, particular joint limits or a calibrated camera mount.
 
@@ -32,7 +47,9 @@ rvi robot-model --urdf /path/to/selected.urdf --expected-sha256 YOUR_SHA256 --ca
 ```
 
 The audit rejects changed/untrusted bytes, invalid topology, unsupported joint
-types, degenerate axes and invalid joint bounds. It reconstructs the zero-joint
+types, degenerate axes and invalid joint bounds. It supports one virtual root `floating` base joint, as found in
+the upstream G1 URDF; it assumes the virtual base is at its identity pose
+and **does not infer the robot's physical world pose**. It reconstructs the zero-joint
 tree transforms and checks whether a specifically requested camera link exists.
 An unknown camera frame is **not** silently replaced by a guessed transform.
 The output is `evidence_type: fixture`: static source consistency only.
