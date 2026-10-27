@@ -63,3 +63,15 @@ the protocol's main hypothesis remains untested.
 
 Manuscript: [paper 02](../../papers/paper02/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Grouped exploratory factor pilot
+
+The [P02 family generator](../../docs/localization.md) now provides disjoint
+synthetic family partitions and a crossed near/far separation × clear/blocked
+visibility design with paired present/absent identity requests. The evaluator
+holds the geometry-to-detection identity mapping until after prediction.
+A family, rather than a repeated sensor capture, is the unit for descriptive
+method contrasts. This is neither image-feature fusion nor a calibrated
+object identity population; the prospective hypothesis and thresholds remain
+unfrozen. Study-specific independent session sampling and visual similarity
+conditions are still required before confirmation.

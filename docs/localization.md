@@ -155,3 +155,37 @@ validated identity recognizer or a closed-loop robotics component. The
 fixture evaluator cannot be used to control an inspection robot. Identity
 assignment remains the distinct primary contribution proposed for Study 02;
 planning and coverage belong to Studies 03–04.
+
+
+## Group-separated factorial pilot (P02)
+
+The exploratory generator extends the one-scene proxy replay with **separate
+synthetic object-set families**, two distractor separations (near/far), two
+target-visibility conditions (clear/blocked) and matched **present / absent
+identity** requests. Replicated sensor captures remain *nested within family*.
+
+```bash
+rvi localize-population --spec simulation/conditions/study02_population_pilot.json --output-dir results/study02_population
+rvi localize --population-manifest results/study02_population/manifest.json --partition pilot --output results/study02_pilot.json
+```
+
+The public specification uses two development families, three pilot families,
+two holdout families, and two captures per cell. Generated scenes, per-scene
+sensor-study inputs and manifest records carry SHA-256 digests. A model-family
+layout is drawn once and reused across factorial conditions. The study reports
+a paired method comparison with **equal weight per family**, explicit
+wrong-selection/abstention counts and present/absent factor strata. Positive
+`paired_difference_joint_minus_bearing` indicates worse joint-proxy risk.
+This is descriptive; there are **no confidence intervals or significance tests**.
+
+Only `development` and `pilot` are accepted by this analysis command. It
+does **not** read holdout scene/study contents. The generated holdout is public,
+so it is not blinded or independently preregistered. Every absent-target
+request uses a plausible hard-negative cue near a distractor, and all selected
+detections are matched to evaluator-only identity *after* decision. Physical
+absence, scene realism and measured sensor calibration are not established.
+
+**Remaining gaps:** images/appearance features, truly near-identical visual
+objects, temporal re-identification, independent session draws, grounded pose
+uncertainty and the frozen confirmatory comparison. The controlled "separation"
+is planar angular/geometric separation, **not visual similarity**.
