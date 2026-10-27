@@ -117,9 +117,11 @@ to view selection. `status: completed` means all selected moves were executed;
 The two fixed smoke scenes demonstrate the data boundary, not effectiveness.
 The mode has no independent scene families, calibrated appearance/photometry,
 unknown-surface model, confirmed power or physical validation. Existing
-unsensored reports remain **known-geometry oracle**. This experimental interface
-does not open held-out partition suites through `rvi batch`; the forthcoming
-study-specific split gate and factorial P01 benchmark remain required.
+unsensored reports remain **known-geometry oracle**. The exploratory mode refuses explicitly named holdout suites/paths, but this
+is **not a sealed split gate**: arbitrary renamed files cannot be authenticated.
+Do not run it against confirmatory data. The separate `rvi batch` partition gate
+still applies to its own interface; complete study-specific split provenance and
+factorial P01 validation remain required.
 Track that work in [Issues #17](https://github.com/MatPomGit/arc-rvi/issues/17),
 [#21](https://github.com/MatPomGit/arc-rvi/issues/21) and
 [#22](https://github.com/MatPomGit/arc-rvi/issues/22).
