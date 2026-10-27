@@ -8,6 +8,13 @@ reference_platform:
   installed_sensors: not_verified
   firmware_revision: not_recorded
   sdk_revision: not_recorded
+  mode_machine: not_recorded
+  reference_description:
+    repository: unitreerobotics/unitree_ros
+    source_commit: 7919cba47a3f68888f3b084945b0ffbf3bb3763a
+    urdf_variant: not_selected_pending_actual_hardware_id
+    audited_file_sha256: not_recorded
+    offline_audit: available_not_executed_for_selected_hardware
 # Existing conservative interface limits are placeholders, not rated G1 EDU limits.
 # Hardware integration requires independently validated models and a safety review.
 frame_id: map
