@@ -82,6 +82,10 @@ based power assessment. The complete crossed geometry × occlusion ×
 illumination × clutter design remains unavailable. No use of public synthetic
 holdout data is allowed to determine primary choices.
 
+The separate [family-level Monte Carlo diagnostic](cluster-monte-carlo.md)
+can assess simulated null error and interval coverage under explicit synthetic
+family-effect distributions. It is **not** a calibration of real-world family SD.
+
 This planner is **not** a substitute for preregistration, external calibration,
 real-object representativeness or a permission to execute physical experiments.
 See [study 01 protocol](../experiments/exp01_benchmark/protocol.md),
