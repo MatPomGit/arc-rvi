@@ -35,6 +35,17 @@ code snippets are illustrative, not a deployed or tested G1 interface.
 In particular, `unitree_guide` discussed in the short description
 targets quadruped examples and is not a validated G1 driver.
 
+The user additionally supplied three laboratory photographs (2026-10-27)
+showing an upright robot which the user identifies as G1 EDU. A segmented
+hand-shaped end effector, silver articulated limbs, dark head housing,
+body straps and a nearby wheeled structure are visible. These observations
+confirm the *visual documentation of an available laboratory platform*,
+**not** its 29-DOF layout, exact revision, camera/LiDAR models, protective
+harness certification, SDK connectivity or measured movement. The photos
+remain outside the public repository. The next identification step is an
+operator-approved **read-only** hardware/firmware and `mode_machine`
+inventory, followed by matching and auditing the manufacturer's URDF.
+
 The exact hardware variant is **not yet known**. Do not assume a 29-DoF
 robot, a D435 camera, particular joint limits or a calibrated camera mount.
 
