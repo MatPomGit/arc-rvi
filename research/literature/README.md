@@ -18,3 +18,11 @@ Original user-upload SHA-256:
 - `ARC_RVI_Literature_Evidence_Matrices.md`: `9451979f3fdf3b13bc42e0ad24d475294daecb664ebc78203142ad51734b6594`
 - `ARC_RVI_Gap_Analysis_Publication_Strategy.md`: `60c6e8562f490a5153dd5a51c25fef2898df45a57648a9e66fd53806e533b6b4`
 - `ARC_RVI_Hypotheses_Experimental_Recommendations.md`: `4aa21ff4f8de6d591336f152cee9780e44fe373e2a6541fb9ea0e18e65cb79d1`
+
+## Offline bibliography inventory
+
+Run `python scripts/audit_literature.py --output results/literature_inventory.json`
+to export the machine-readable DOI/numbering audit. This script never
+contacts Crossref, arXiv or publisher servers and **does not verify** authors,
+publication dates, experimental claims or the 1,908/240 search denominators.
+All four archival drafts remain byte-for-byte unchanged.

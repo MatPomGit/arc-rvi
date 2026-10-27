@@ -1,5 +1,6 @@
 """Literature inventory tests verify source arithmetic, not metadata truth."""
 import shutil
+import re
 import tempfile
 from pathlib import Path
 import unittest
@@ -33,7 +34,7 @@ class LiteratureInventoryTests(unittest.TestCase):
         self.assertEqual(len(set(x["sha256"] for x in first["sources"].values())), 4)
         self.assertEqual(len(set(x["numbered_references_sha256"]
                                  for x in first["sources"].values())), 1)
-        self.assertEqual(len({x["paper"] for x in first["rows"]}), 77)
+        self.assertEqual(len({re.sub(r" \\[\\d+\\]$", "", x["paper"]) for x in first["rows"]}), 77)
 
     def test_doi_canonicalization_and_missing_numbers(self):
         self.assertEqual(doi_from("DOI: 10.1007/S11263-021-01469-5."),

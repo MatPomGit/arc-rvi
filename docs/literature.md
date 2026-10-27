@@ -43,6 +43,62 @@ and [robotic cylindrical-cavity inspection](https://arxiv.org/abs/2608.16442).
 These checks do **not** validate the remaining bibliographic metadata,
 quantitative gap counts, study summaries or novelty assertions.
 
+## Reproducible bibliographic inventory (partial reconstruction)
+
+The offline inventory checks the **numbering and DOI fields in these four
+source files**, not publisher metadata or systematic search completeness.
+Run from the repository root:
+
+```bash
+python scripts/audit_literature.py --output results/arc_rvi_literature_inventory.json
+```
+
+The report is content-addressed with the SHA-256 of all four source drafts;
+the command exclusively creates an output file and refuses to overwrite it.
+The JSON lists the study, matrix source line, cited label, table DOI, numbered
+bibliography DOI and a mismatch category for **every row**.
+
+| Checked quantity | Value | Interpretation |
+| --- | ---: | --- |
+| Study-specific matrix rows | 79 | P01: 9; P02–P08: 10 each |
+| Rows with a parseable DOI | 73 | String present, **not externally verified** |
+| Rows without DOI | 6 | Work identification requires manual bibliographic follow-up |
+| Unique DOI strings in matrix | 71 | Two DOI strings each occur in two study matrices |
+| Entries in appended references | 30 | **The same 30-entry block** appears in all four drafts |
+| Matrix label resolves to same DOI as appended bibliography | 9 | String match only |
+| Matrix label resolves to a **different** DOI | **64** | Unusable numbered citation until repaired |
+| Matrix row without a DOI | 6 | Label linkage unresolved without source verification |
+
+Examples: P03 `Human-Inspired Inspection [1]` has DOI
+`10.3390/biomimetics11050296`, while the shared bibliography's
+`[1]` points to `10.7717/peerj.7086`, an eye-tracker assessment.
+P02 `ActivePose [8]` likewise has an arXiv DOI different from the
+shared bibliography item `[8]`. These are **numbering collisions**,
+not evidence that either corresponding publication is nonexistent.
+
+The two multiply counted matrix DOI strings are
+`10.48550/arxiv.2603.16471` (P03/P04) and
+`10.1088/1361-6501/adf3d4` (P05/P08).
+Repeated study *mentions* must not become independent papers or
+independent support for a research gap. The **79** matrix rows, the
+draft's **240** selected works and the reported **1,908** unique
+retrievals are separate unverified counting stages, not an
+established PRISMA-style flow. The available exports cannot confirm
+the inclusion criteria, exact overlap or deduplication.
+
+### Dated external bibliographic spot checks
+
+| DOI | Status on 2026-10-27 | Implication for ARC-RVI |
+| --- | --- | --- |
+| [10.1007/s11263-021-01469-5](https://link.springer.com/article/10.1007/s11263-021-01469-5) | VPR-Bench, Zaffar et al., *IJCV* (2021): title, year and VPR benchmarking subject checked against publisher | Supports standardized viewpoint/appearance variation methodology, **not** direct proof of robotic inspection superiority |
+| [10.3390/s26154757](https://www.mdpi.com/1424-8220/26/15/4757) | ROEP, Han & Choi, *Sensors* 26(15), 4757 (2026): DOI, title and authors checked against publisher | Deployment-facing VLA evaluation; not a humanoid inspection trial |
+| [10.1016/j.cacaie.2026.100007](https://doi.org/10.1016/j.cacaie.2026.100007) | *Toward next-generation autonomous structural health monitoring and inspection with humanoid robots*, Wang et al. (2026), publisher page checked | **Material prior art**: RoboInspect reports two physical humanoid inspection case studies; P03/P08 novelty must be narrower than “first humanoid inspection” |
+| [10.7717/peerj.7086](https://pubmed.ncbi.nlm.nih.gov/31328028/) | Ehinger et al. (2019), *PeerJ*: DOI/title checked against PubMed | A test battery for Pupil Labs/EyeLink eye-tracking, not an autonomous robotic inspection benchmark |
+
+The external spot checks cover only these **four individual DOI records**,
+not the full matrix, all abstracts or any reported quantitative gap rate.
+Do not label the entire bibliography verified based on this table.
+
 ## Research directions and evidence thresholds
 
 | Study | Candidate contribution from supplied review | Provisional primary outcome (see canonical protocol) | Publication blocker / competing scope |

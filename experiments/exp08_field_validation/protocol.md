@@ -57,3 +57,15 @@ protocol release. No confirmation data may be used to tune these choices.
 
 Manuscript: [paper 08](../../papers/paper08/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Prior-art boundary, 2026-10-27
+
+[RoboInspect (Wang et al., 2026)](https://doi.org/10.1016/j.cacaie.2026.100007)
+reports physical humanoid inspection demonstrations in an indoor
+infrastructure setting. This proposal therefore does **not** claim
+the first physical humanoid autonomous inspection system.
+Its distinct intended contribution is a **prespecified, assessor-blinded
+noninferiority comparison against standardized manual documentation**
+under independent object/session blocks, a clinically or operationally
+justified margin and signed safety/measurement approvals. Such evidence
+is not yet collected in ARC-RVI.
