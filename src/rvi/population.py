@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import asdict
+from itertools import product
 import json
 import math
 from pathlib import Path
 import random
 
 from .conditions import CONDITIONS, PARTITIONS, VERSION, _encoded, _hash
+from .perception import SensorConfig
+from .scenarios import read_json
 
 DESIGN = "sampled_geometry_v1"
 DISTRIBUTION = {
@@ -22,6 +26,15 @@ DISTRIBUTION = {
 }
 MAX_FAMILIES = 128
 MAX_SCENES = 2048
+FACTORIAL_DESIGN = "sampled_factorial_v1"
+FACTOR_LEVELS = {
+    "occlusion": ("none", "moderate", "strong"),
+    "illumination": ("low", "reference"),
+    "clutter": ("none", "dense"),
+}
+OCCLUDER_RADIUS_M = {"none": 0.0, "moderate": 0.12, "strong": 0.32}
+ILLUMINATION_RELATIVE = {"low": 0.35, "reference": 1.0}
+
 
 
 def _pairs(entries):
@@ -72,10 +85,11 @@ def _seed(master_seed: int, *parts: object) -> int:
     return int.from_bytes(hashlib.sha256(value.encode("ascii")).digest()[:8], "big")
 
 
-def _family_layout(master_seed: int, family: str) -> tuple[tuple[float, float, float], ...]:
+def _family_layout(master_seed: int, family: str,
+                   patch_count: int | None = None) -> tuple[tuple[float, float, float], ...]:
     """One independent *pseudo-random model* draw per family, reused by replicates."""
     rng = random.Random(_seed(master_seed, family, "layout"))
-    count = rng.randint(2, 4)
+    count = rng.randint(2, 4) if patch_count is None else patch_count
     layout = []
     for index in range(count):
         center_y = -0.9 + 1.8 * index / (count - 1)
@@ -115,11 +129,50 @@ def _scene(family: str, repeat: int, replicate_seed: int, condition: str,
     }
 
 
+def _write_artifacts(output_dir: Path, payloads: dict[str, bytes]) -> None:
+    """Exclusively write new results and roll back only this call's artifacts."""
+    output_dir = Path(output_dir)
+    if output_dir.exists() or output_dir.is_symlink():
+        raise ValueError("output directory already exists")
+    written: list[Path] = []
+    directories: set[Path] = set()
+    created = False
+    try:
+        output_dir.mkdir(parents=True, exist_ok=False)
+        created = True
+        for relative, raw_file in payloads.items():
+            destination = output_dir / relative
+            parent = destination.parent
+            while parent != output_dir:
+                directories.add(parent)
+                parent = parent.parent
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("xb") as file:
+                written.append(destination)
+                file.write(raw_file)
+    except BaseException:
+        if created:
+            for path in reversed(written):
+                path.unlink(missing_ok=True)
+            for path in sorted(directories, key=lambda p: len(p.parts), reverse=True):
+                try:
+                    path.rmdir()
+                except OSError:
+                    pass
+            try:
+                output_dir.rmdir()
+            except OSError:
+                pass
+        raise
+
 def generate_population(spec_path: Path, output_dir: Path) -> dict:
     """Generate paired, disjoint, synthetic families with hashes and no overwrites.
 
     The public holdout is *not blinded confirmation*. The output is exploratory.
     """
+    design, _ = read_json(Path(spec_path))
+    if isinstance(design, dict) and design.get("design") == FACTORIAL_DESIGN:
+        return _factorial_population(Path(spec_path), output_dir)
     spec, raw = _read_spec(Path(spec_path))
     output_dir = Path(output_dir)
     if output_dir.exists() or output_dir.is_symlink():
@@ -176,36 +229,5 @@ def generate_population(spec_path: Path, output_dir: Path) -> dict:
         manifest["suites"][split] = {"path": relative, "sha256": _hash(encoded)}
     payloads["manifest.json"] = _encoded(manifest)
 
-    # Fail closed on all content errors before making the output directory.
-    # Exclusive file creation; rollback only paths created by this call.
-    written: list[Path] = []
-    directories: set[Path] = set()
-    created = False
-    try:
-        output_dir.mkdir(parents=True, exist_ok=False)
-        created = True
-        for relative, raw_file in payloads.items():
-            destination = output_dir / relative
-            parent = destination.parent
-            while parent != output_dir:
-                directories.add(parent)
-                parent = parent.parent
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            with destination.open("xb") as file:
-                written.append(destination)
-                file.write(raw_file)
-    except BaseException:
-        if created:
-            for path in reversed(written):
-                path.unlink(missing_ok=True)
-            for path in sorted(directories, key=lambda p: len(p.parts), reverse=True):
-                try:
-                    path.rmdir()
-                except OSError:
-                    pass
-            try:
-                output_dir.rmdir()
-            except OSError:
-                pass
-        raise
+    _write_artifacts(output_dir, payloads)
     return manifest
