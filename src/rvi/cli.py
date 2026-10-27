@@ -11,6 +11,7 @@ from .benchmark import run_benchmark
 from .conditions import generate_conditions
 from .experiment import run_experiment
 from .localization import run_localization_fixture, run_sensor_localization
+from .image_dataset import evaluate_image_manifest
 from .localization_population import (generate_localization_population,
                                       analyze_localization_population)
 from .pilot import analyze_pilot
@@ -44,6 +45,7 @@ def make_parser() -> argparse.ArgumentParser:
     localize_input.add_argument("--fixture", type=Path)
     localize_input.add_argument("--sensor-study", type=Path)
     localize_input.add_argument("--population-manifest", type=Path)
+    localize_input.add_argument("--image-manifest", type=Path)
     localize.add_argument("--partition", choices=("development", "pilot"), default="pilot")
 
     localize.add_argument("--output", required=True, type=Path)
@@ -94,7 +96,10 @@ def main(argv: list[str] | None = None) -> int:
                        run_sensor_localization(arguments.sensor_study)
                        if arguments.sensor_study is not None else
                        analyze_localization_population(arguments.population_manifest,
-                                                       partition=arguments.partition))
+                                                       partition=arguments.partition)
+                       if arguments.population_manifest is not None else
+                       evaluate_image_manifest(arguments.image_manifest,
+                                               partition=arguments.partition))
             serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
                                     indent=2, allow_nan=False) + "\n"
             arguments.output.parent.mkdir(parents=True, exist_ok=True)
