@@ -12,6 +12,7 @@ on:
       - "papers/**"
       - "README.md"
       - "AUTOPILOT_PLAN.md"
+      - "AGENTS.md"
       - "PROJECT_STATE.yaml"
   push:
     branches: [main]
@@ -24,6 +25,7 @@ on:
       - "papers/**"
       - "README.md"
       - "AUTOPILOT_PLAN.md"
+      - "AGENTS.md"
       - "PROJECT_STATE.yaml"
   workflow_dispatch:
 
