@@ -163,7 +163,7 @@ def _verified_metadata(path: Path) -> tuple[dict[str, dict], dict[str, str], str
                                  "verification_scope", "records"}
             or document["schema_version"] != "1.0.0"
             or document["verification_scope"] !=
-            "publisher_or_institutional_metadata_only_no_full_article_claim_verification"
+            "publisher_institutional_bibliographic_or_preprint_metadata_not_full_article_claim_verification"
             or not isinstance(document["verification_date"], str)
             or not re.fullmatch(r"\d{4}-\d{2}-\d{2}",
                                 document["verification_date"])):
@@ -190,7 +190,8 @@ def _verified_metadata(path: Path) -> tuple[dict[str, dict], dict[str, str], str
                 or not isinstance(record["relevance"], str)
                 or not record["relevance"].strip()
                 or record["source_kind"] not in
-                ("publisher", "institutional_repository", "bibliographic_index")
+                ("publisher", "institutional_repository", "bibliographic_index",
+                 "preprint_repository")
                 or not isinstance(record["source_url"], str)
                 or not record["source_url"].startswith("https://")
                 or " " in record["source_url"]

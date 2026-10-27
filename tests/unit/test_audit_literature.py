@@ -68,8 +68,8 @@ class LiteratureInventoryTests(unittest.TestCase):
         result = catalog()
         self.assertEqual(result["source_mention_count"], 79)
         self.assertEqual(result["distinct_candidate_work_keys"], 77)
-        self.assertEqual(result["reviewed_metadata_work_count"], 10)
-        self.assertEqual(result["unverified_doi_work_count"], 61)
+        self.assertEqual(result["reviewed_metadata_work_count"], 22)
+        self.assertEqual(result["unverified_doi_work_count"], 49)
         self.assertEqual(result["unresolved_no_doi_work_count"], 6)
         self.assertEqual(result["curated_doi_typo_mentions"], 1)
         self.assertEqual(result["legacy_label_doi_mismatch_count"], 64)
@@ -97,6 +97,23 @@ class LiteratureInventoryTests(unittest.TestCase):
         self.assertEqual(len(missing), 6)
         self.assertTrue(all(item["verified_metadata"] is None for item in missing))
         self.assertEqual(catalog(), result)
+
+    def test_reviewed_preprint_is_not_mistaken_for_peer_review(self):
+        result = catalog()
+        items = {row["key"]: row for row in result["records"]}
+        source = items["doi:10.48550/arxiv.2603.16471"]
+        self.assertEqual(source["metadata_status"], "reviewed_metadata")
+        self.assertEqual(source["verified_metadata"]["source_kind"], "preprint_repository")
+        self.assertEqual(len(source["mentions"]), 2)
+        self.assertEqual({m["study"] for m in source["mentions"]}, {"P03", "P04"})
+        measured = items["doi:10.3390/machines14090980"]["verified_metadata"]
+        self.assertIn("Gazebo", measured["relevance"])
+        self.assertNotIn("physically", measured["relevance"])
+        device = items["doi:10.3390/s22249641"]["verified_metadata"]
+        self.assertIn("stereo-DIC", device["relevance"])
+        for row in result["records"]:
+            if row["metadata_status"] != "reviewed_metadata":
+                self.assertIsNone(row["verified_metadata"])
 
     def test_malformed_external_verified_metadata_is_rejected(self):
         with tempfile.TemporaryDirectory() as folder:

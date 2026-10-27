@@ -75,3 +75,15 @@ scored inspection coverage at a common action/time budget, with clear failure
 and re-observation denominators. Bibliographic matching alone does not verify
 these papers' experimental performance claims; consult the full methods before
 freezing baselines.
+
+## Distinct prior-art domains
+
+[Deng et al. (2024)](https://doi.org/10.1016/j.rcim.2023.102619)
+study predictive image exposure in robotic **disassembly**;
+[Zhang et al. (2022)](https://doi.org/10.3390/s22249641)
+study synchronized stereo-DIC **metrology** exposure, not robot inspection;
+and [Shin et al. (2019)](https://doi.org/10.1109/IROS40897.2019.8968590)
+study noise-aware exposure for robot vision. These are useful controls
+for exposure and image-quality estimation, but cannot be presented as
+equivalent to independent inspection-valid surface coverage or autonomous
+recovery. Add their comparable scores only where units and data are compatible.

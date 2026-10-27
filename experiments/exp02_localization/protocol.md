@@ -107,3 +107,16 @@ sensor, that annotations were independently measured or that cropped
 appearances generalize to new objects. Operator declarations do not replace
 calibration records, a verified sampling population, data-rights review or
 prospective confirmation. Thresholds remain exploratory.
+
+## New prior-art comparator boundary (2026-10-27)
+
+[Fusion++ (McCormac et al., 2018)](https://doi.org/10.1109/3DV.2018.00015)
+provides object-level RGB-D SLAM with instance tracking, and
+[RoboEye (Zhang et al., 2025, preprint)](https://arxiv.org/abs/2509.14966)
+combines 2D appearance with selective geometric reasoning for ambiguous
+warehouse object identification. Thus visual/spatial fusion and object
+re-identification are already researched. P02 must validate the
+**different inspection-specific error/abstention tradeoff** against
+held-out object/session identity truth and calibrated poses. The current
+8×8 simulated textures and uncalibrated PGM input do not meet that gate.
+See [prior-art appraisal](../../docs/prior-art-critical.md).

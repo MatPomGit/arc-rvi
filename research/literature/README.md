@@ -30,7 +30,12 @@ All four archival drafts remain byte-for-byte unchanged.
 ## DOI-keyed research catalogue
 
 Run `python scripts/audit_literature.py --catalog --output results/literature_work_catalog.json`.
-The ten checked-metadata DOI records reside in `verified_doi_metadata.json` with
+The 22 checked-metadata DOI records reside in `verified_doi_metadata.json` with
 review date and source URLs. Catalogued unverified DOI strings and provisional
 DOI-free items **must not** be copied into `papers/references.bib` or cited
 as verified primary evidence. Duplicate DOI mentions are grouped across studies.
+
+The [critical prior-art appraisal](../../docs/prior-art-critical.md) distinguishes
+reported physical manipulator/field trials, simulated Gazebo evidence,
+metrology-only methods and arXiv publication status. None of these
+records by itself validates the eight ARC-RVI research contributions.

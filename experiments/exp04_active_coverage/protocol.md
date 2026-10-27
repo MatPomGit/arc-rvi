@@ -51,3 +51,14 @@ protocol release. No confirmation data may be used to tune these choices.
 
 Manuscript: [paper 04](../../papers/paper04/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Reported physical NBV prior art
+
+[Bettles et al. (2026, arXiv)](https://arxiv.org/abs/2603.16471) report
+physical mobile-manipulator pipe-network inspection, online geometry and
+stochastic obstacle constraints. The source is a **preprint**, and its
+reported physical experiments have not been replicated by ARC-RVI. P04 must
+therefore avoid a broad novelty claim for physical NBV coverage; it should
+compare a prespecified unknown-surface, observation-only policy on matched
+budgets and separated hidden evaluator geometry. Do not double-count P03
+planning outcomes as independent P04 evidence.
