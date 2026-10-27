@@ -9,7 +9,7 @@ reference_platform:
   firmware_revision: not_recorded
   sdk_revision: not_recorded
   mode_machine: not_recorded
-    laboratory_observation:
+  laboratory_observation:
     source: user_supplied_photographs_2026_10_27
     identification: user_identified_as_G1_EDU_not_verified_from_label
     physical_presence: visually_documented_in_laboratory
