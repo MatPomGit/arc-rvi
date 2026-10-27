@@ -1,32 +1,12 @@
 name: Documentation (MkDocs + Pages)
 
+# Always validate the exact PR/main commit, including code-only changes.
+# Path filters here silently skipped Python regressions for source-only PRs.
 on:
   pull_request:
     branches: [main]
-    paths:
-      - ".github/workflows/docs-pages.yml"
-      - "mkdocs.yml"
-      - "scripts/build_docs.py"
-      - "docs/**"
-      - "experiments/**"
-      - "papers/**"
-      - "README.md"
-      - "AUTOPILOT_PLAN.md"
-      - "AGENTS.md"
-      - "PROJECT_STATE.yaml"
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/docs-pages.yml"
-      - "mkdocs.yml"
-      - "scripts/build_docs.py"
-      - "docs/**"
-      - "experiments/**"
-      - "papers/**"
-      - "README.md"
-      - "AUTOPILOT_PLAN.md"
-      - "AGENTS.md"
-      - "PROJECT_STATE.yaml"
   workflow_dispatch:
 
 permissions:
