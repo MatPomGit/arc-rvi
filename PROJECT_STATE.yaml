@@ -39,7 +39,7 @@ reference_robot:
   user_source_documents: G1_EDU_basic_description_and_teaching_manual_v1_8
   sensor_topics_and_transforms: illustrative_not_measured
   offline_model_auditor: implemented_but_not_verified_on_exact_delivered_robot
-research_phase: exploratory_p01_factorial_scene_generation
+research_phase: exploratory_p01_p02_factorial_simulation
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
   - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
@@ -79,7 +79,7 @@ evidence_state:
   p01_factorial: 216_uncalibrated_synthetic_worlds_in_example_generated_on_demand_not_collected_results
   p02_sensor_association: single_scene_and_grouped_factorial_proxy_features_only
   p02_population: seeded_synthetic_family_draws_descriptive_not_physically_independent
-  pages_deployment: verified_success_main_08a62569d407bca3cdcb1646d3ceec4d9060182c
+  pages_deployment: verified_success_main_3f65264d062f945c2d6c04e8a7f2abfacecf2773
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   robot_description_audit: static_urdf_structure_and_zero_joint_pose_only
@@ -93,6 +93,13 @@ evidence_state:
   literature_and_novelty_review: pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "3f65264d062f945c2d6c04e8a7f2abfacecf2773"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 144
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40548896569"
+    scope: "Grouped exploratory Study02 synthetic bearing/range pilot and strict MkDocs; not visual or physical validation"
   - corresponding_main_commit: "08a62569d407bca3cdcb1646d3ceec4d9060182c"
     command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
     outcome: PASS
@@ -189,6 +196,10 @@ next_actions:
     action: "Run a declared geometric-simulation pilot and implement clustered analysis"
     done_when: "Independent units, failures and uncertainty are explicit; fixtures are excluded from confirmation evidence"
   - order: 3
+    id: RVI02_IMAGE_AND_SESSION_MODEL
+    action: "Implement verified image-descriptor and timestamped session observation model with independent identity and pose ground truth"
+    done_when: "No evaluator truth leakage, disjoint object and session partitions, calibration checks and declared appearance-similarity conditions"
+  - order: 4
     id: RVI03_CALIBRATION
     action: "Select and validate physics/sensor models only when required by the frozen study"
     done_when: "Coordinate, visibility, timing and sensor error models have independent reference checks"
