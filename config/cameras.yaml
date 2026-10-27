@@ -1,6 +1,10 @@
 # Illustrative calibration targets, not measured device parameters.
 # The installed G1 EDU sensor and extrinsic must be independently identified.
 reference_urdf_camera_link: not_verified
+# User-provided documents mention D435i; mounting and optical calibration unverified.
+candidate_camera_model: Intel_RealSense_D435i
+candidate_model_source: user_supplied_G1_EDU_descriptions
+candidate_model_installed: not_verified
 camera_to_robot_extrinsic: not_calibrated
 camera_time_alignment: not_verified
 camera_frame: camera_optical
