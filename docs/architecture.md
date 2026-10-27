@@ -21,7 +21,7 @@ camera capture, actual physics simulator integration and closed-loop operation.
 
 The baseline hardware target for forthcoming simulation-model integration and
 authorized physical validation is **Unitree G1 EDU**, as declared in
-[`config/robot.yaml`](../config/robot.yaml). Keep this designation in the
+`config/robot.yaml`. Keep this designation in the
 hardware configuration and experiment provenance, not hard-coded in planning,
 perception or evaluation algorithms. Import and validate the exact delivered
 variant's model, sensors, transforms, firmware and SDK before introducing a
