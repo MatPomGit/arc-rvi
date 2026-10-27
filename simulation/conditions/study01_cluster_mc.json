@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "study_id": "01",
+  "status": "illustrative_not_frozen",
+  "design": "paired_family_effect_model",
+  "master_seed": 20261027,
+  "repetitions": 400,
+  "replicates_per_family": 2,
+  "confidence_level": 0.95,
+  "alternative_effect": 0.15,
+  "scenarios": [
+    {
+      "id": "normal_low",
+      "families": 8,
+      "between_family_sd": 0.12,
+      "within_family_sd": 0.08,
+      "missing_family_fraction": 0,
+      "family_distribution": "normal",
+      "missingness_mechanism": "independent"
+    },
+    {
+      "id": "normal_mid",
+      "families": 16,
+      "between_family_sd": 0.2,
+      "within_family_sd": 0.1,
+      "missing_family_fraction": 0.1,
+      "family_distribution": "normal",
+      "missingness_mechanism": "independent"
+    },
+    {
+      "id": "heavy_tail",
+      "families": 16,
+      "between_family_sd": 0.2,
+      "within_family_sd": 0.1,
+      "missing_family_fraction": 0.1,
+      "family_distribution": "student_t5",
+      "missingness_mechanism": "independent"
+    },
+    {
+      "id": "dependent_missing",
+      "families": 40,
+      "between_family_sd": 0.32,
+      "within_family_sd": 0.1,
+      "missing_family_fraction": 0.2,
+      "family_distribution": "normal",
+      "missingness_mechanism": "family_effect_dependent"
+    }
+  ]
+}
