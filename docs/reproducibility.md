@@ -1,12 +1,15 @@
 # Reproducibility contract
 
-Version: 1.2.0
+Version: 1.3.0
 
 ## Run and trial records
 
 The following fields specify the proposed research record. The [fixture benchmark](benchmark.md)
-and [planar simulator](simulation.md) implement documented subsets; no CLI command
-implements this complete contract. Keep private measurements and large assets outside Git.
+and [planar simulator](simulation.md) implement documented subsets. The
+[exploratory experiment batch interface](experiment-batches.md) now adds grouped
+Study 01 simulation/fixture trial records, deterministic outputs, hashes and
+UTC receipts. It does **not** yet implement the entire cross-study contract,
+physical recording, crash-timeout recovery or secure sealed confirmation. Keep private measurements and large assets outside Git.
 Use anonymous technical identifiers in public manifests.
 
 | Record | Required fields and meaning |
@@ -59,4 +62,6 @@ Keep a complete environment record: OS, Python, dependencies, simulator version,
 robot firmware, sensor settings and calibration where applicable.
 A rerun must preserve inputs, pairing and scoring, then regenerate the same tables
 within declared numerical tolerances. Report hardware-sensitive timing separately.
-The next implementation is specified in [project state](project-state.md).
+Implementation gaps and future cross-study extensions are tracked in
+[Issue #16](https://github.com/MatPomGit/arc-rvi/issues/16) and the
+[project state](project-state.md).

@@ -27,6 +27,7 @@ nav:
   - Software and models:
       - Architecture: docs/architecture.md
       - Paired benchmark: docs/benchmark.md
+      - Immutable experiment batches: docs/experiment-batches.md
       - Geometric simulator: docs/simulation.md
       - Seeded conditions: docs/conditions.md
       - Paired pilot analysis: docs/pilot-analysis.md

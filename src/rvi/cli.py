@@ -9,6 +9,7 @@ from pathlib import Path
 from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
 from .conditions import generate_conditions
+from .experiment import run_experiment
 from .localization import run_localization_fixture
 from .pilot import analyze_pilot
 from .planning import plan_family_sample
@@ -48,6 +49,13 @@ def make_parser() -> argparse.ArgumentParser:
     precision.add_argument("--spec", required=True, type=Path)
     precision.add_argument("--output", required=True, type=Path)
     precision.add_argument("--pilot-summary", type=Path)
+    batch = sub.add_parser("batch", help="replay exploratory study01 batches with immutable receipts")
+    batch_source = batch.add_mutually_exclusive_group(required=True)
+    batch_source.add_argument("--manifest", type=Path)
+    batch_source.add_argument("--suite", type=Path, help="fixture-only suite; never physical or holdout")
+    batch.add_argument("--partition", default="pilot", choices=("development", "pilot"))
+    batch.add_argument("--output-dir", required=True, type=Path)
+    batch.add_argument("--resume", action="store_true", help="verify existing outputs without modifying them")
     return parser
 
 
@@ -65,6 +73,12 @@ def main(argv: list[str] | None = None) -> int:
             with arguments.output.open("x", encoding="utf-8") as stream:
                 stream.write(serialized)
             print(f"Saved fixture localization report to {arguments.output}")
+            return 0
+        if arguments.command == "batch":
+            receipt = run_experiment(manifest=arguments.manifest, suite=arguments.suite,
+                                     partition=arguments.partition,
+                                     output_dir=arguments.output_dir, resume=arguments.resume)
+            print(f"Verified experiment batch {receipt['provenance']['run_id']} in {arguments.output_dir}")
             return 0
         if arguments.command == "population":
             manifest = generate_population(arguments.spec, arguments.output_dir)
