@@ -108,7 +108,8 @@ No client identities, proprietary data, credentials, real vehicle identifiers, r
 
 ## Research development
 
-Start with the [research program](experiments/README.md), then read the study-specific
+Start with the [research program](experiments/README.md) and
+[literature evidence gates](docs/literature.md), then read the study-specific
 protocol and [shared analysis plan](experiments/analysis/README.md).
 The canonical [project state](PROJECT_STATE.yaml) lists current evidence and next actions.
 The [ARC plan](AUTOPILOT_PLAN.md) defines its portfolio role and proposed sensor interfaces.
