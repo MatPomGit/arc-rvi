@@ -39,6 +39,7 @@ rvi population --spec simulation/conditions/study01_population_pilot.json --outp
 rvi pilot --manifest results/study01_population/manifest.json --output results/study01_population_analysis.json
 rvi precision --spec simulation/conditions/study01_precision_sensitivity.json --output results/study01_precision.json
 rvi batch --suite simulation/suites/fixture_smoke.json --output-dir results/study01_fixture_batch
+rvi power-mc --spec simulation/conditions/study01_cluster_mc.json --output results/study01_cluster_mc.json
 ```
 
 The `plan` command operates on a **synthetic fixture**, not a real robot or physics simulator. It provides a reproducible baseline greedy coverage planner, not an optimality claim. Real robot and external physics-engine integrations remain unavailable.
@@ -57,6 +58,9 @@ it does not establish an independent physical sampling frame.
 The [sample-size sensitivity planner](docs/sample-size.md) computes illustrative
 independent-family counts from explicit SD, effect, precision and missingness
 assumptions; it is not a frozen confirmatory design.
+The [cluster Monte Carlo tool](docs/cluster-monte-carlo.md) explores synthetic
+null rejection, interval coverage and assumed alternative power at the
+**family** level under normal/heavy-tailed effects and missingness stress.
 The [immutable experiment batch interface](docs/experiment-batches.md) stores
 paired trial records, independent-unit metadata and provenance receipts for
 exploratory Study 01. It blocks holdout access and does not cover physical studies.
