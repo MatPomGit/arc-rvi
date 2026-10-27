@@ -68,8 +68,9 @@ cues have not been calibrated.
 
 This is partial progress on [Issue #23](https://github.com/MatPomGit/arc-rvi/issues/23)
 and [Issue #24](https://github.com/MatPomGit/arc-rvi/issues/24).
-Actual image descriptors, multi-instance family sampling, session separation,
-physical pose metrology and prospective confirmation remain outstanding.
+Natural-image descriptors, real session separation, physical pose metrology
+and prospective confirmation remain outstanding. Synthetic grayscale matching
+is described below.
 
 ## Reproduce the software fixture
 
@@ -189,3 +190,49 @@ absence, scene realism and measured sensor calibration are not established.
 objects, temporal re-identification, independent session draws, grounded pose
 uncertainty and the frozen confirmatory comparison. The controlled "separation"
 is planar angular/geometric separation, **not visual similarity**.
+
+
+## Generated grayscale image-patch experiment (v1.18)
+
+The next exploratory Study 02 increment adds **synthetic 8×8 grayscale
+patches**, not RGB frames from a camera. Identity-specific binary-intensity
+templates are generated once for each object-set family. The distractor
+differs from the target in exactly 4 pixels (similar) or 40 pixels
+(distinct); the per-frame renderer applies reproducible ±5 gray-level
+pixel noise and a shared ±6 gray-level simulated-session luminance offset.
+
+Each detection receives only an anonymous `gray8_8x8` array. The policy
+matches a target-request image template using normalized mean absolute
+pixel error (MAE), a separate range mismatch, or their equal-weight mean.
+The privileged generator uses geometry-to-instance correspondence to render
+the synthetic crops, **but correspondence is not an input to the selector**.
+An absent request uses a template from a third object that is not in the
+scene. Template ownership, camera projection, identity reference and
+final scoring are simulation constructs, not independent physical truth.
+
+```bash
+rvi localize-population --spec simulation/conditions/study02_image_pilot.json --output-dir results/study02_images
+rvi localize --population-manifest results/study02_images/manifest.json --partition pilot --output results/study02_image_pilot.json
+```
+
+The public configuration crosses 2 planar separations × 2 target visibility
+states × 2 synthetic appearance levels, with 2 correlated captures per cell.
+Family groups are disjoint between development, pilot and holdout; a
+`session_id` groups repeated observations within each family and is **not**
+equivalent to an independently collected session. Every image-study input
+and generated scene is covered by the SHA-256 manifest. Holdout evaluation
+remains prohibited by the exploratory CLI, and the public holdout is not blind.
+
+Reports preserve missing detections, wrong instances, correct selections,
+correct rejections and abstentions. The unit for descriptive contrasts is the
+**synthetic family**, not the individual pixel, frame or request. An
+`appearance_range − appearance` wrong-selection risk difference below zero
+favours fusion on this artificial sample only. No confidence intervals,
+significance tests, real-image generalization or physical claims are produced.
+
+This adds actual numeric **pixel-array matching**, but does *not* implement
+recognition from natural images, trained embeddings, 3D pose estimation,
+physical timestamps, synchronized sensors or independently calibrated
+ground truth. Further work must replace synthetic crops with
+rights-cleared measured imagery and frozen object/session-disjoint
+validation before the proposed scientific hypothesis can be assessed.

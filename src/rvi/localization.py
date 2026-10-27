@@ -156,6 +156,12 @@ SENSOR_METHODS = {
     "joint_proxy": "fused",
 }
 
+IMAGE_METHODS = {
+    "grayscale_mae": "visual",
+    "range_proxy": "spatial",
+    "grayscale_range": "fused",
+}
+
 
 def _study_file(study_path: Path, relative: object) -> Path:
     """Confine included files to the study directory's parent data tree."""
@@ -176,15 +182,21 @@ def run_sensor_localization(study_path: Path) -> dict:
     """
     from .adapters.simulator import PlanarSimulator, load_scene
     from .perception import load_sensor_config, simulate_sensor
+    from .image_features import pixel_distance, render_patch, validate_pixels
     from .scenarios import read_json
 
     spec, raw = read_json(Path(study_path))
-    _fields(spec, {"schema_version", "study_id", "evidence_type", "stage",
-                   "suite_id", "scene", "sensor", "threshold",
-                   "ambiguity_margin", "requests"}, "sensor study")
+    image_mode = spec.get("schema_version") == "1.1.0"
+    expected = {"schema_version", "study_id", "evidence_type", "stage",
+                "suite_id", "scene", "sensor", "threshold",
+                "ambiguity_margin", "requests"}
+    if image_mode:
+        expected |= {"appearance", "session_id"}
+    _fields(spec, expected, "sensor study")
     if (spec["schema_version"], spec["study_id"], spec["evidence_type"],
-            spec["stage"]) != ("1.0.0", "02", "simulation",
-                                "exploratory_not_confirmatory"):
+            spec["stage"]) not in (
+                ("1.0.0", "02", "simulation", "exploratory_not_confirmatory"),
+                ("1.1.0", "02", "simulation", "exploratory_not_confirmatory")):
         raise ValueError("unsupported or non-exploratory sensor study")
     suite_id = _id(spec["suite_id"], "suite id")
     threshold = _fraction(spec["threshold"], "threshold")
@@ -200,9 +212,24 @@ def run_sensor_localization(study_path: Path) -> dict:
         raise ValueError("sensor study requires 1 to 256 target requests")
     observed_ids = set()
     rows, observations = [], []
+    methods = IMAGE_METHODS if image_mode else SENSOR_METHODS
+    if image_mode:
+        appearance = _fields(spec["appearance"], {"textures", "noise_seed"},
+                             "appearance")
+        texture_map = _fields(appearance["textures"], {"target", "distractor"},
+                              "appearance textures")
+        texture_map = {key: validate_pixels(value)
+                       for key, value in texture_map.items()}
+        noise_seed = appearance["noise_seed"]
+        if type(noise_seed) is not int or not 0 <= noise_seed < 2**64:
+            raise ValueError("appearance noise seed must be unsigned 64-bit integer")
+        session_id = _id(spec["session_id"], "session id")
     for request in requests:
-        _fields(request, {"request_id", "capture_index", "expected_u_px",
-                          "expected_range_m", "ground_truth_patch_id"}, "target request")
+        request_fields = {"request_id", "capture_index", "expected_u_px",
+                          "expected_range_m", "ground_truth_patch_id"}
+        if image_mode:
+            request_fields |= {"template_pixels", "timestamp_s"}
+        _fields(request, request_fields, "target request")
         request_id = _id(request["request_id"], "request id")
         if request_id in observed_ids:
             raise ValueError("duplicate target request id")
@@ -223,17 +250,41 @@ def run_sensor_localization(study_path: Path) -> dict:
         truth = request["ground_truth_patch_id"]
         if truth is not None and (type(truth) is not str or truth not in patch_ids):
             raise ValueError("unknown evaluator-only patch identity")
+        timestamp_s = request["timestamp_s"] if image_mode else 0.0
+        if image_mode and (type(timestamp_s) not in (int, float)
+                           or not isfinite(timestamp_s) or timestamp_s < 0):
+            raise ValueError("invalid observation timestamp")
         policy, reference = simulate_sensor(
-            scene, scene.start, sensor, capture_index=capture_index)
+            scene, scene.start, sensor, capture_index=capture_index,
+            timestamp_s=timestamp_s)
+        if image_mode:
+            template = validate_pixels(request["template_pixels"])
+            # Privileged simulator stage produces pixels. Only anonymous pixels
+            # and the request template cross the boundary to the selector.
+            renderer_labels = {
+                item["detection_id"]: item["patch_id"]
+                for item in reference["geometry_references"]
+                if item["detection_id"] is not None
+            }
+            anonymous = []
+            for detection in policy["detections"]:
+                identity = renderer_labels[detection["id"]]
+                pixels = render_patch(texture_map[identity], noise_seed,
+                                      session_id, capture_index, identity)
+                anonymous.append({**detection, "gray8_8x8": pixels})
+            policy = {**policy, "detections": anonymous,
+                      "image_model": "synthetic_grayscale_patch_v1"}
         candidates = [{
             "id": detection["id"],
-            "visual_distance": abs(detection["u_px"] - u) / sensor.width_px,
+            "visual_distance": (pixel_distance(
+                template, detection["gray8_8x8"]) if image_mode
+                else abs(detection["u_px"] - u) / sensor.width_px),
             "spatial_distance": min(
                 1.0, abs(detection["range_m"] - expected_range)
                 / scene.camera.max_range_m),
         } for detection in policy["detections"]]
         decisions = {label: select_instance(candidates, internal, threshold, margin)
-                     for label, internal in SENSOR_METHODS.items()}
+                     for label, internal in methods.items()}
         # Only the evaluator reads identity correspondence after predictions.
         visible_truth = {item["detection_id"]: item["patch_id"]
                          for item in reference["geometry_references"]
@@ -253,9 +304,11 @@ def run_sensor_localization(study_path: Path) -> dict:
                 "wrong_selection": outcome == "wrong_selection",
                 "target_present": truth is not None,
                 "measurement_status": policy["status"],
+                **({"session_id": session_id, "timestamp_s": timestamp_s}
+                   if image_mode else {}),
             })
     summary = {}
-    for method in SENSOR_METHODS:
+    for method in methods:
         method_rows = [row for row in rows if row["method"] == method]
         counts = {label: sum(row["status"] == label for row in method_rows)
                   for label in ("correct_selection", "correct_rejection",
@@ -272,19 +325,26 @@ def run_sensor_localization(study_path: Path) -> dict:
     return {
         "schema_version": "1.0.0", "evidence_type": "simulation",
         "status": "exploratory_not_confirmatory", "study_id": "02",
-        "suite_id": suite_id, "model": "planar_bearing_range_proxy_v1",
+        "suite_id": suite_id,
+        "model": ("synthetic_grayscale_patch_plus_planar_range_v1"
+                  if image_mode else "planar_bearing_range_proxy_v1"),
         "independent_unit": "one_hand_constructed_scene_not_population",
-        "selection_modes": list(SENSOR_METHODS),
-        "method_semantics": {
+        "selection_modes": list(methods),
+        "method_semantics": ({
+            "grayscale_mae": "normalized_gray8_patch_mean_absolute_error",
+            "range_proxy": "normalized_planar_range_discrepancy",
+            "grayscale_range": "equal_weight_grayscale_and_range_proxy",
+        } if image_mode else {
             "bearing_proxy": "horizontal_pixel_difference_not_appearance",
             "range_proxy": "sensor_range_difference_not_3d_pose",
             "joint_proxy": "equal_weight_normalized_bearing_range",
-        },
+        }),
         "source": software_provenance(),
         "input_sha256": sha256(raw).hexdigest(),
         "scene_sha256": sha256_file(scene_path),
         "sensor_sha256": sha256_file(sensor_path),
         "visibility_access": "evaluator_only_geometry",
         "threshold": threshold, "ambiguity_margin": margin,
+        **({"session_id": session_id} if image_mode else {}),
         "observations": observations, "trials": rows, "summary": summary,
     }

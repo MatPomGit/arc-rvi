@@ -5,7 +5,7 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.17.0
+  software_version: 1.18.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
@@ -55,6 +55,7 @@ implemented:
   - "Reusable planar sensor observation features and separate evaluator-only geometric truth"
   - "Exploratory P02 bearing/range-proxy selection on generated anonymous features"
   - "Grouped P02 planar-association factorial pilot with hashed disjoint family partitions"
+  - "P02 8x8 synthetic grayscale patch matching with crossed visual similarity and within-session image noise"
   - "Exploratory P01 observed-feature route selection with evaluator-only detected-area scoring"
   - "Balanced 12-cell P01 toy-factorial generator with disjoint 2–4 patch families and hashed cell suites"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
@@ -73,12 +74,13 @@ evidence_state:
   family_count_planning: illustrative_known_variance_normal_assumptions_only
   common_experiment_runner: study01_fixture_and_exploratory_simulation_only
   cluster_monte_carlo: uncalibrated_synthetic_assumptions_only
-  instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
-  sensor_observations: uncalibrated_horizontal_1d_synthetic_features_only
+  instance_localization: fixture_distances_plus_synthetic_grayscale_pixel_mae_not_natural_image_recognition
+  sensor_observations: uncalibrated_planar_bearing_range_and_generated_gray8_patch_arrays
   p01_observation_planning: exploratory_12_cell_generator_and_two_hand_constructed_policy_smokes_not_confirmatory
   p01_factorial: 216_uncalibrated_synthetic_worlds_in_example_generated_on_demand_not_collected_results
-  p02_sensor_association: single_scene_and_grouped_factorial_proxy_features_only
+  p02_sensor_association: single_scene_proxy_and_grouped_synthetic_pixel_and_range_association
   p02_population: seeded_synthetic_family_draws_descriptive_not_physically_independent
+  p02_image_pilot: generated_gray8_8x8_pixel_arrays_not_measured_images_or_calibrated_recognition
   pages_deployment: verified_success_main_3f65264d062f945c2d6c04e8a7f2abfacecf2773
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
@@ -163,6 +165,8 @@ verification_commands:
   - "rvi power-mc --spec simulation/conditions/study01_cluster_mc.json --output results/study01_cluster_mc.json"
   - "rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json"
   - "rvi localize-population --spec simulation/conditions/study02_population_pilot.json --output-dir results/study02_population"
+  - "rvi localize-population --spec simulation/conditions/study02_image_pilot.json --output-dir results/study02_images"
+  - "rvi localize --population-manifest results/study02_images/manifest.json --partition pilot --output results/study02_image_pilot.json"
   - "rvi localize --population-manifest results/study02_population/manifest.json --partition pilot --output results/study02_pilot.json"
   - "python -m unittest tests.unit.test_perception"
   - "rvi localize --sensor-study simulation/suites/localization_sensor_demo.json --output results/study02_sensor.json"
@@ -182,6 +186,7 @@ publication_portfolio:
     - {id: P08, question: "End-to-end documentation evaluation", protocol: experiments/exp08_field_validation/protocol.md}
 current_blockers:
   - "Representative independent scene sampling, blinded confirmation partition and full crossed conditions"
+  - "Natural-image appearance, independently repeated sessions, measured camera and pose calibration for P02"
   - "Frozen thresholds, baseline revisions and sample-size calculations"
   - "Literature verification and distinct publication contributions"
   - "Calibrated physical reference measurements and authorized equipment access"
@@ -197,8 +202,8 @@ next_actions:
     done_when: "Independent units, failures and uncertainty are explicit; fixtures are excluded from confirmation evidence"
   - order: 3
     id: RVI02_IMAGE_AND_SESSION_MODEL
-    action: "Implement verified image-descriptor and timestamped session observation model with independent identity and pose ground truth"
-    done_when: "No evaluator truth leakage, disjoint object and session partitions, calibration checks and declared appearance-similarity conditions"
+    action: "Validate natural-image descriptors and real timestamped sessions with independently calibrated identity and pose ground truth"
+    done_when: "Measured image/camera interface and independent session/pose references verified, with object/session-disjoint splits and no evaluator truth leakage"
   - order: 4
     id: RVI03_CALIBRATION
     action: "Select and validate physics/sensor models only when required by the frozen study"

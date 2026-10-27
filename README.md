@@ -45,6 +45,8 @@ rvi benchmark --suite simulation/suites/geometric_smoke.json --sensor simulation
 rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions
 rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json
 rvi localize-population --spec simulation/conditions/study02_population_pilot.json --output-dir results/study02_population
+rvi localize-population --spec simulation/conditions/study02_image_pilot.json --output-dir results/study02_images
+rvi localize --population-manifest results/study02_images/manifest.json --partition pilot --output results/study02_image_pilot.json
 rvi localize --population-manifest results/study02_population/manifest.json --partition pilot --output results/study02_pilot.json
 rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json
 rvi population --spec simulation/conditions/study01_population_pilot.json --output-dir results/study01_population
@@ -78,6 +80,10 @@ assumptions; it is not a frozen confirmatory design.
 The [cluster Monte Carlo tool](docs/cluster-monte-carlo.md) explores synthetic
 null rejection, interval coverage and assumed alternative power at the
 **family** level under normal/heavy-tailed effects and missingness stress.
+The [synthetic grayscale Study 02 pilot](docs/localization.md) extends
+association from 1D bearing/range proxies to generated 8×8 grayscale pixel
+arrays with controlled appearance similarity and simulated-session noise;
+no real camera images or calibrated 3D pose references are used.
 The [grouped P02 synthetic pilot](docs/localization.md) compares fixed
 bearing/range methods across separately seeded object-set families, paired
 visibility and distractor separation conditions, with no confirmation claims.

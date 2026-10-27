@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "study_id": "02",
+  "design": "planar_grayscale_association_v1",
+  "master_seed": 20261027,
+  "family_counts": {
+    "development": 2,
+    "pilot": 3,
+    "holdout": 2
+  },
+  "replicates_per_cell": 2,
+  "sensor": "sensor_exploratory.json",
+  "appearance_levels": [
+    "distinct",
+    "similar"
+  ]
+}
