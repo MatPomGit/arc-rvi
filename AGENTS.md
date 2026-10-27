@@ -17,6 +17,22 @@ This is an independently maintained academic research repository.
 - Do not run untrusted code on persistent hosts; do not enable paid hosted automation.
 - Develop in a feature branch and open a PR. Run local offline tests and review diffs before merge. Do not invent approvals or results.
 
+## Code quality and simplicity (mandatory)
+- Follow **KISS** and **YAGNI**: make the smallest correct change. Avoid overengineering, speculative features, unnecessary layers, factories, wrappers, configuration switches and dependencies.
+- **Inspect before creating**: search existing modules, scripts, CLI commands and tests. Extend the canonical implementation instead of creating similar programs, parallel runners, duplicate generators or alternative entry points.
+- Prefer reusable, cohesive functions with clear inputs/outputs. Separate domain logic from CLI, I/O and hardware adapters; introduce shared abstractions only for demonstrated reuse.
+- Follow applicable Python PEPs, especially **PEP 8** (style, imports, naming and formatting), **PEP 257** (useful docstrings) and **PEP 484** (type hints at public interfaces). Keep functions readable and reasonably short.
+- Prefer the standard library and existing dependencies. Do not add a package or build tool unless it solves a concrete requirement better than the current code.
+- Refactor duplication in place. Replace obsolete implementations and remove redundant scripts/files after checking all callers; never delete research evidence or required historical sources.
+- Add focused tests for changed behavior and important edge cases; reuse current test fixtures and infrastructure. Run `python scripts/validate.py` and report the actual result. Do not claim tests passed if not run.
+- Keep PRs scoped. Review the diff for duplicated logic, unnecessary files, complexity and regressions; after merge, delete the feature branch.
+
+## Documentation and communication
+- Document **what is needed to use, reproduce or verify** a change, not everything that could be explained. Keep text short, factual, structured and free of repetition or filler.
+- Update existing canonical documentation instead of generating new READMEs, guides, summaries, status files or diagrams for each small change. Create a new document only when it has a distinct, lasting purpose.
+- Keep comments and docstrings concise; explain non-obvious decisions and research constraints rather than narrating self-evident code. Give brief agent/PR reports: result, evidence, remaining blockers. No overexplaining.
+- Simplicity never overrides scientific provenance, security, validation, physical safety or reproducibility requirements.
+
 ## Project state
 - Read `PROJECT_STATE.yaml` and `AUTOPILOT_PLAN.md` before continuing work.
 - Update canonical state after verified changes; do not copy state into parallel status files.
