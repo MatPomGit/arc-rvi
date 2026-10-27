@@ -5,7 +5,7 @@ Version: 1.1.0
 The planned reference robot for simulation-model validation and authorized
 physical stages is **Unitree G1 EDU**. It is a platform choice, not proof
 of an implemented adapter, calibrated robot model or available physical data.
-See [platform configuration](../config/robot.yaml) and
+See `config/robot.yaml` and
 [hardware safety requirements](../docs/safety.md).
 
 Eight prospective studies share infrastructure but answer different questions.
