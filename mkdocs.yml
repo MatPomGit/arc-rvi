@@ -36,6 +36,7 @@ nav:
       - Cluster Monte Carlo: docs/cluster-monte-carlo.md
       - Data interface: docs/data-interface.md
   - Research integrity:
+      - Literature evidence and publication gates: docs/literature.md
       - Methodology: docs/methodology.md
       - Reproducibility: docs/reproducibility.md
       - Safety: docs/safety.md

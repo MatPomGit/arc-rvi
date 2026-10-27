@@ -37,7 +37,10 @@ Data may be shared when rights permit, but each paper must identify reused objec
 sessions, methods and tables. Keep primary contrasts distinct. Cite related manuscripts
 and explain shared evidence. Do not count the same result as two independent validations.
 Eight folders are candidate contributions; consolidate papers if evidence does not
-support distinct scientific contributions. Novelty requires a verified literature review.
+support distinct scientific contributions. Novelty requires a verified literature review. The four submitted draft reviews
+are preserved as unverified source material; see the
+[literature intake and claim register](../docs/literature.md) for the initial
+eight-study evidence gates and DOI verification backlog.
 
 ## Implementation order and acceptance
 

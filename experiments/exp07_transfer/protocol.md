@@ -53,3 +53,14 @@ protocol release. No confirmation data may be used to tune these choices.
 
 Manuscript: [paper 07](../../papers/paper07/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Literature-derived fidelity and bias audit
+
+The [literature intake](../../docs/literature.md) motivates explicit
+self-occlusion, external-occlusion and sensor-limit strata, and nominal,
+geometrically calibrated and sensor-calibrated prediction controls.
+Compare signed coverage bias, absolute prediction error and missing
+physical reference measurements on frozen held-out object/session units.
+This is an extension of the existing predictive-transfer endpoint, not
+a claim that “full calibration” works or that measured physical sessions
+have already been collected.

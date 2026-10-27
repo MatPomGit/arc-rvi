@@ -64,6 +64,7 @@ implemented:
   - "One virtual root floating joint supported with explicit identity-base assumption"
   - "Read-only SSH G1 EDU system and device inventory with optional bounded rt/lowstate mode_machine subscription"
   - "MkDocs source staging and verified GitHub Pages deployment"
+  - "Unverified four-draft literature intake preserved with eight-study claim/gate triage"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -94,7 +95,7 @@ evidence_state:
   physical_robot_adapter: not_implemented
   physical_measurements: absent
   manuscripts: templates_not_results
-  literature_and_novelty_review: pending
+  literature_and_novelty_review: four_author_supplied_drafts_archived_and_editorial_triage_created_source_and_screening_verification_pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
   - corresponding_main_commit: "08d86b215d4f9ab31ed14d839014a21351516072"
@@ -206,6 +207,7 @@ current_blockers:
   - "Natural-image appearance, independently repeated sessions, measured camera and pose calibration for P02"
   - "Frozen thresholds, baseline revisions and sample-size calculations"
   - "Literature verification and distinct publication contributions"
+  - "Reconstruct literature screening exports (1908 claims vs 240 analyzed vs 79 evidence-matrix rows), verify DOI metadata and evidence-to-claim links"
   - "Calibrated physical reference measurements and authorized equipment access"
   - "Identify actual G1 EDU mode_machine, URDF joint layout and measured sensor mount"
 next_actions:

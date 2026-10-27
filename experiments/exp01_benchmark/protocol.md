@@ -83,3 +83,14 @@ protocol release. No confirmation data may be used to tune these choices.
 
 Manuscript: [paper 01](../../papers/paper01/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Literature-derived factorial candidate (unfrozen)
+
+The [literature intake](../../docs/literature.md) suggests a candidate grid of
+100/500/1000/2000 lux, ±10 cm object translation, ±15° rotation and
+0/25/50/75% externally measured occlusion. **These are proposals, not
+validated simulator settings or achieved physical conditions.** Select
+measurable condition levels and family/sample counts only after model
+calibration and an independent-unit power sensitivity study. Preserve the
+current primary paired degradation contrast; do not replace it with a
+post-hoc omnibus significance test.

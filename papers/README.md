@@ -12,3 +12,9 @@ before submission or public release.
 
 Generated figures belong in each paper's `figures/` after clearance.
 `references.bib` contains shared citation records only when verified.
+
+The [literature intake audit](../docs/literature.md) documents submitted draft
+reviews, unresolved bibliographic provenance and cross-paper novelty risks.
+Do not transfer draft references to `references.bib` or characterize a manuscript
+as submission-ready until each claim has an independently verified source and
+its prospective experimental gate has been satisfied.
