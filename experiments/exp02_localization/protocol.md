@@ -75,3 +75,17 @@ method contrasts. This is neither image-feature fusion nor a calibrated
 object identity population; the prospective hypothesis and thresholds remain
 unfrozen. Study-specific independent session sampling and visual similarity
 conditions are still required before confirmation.
+
+
+## Synthetic pixel-array association extension
+
+A [new grayscale pilot](../../docs/localization.md) supplies 8×8
+simulated crops for anonymous detections, with exactly controlled
+target/distractor pixel similarity. The comparison has three methods:
+normalized grayscale MAE, range-only proxy and equal-weight grayscale/range.
+The synthetic session offset induces within-session dependence; repetitions
+are not treated as independently sampled objects or physical sessions.
+All methods see the same requests, including absent-target hard negatives.
+Only family-aggregated descriptive contrasts are permitted. A successful
+software test does not establish natural-image accuracy, calibration or
+the protocol's visual-spatial fusion hypothesis.
