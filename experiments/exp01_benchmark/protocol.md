@@ -1,6 +1,6 @@
 # Study 01: Reproducible Simulation Benchmark for Autonomous Robotic Visual Inspection
 
-Protocol version: 1.1.0
+Protocol version: 1.2.0
 
 Status: prospective design, not preregistered or frozen
 
@@ -45,6 +45,15 @@ If too few families support cluster inference, report descriptive estimates only
 Before confirmation, implement scenario generation, simulator ground truth and all
 baselines; verify collision and coverage calculations on known geometries.
 A fixture suite can check the analysis pipeline but cannot establish simulator robustness.
+
+## Exploratory scenario-family generator
+
+The [sampled-geometry implementation](../../docs/population.md) can draw
+independent synthetic latent family parameters and preserve disjoint family splits.
+Its sample space is prescribed by an uncalibrated 2D model. Its 12 pilot families
+are **computational draws**, not real-world independent objects and not a
+pre-registered confirmatory sample. Illumination and clutter are not modeled.
+The locked confirmation design and its power analysis remain pending.
 
 ## Provenance and confirmation gate
 

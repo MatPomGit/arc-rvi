@@ -11,6 +11,7 @@ from .benchmark import run_benchmark
 from .conditions import generate_conditions
 from .localization import run_localization_fixture
 from .pilot import analyze_pilot
+from .population import generate_population
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
 
@@ -39,6 +40,9 @@ def make_parser() -> argparse.ArgumentParser:
     pilot.add_argument("--reference", default="fixed_order", choices=("fixed_order", "greedy_coverage", "greedy_distance"))
     pilot.add_argument("--comparator", default="greedy_distance", choices=("fixed_order", "greedy_coverage", "greedy_distance"))
     pilot.add_argument("--seed", type=int, default=20261026)
+    population = sub.add_parser("population", help="sample exploratory geometry families for study01")
+    population.add_argument("--spec", required=True, type=Path)
+    population.add_argument("--output-dir", required=True, type=Path)
     return parser
 
 
@@ -56,6 +60,10 @@ def main(argv: list[str] | None = None) -> int:
             with arguments.output.open("x", encoding="utf-8") as stream:
                 stream.write(serialized)
             print(f"Saved fixture localization report to {arguments.output}")
+            return 0
+        if arguments.command == "population":
+            manifest = generate_population(arguments.spec, arguments.output_dir)
+            print(f"Saved {len(manifest['scenes'])} exploratory population scenes to {arguments.output_dir}")
             return 0
         if arguments.command == "conditions":
             manifest = generate_conditions(arguments.spec, arguments.output_dir)

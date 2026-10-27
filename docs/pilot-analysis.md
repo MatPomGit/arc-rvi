@@ -34,10 +34,13 @@ occlusion-associated loss** for the comparator. Effects are first averaged
 within each geometry family, then averaged equally across families.
 Replicate seeds and individual acquisitions are not independent families.
 
-The current pilot has **two geometry families, six pairs and 36 method trials**.
-It reports descriptive contrasts without confidence intervals or significance
-tests. Code for a deterministic 10,000-resample percentile bootstrap exists
-for future exploratory datasets with at least eight independent families; this
+The fixed-template example contains **two pilot families, six pairs and 36 method trials**
+and reports descriptive contrasts without confidence intervals. The separately
+[sampled-geometry example](population.md) contains **12 pilot families, 24
+pairs and 144 method trials**, for which the existing analyzer computes an
+exploratory family-resampled interval. Neither design supports physical or
+confirmatory inference. Code for a deterministic 10,000-resample percentile bootstrap exists
+for exploratory datasets with at least eight sampled model families; this
 threshold is a conservative software guard, **not** a sample-size calculation
 or a guarantee of correct population coverage. Cluster resampling is at the
 family level and retains paired method/condition comparisons.
