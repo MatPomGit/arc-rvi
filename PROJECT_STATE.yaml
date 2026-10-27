@@ -39,7 +39,7 @@ evidence_state:
   common_experiment_runner: study01_fixture_and_exploratory_simulation_only
   cluster_monte_carlo: uncalibrated_synthetic_assumptions_only
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
-  pages_deployment: verified_success_main_b2b4f8b42be984cf10d3fc6747f7f2cf462c1305
+  pages_deployment: verified_success_main_08a62569d407bca3cdcb1646d3ceec4d9060182c
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   physical_robot_adapter: not_implemented
@@ -48,6 +48,20 @@ evidence_state:
   literature_and_novelty_review: pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "08a62569d407bca3cdcb1646d3ceec4d9060182c"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 106
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40466791329"
+    scope: "Study01 synthetic family Monte Carlo sensitivity; not physical or confirmatory power"
+  - corresponding_main_commit: "d26c63321ff8b2002ad280e320b9f29a366ea584"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 101
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40465964379"
+    scope: "Study01 immutable exploratory batch records; not full P01-P08 experimental runner"
   - corresponding_main_commit: "b2b4f8b42be984cf10d3fc6747f7f2cf462c1305"
     command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
     outcome: PASS
