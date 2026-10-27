@@ -1,6 +1,6 @@
 # Study 01: Reproducible Simulation Benchmark for Autonomous Robotic Visual Inspection
 
-Protocol version: 1.2.0
+Protocol version: 1.3.0
 
 Status: prospective design, not preregistered or frozen
 
@@ -53,7 +53,10 @@ independent synthetic latent family parameters and preserve disjoint family spli
 Its sample space is prescribed by an uncalibrated 2D model. Its 12 pilot families
 are **computational draws**, not real-world independent objects and not a
 pre-registered confirmatory sample. Illumination and clutter are not modeled.
-The locked confirmation design and its power analysis remain pending.
+The [pre-confirmatory sensitivity calculator](../../docs/sample-size.md)
+provides illustrative normal-model estimates of independent family counts,
+conditioning on externally specified effects, between-family SD and attrition.
+The locked confirmation design and its validated power analysis remain pending.
 
 ## Provenance and confirmation gate
 

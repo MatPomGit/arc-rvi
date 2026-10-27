@@ -11,6 +11,7 @@ from .benchmark import run_benchmark
 from .conditions import generate_conditions
 from .localization import run_localization_fixture
 from .pilot import analyze_pilot
+from .planning import plan_family_sample
 from .population import generate_population
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
@@ -43,6 +44,10 @@ def make_parser() -> argparse.ArgumentParser:
     population = sub.add_parser("population", help="sample exploratory geometry families for study01")
     population.add_argument("--spec", required=True, type=Path)
     population.add_argument("--output-dir", required=True, type=Path)
+    precision = sub.add_parser("precision", help="assumption-only independent-family sample size sensitivity")
+    precision.add_argument("--spec", required=True, type=Path)
+    precision.add_argument("--output", required=True, type=Path)
+    precision.add_argument("--pilot-summary", type=Path)
     return parser
 
 
@@ -69,12 +74,14 @@ def main(argv: list[str] | None = None) -> int:
             manifest = generate_conditions(arguments.spec, arguments.output_dir)
             print(f"Saved {len(manifest['scenes'])} exploratory scenes to {arguments.output_dir}")
             return 0
-        if arguments.command in ("benchmark", "simulate", "pilot"):
+        if arguments.command in ("benchmark", "simulate", "pilot", "precision"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
             if arguments.command == "pilot":
                 payload = analyze_pilot(arguments.manifest, arguments.reference,
                                         arguments.comparator, seed=arguments.seed)
+            elif arguments.command == "precision":
+                payload = plan_family_sample(arguments.spec, arguments.pilot_summary)
             else:
                 payload = (run_benchmark(arguments.suite) if arguments.command == "benchmark"
                            else run_simulation(arguments.scene))
