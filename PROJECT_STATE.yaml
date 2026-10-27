@@ -87,7 +87,7 @@ evidence_state:
   p02_population: seeded_synthetic_family_draws_descriptive_not_physically_independent
   p02_image_pilot: generated_gray8_8x8_pixel_arrays_not_measured_images_or_calibrated_recognition
   p02_local_image_input: offline_pgm_reader_implemented_no_real_dataset_collected_or_calibration_verified
-  pages_deployment: verified_success_main_4d902d78c1b2118ee6dcdaa8f803a66dac9bfb1d
+  pages_deployment: verified_success_main_952e0344bd1eaab332570e373ba19eb2d5b42298
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   robot_description_audit: static_urdf_structure_and_zero_joint_pose_only
@@ -101,6 +101,13 @@ evidence_state:
   literature_and_novelty_review: doi_keyed_77_candidate_works_22_reviewed_metadata_49_unverified_doi_6_unresolved_no_doi_not_systematic_review
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "952e0344bd1eaab332570e373ba19eb2d5b42298"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 172
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40596642843"
+    scope: "Version 1.22.0 with 22 reviewed DOI metadata, P02-P08 critical source-level prior-art comparison; does not certify full articles or systematic search counts"
   - corresponding_main_commit: "4d902d78c1b2118ee6dcdaa8f803a66dac9bfb1d"
     command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
     outcome: PASS
