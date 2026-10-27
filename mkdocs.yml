@@ -33,6 +33,7 @@ nav:
       - Paired pilot analysis: docs/pilot-analysis.md
       - Sampled geometry population: docs/population.md
       - Sample-size sensitivity: docs/sample-size.md
+      - Cluster Monte Carlo: docs/cluster-monte-carlo.md
       - Data interface: docs/data-interface.md
   - Research integrity:
       - Methodology: docs/methodology.md
