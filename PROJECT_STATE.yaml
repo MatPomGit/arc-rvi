@@ -5,14 +5,14 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.5.0
+  software_version: 1.6.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
   documentation: mkdocs.yml
-research_phase: seeded_exploratory_geometric_simulation
+research_phase: exploratory_paired_geometric_pilot_analysis
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
   - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
@@ -20,6 +20,7 @@ implemented:
   - "Input/source hashes, partial outcomes and repeatable JSON reports"
   - "Eight prospective protocols and shared statistical design"
   - "Seeded paired geometric conditions, disjoint family partitions and hash manifests"
+  - "Pilot-only paired geometric analysis with SHA-256 input checks and family aggregation"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
   - "MkDocs source staging and GitHub Pages workflow (deployment unverified)"
 evidence_state:
@@ -28,6 +29,7 @@ evidence_state:
   policy_visibility: known_geometry_oracle_not_unknown_surface_perception
   collected_research_dataset: absent
   seeded_conditions: exploratory_generator_only
+  pilot_analysis: software_only_descriptive_two_family_pilot
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
   pages_deployment: verified_success_main_502127a3e906a162cf13764ef08b8d328a423c95
   independent_family_sample: not_established
@@ -55,6 +57,7 @@ verification_commands:
   - "python scripts/validate.py"
   - "rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json"
   - "rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions"
+  - "rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json"
   - "rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json"
   - "python scripts/build_docs.py && python -m mkdocs build --strict"
 publication_portfolio:

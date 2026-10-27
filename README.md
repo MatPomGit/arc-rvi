@@ -34,6 +34,7 @@ rvi simulate --scene simulation/worlds/planar_inspection.json --output results/s
 rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json
 rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions
 rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json
+rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json
 ```
 
 The `plan` command operates on a **synthetic fixture**, not a real robot or physics simulator. It provides a reproducible baseline greedy coverage planner, not an optimality claim. Real robot and external physics-engine integrations remain unavailable.
@@ -44,6 +45,8 @@ The [planar simulator](docs/simulation.md) computes visibility, swept-footprint 
 and model time from a geometric scene and a supplied route.
 The [seeded condition generator](docs/conditions.md) creates separate exploratory
 geometry families and matched nominal/occluded scenes with a SHA-256 manifest.
+The [exploratory paired pilot analysis](docs/pilot-analysis.md) checks input hashes,
+retains failed trials and summarizes family-paired effects without claiming confirmation.
 
 ## Research integrity
 
