@@ -165,6 +165,7 @@ def _write_artifacts(output_dir: Path, payloads: dict[str, bytes]) -> None:
                 pass
         raise
 
+
 def _factorial_spec(path: Path) -> tuple[dict, bytes]:
     spec, raw = read_json(path)
     required = {"schema_version", "study_id", "design", "master_seed",
@@ -243,6 +244,7 @@ def _factorial_population(spec_path: Path, output_dir: Path) -> dict:
         "stage": "exploratory_not_confirmatory",
         "visibility_access": "evaluator_only_when_sensor_mode_enabled",
         "master_seed": spec["master_seed"],
+        "sensor_stream_seed": _seed(spec["master_seed"], "sensor_stream"),
         "replicates_per_family": spec["replicates_per_family"],
         "partitions": members, "factor_levels": spec["factors"],
         "geometry_strata_patch_counts": [2, 3, 4],
@@ -254,7 +256,8 @@ def _factorial_population(spec_path: Path, output_dir: Path) -> dict:
     payloads: dict[str, bytes] = {}
     for illumination in FACTOR_LEVELS["illumination"]:
         relative = f"sensors/{illumination}.json"
-        encoded = _encoded(_factor_sensor(spec["master_seed"], illumination))
+        encoded = _encoded(_factor_sensor(
+            _seed(spec["master_seed"], "sensor_stream"), illumination))
         payloads[relative] = encoded
         manifest["sensor_configs"][illumination] = {
             "path": relative, "sha256": _hash(encoded),
