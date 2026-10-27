@@ -5,7 +5,7 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.15.1
+  software_version: 1.17.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
@@ -54,6 +54,7 @@ implemented:
   - "Study01 synthetic family-level Monte Carlo CI coverage/type-I/power and missingness sensitivity checks"
   - "Reusable planar sensor observation features and separate evaluator-only geometric truth"
   - "Exploratory P02 bearing/range-proxy selection on generated anonymous features"
+  - "Grouped P02 planar-association factorial pilot with hashed disjoint family partitions"
   - "Exploratory P01 observed-feature route selection with evaluator-only detected-area scoring"
   - "Balanced 12-cell P01 toy-factorial generator with disjoint 2–4 patch families and hashed cell suites"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
@@ -76,7 +77,8 @@ evidence_state:
   sensor_observations: uncalibrated_horizontal_1d_synthetic_features_only
   p01_observation_planning: exploratory_12_cell_generator_and_two_hand_constructed_policy_smokes_not_confirmatory
   p01_factorial: 216_uncalibrated_synthetic_worlds_in_example_generated_on_demand_not_collected_results
-  p02_sensor_association: single_toy_scene_proxy_features_not_image_appearance_or_physical_localization
+  p02_sensor_association: single_scene_and_grouped_factorial_proxy_features_only
+  p02_population: seeded_synthetic_family_draws_descriptive_not_physically_independent
   pages_deployment: verified_success_main_08a62569d407bca3cdcb1646d3ceec4d9060182c
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
@@ -153,6 +155,8 @@ verification_commands:
   - "rvi batch --suite simulation/suites/fixture_smoke.json --output-dir results/study01_fixture_batch"
   - "rvi power-mc --spec simulation/conditions/study01_cluster_mc.json --output results/study01_cluster_mc.json"
   - "rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json"
+  - "rvi localize-population --spec simulation/conditions/study02_population_pilot.json --output-dir results/study02_population"
+  - "rvi localize --population-manifest results/study02_population/manifest.json --partition pilot --output results/study02_pilot.json"
   - "python -m unittest tests.unit.test_perception"
   - "rvi localize --sensor-study simulation/suites/localization_sensor_demo.json --output results/study02_sensor.json"
   - "python scripts/build_docs.py && python -m mkdocs build --strict"

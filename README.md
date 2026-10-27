@@ -44,6 +44,8 @@ rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/ge
 rvi benchmark --suite simulation/suites/geometric_smoke.json --sensor simulation/conditions/sensor_exploratory.json --output results/observed.json
 rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions
 rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json
+rvi localize-population --spec simulation/conditions/study02_population_pilot.json --output-dir results/study02_population
+rvi localize --population-manifest results/study02_population/manifest.json --partition pilot --output results/study02_pilot.json
 rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json
 rvi population --spec simulation/conditions/study01_population_pilot.json --output-dir results/study01_population
 rvi population --spec simulation/conditions/study01_factorial_pilot.json --output-dir results/study01_factorial
@@ -76,6 +78,9 @@ assumptions; it is not a frozen confirmatory design.
 The [cluster Monte Carlo tool](docs/cluster-monte-carlo.md) explores synthetic
 null rejection, interval coverage and assumed alternative power at the
 **family** level under normal/heavy-tailed effects and missingness stress.
+The [grouped P02 synthetic pilot](docs/localization.md) compares fixed
+bearing/range methods across separately seeded object-set families, paired
+visibility and distractor separation conditions, with no confirmation claims.
 The [exploratory P02 sensor association](docs/localization.md) reuses the
 existing selector on generated bearing/range detections with separate
 evaluator-only truth; actual appearance recognition is not implemented.

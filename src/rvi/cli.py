@@ -11,6 +11,8 @@ from .benchmark import run_benchmark
 from .conditions import generate_conditions
 from .experiment import run_experiment
 from .localization import run_localization_fixture, run_sensor_localization
+from .localization_population import (generate_localization_population,
+                                      analyze_localization_population)
 from .pilot import analyze_pilot
 from .planning import plan_family_sample
 from .power_mc import analyze_cluster_monte_carlo
@@ -41,8 +43,13 @@ def make_parser() -> argparse.ArgumentParser:
     localize_input = localize.add_mutually_exclusive_group(required=True)
     localize_input.add_argument("--fixture", type=Path)
     localize_input.add_argument("--sensor-study", type=Path)
+    localize_input.add_argument("--population-manifest", type=Path)
+    localize.add_argument("--partition", choices=("development", "pilot"), default="pilot")
 
     localize.add_argument("--output", required=True, type=Path)
+    localize_population = sub.add_parser("localize-population", help="generate P02 grouped synthetic object sets")
+    localize_population.add_argument("--spec", required=True, type=Path)
+    localize_population.add_argument("--output-dir", required=True, type=Path)
     pilot = sub.add_parser("pilot", help="analyze exploratory study01 paired geometric pilot")
     pilot.add_argument("--manifest", required=True, type=Path)
     pilot.add_argument("--output", required=True, type=Path)
@@ -84,13 +91,20 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("output already exists; choose a new path")
             payload = (run_localization_fixture(arguments.fixture)
                        if arguments.fixture is not None else
-                       run_sensor_localization(arguments.sensor_study))
+                       run_sensor_localization(arguments.sensor_study)
+                       if arguments.sensor_study is not None else
+                       analyze_localization_population(arguments.population_manifest,
+                                                       partition=arguments.partition))
             serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
                                     indent=2, allow_nan=False) + "\n"
             arguments.output.parent.mkdir(parents=True, exist_ok=True)
             with arguments.output.open("x", encoding="utf-8") as stream:
                 stream.write(serialized)
             print(f"Saved {payload['evidence_type']} localization report to {arguments.output}")
+            return 0
+        if arguments.command == "localize-population":
+            manifest = generate_localization_population(arguments.spec, arguments.output_dir)
+            print(f"Saved {len(manifest['records'])} grouped P02 synthetic study cases")
             return 0
         if arguments.command == "batch":
             receipt = run_experiment(manifest=arguments.manifest, suite=arguments.suite,
