@@ -42,6 +42,16 @@ Freeze the camera model, collision margin, stability criterion, timing model and
 budget before confirmation. Validate each with analytic test scenes.
 Whole-body claims require a verified articulated model; planar fixtures are insufficient.
 
+## Reference model preparation (exploratory)
+
+The planned Unitree G1 EDU embodiment will use a version-pinned,
+manufacturer-provided URDF **only after** its actual machine variant has
+been identified. An [offline model audit](../../docs/architecture.md) now
+checks imported joint-tree consistency, numeric limits and static
+zero-joint camera-frame transforms. It does **not** implement articulated
+collision/reachability, full forward/inverse kinematics, stability or
+actual G1 physical verification. Issue #25 remains open.
+
 ## Provenance and confirmation gate
 
 Apply the [shared analysis plan](../analysis/README.md) and
