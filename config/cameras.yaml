@@ -1,4 +1,8 @@
 # Illustrative calibration targets, not measured device parameters.
+# The installed G1 EDU sensor and extrinsic must be independently identified.
+reference_urdf_camera_link: not_verified
+camera_to_robot_extrinsic: not_calibrated
+camera_time_alignment: not_verified
 camera_frame: camera_optical
 min_laplacian_variance: 100.0
 exposure_mean_min: 40.0
