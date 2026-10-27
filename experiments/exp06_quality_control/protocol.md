@@ -51,3 +51,13 @@ protocol release. No confirmation data may be used to tune these choices.
 
 Manuscript: [paper 06](../../papers/paper06/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Literature-derived proactive/reactive distinction
+
+The [literature intake](../../docs/literature.md) proposes proactive
+quality-aware viewpoint selection versus post-hoc filtering and reacquisition.
+Use this as a **secondary ablation** of the existing primary replanning-versus-
+same-view-retry question, with a shared deadline, matched disturbances and a
+reference evaluator independent from the policy score. This trial must not
+reuse P04's online incomplete-geometry endpoint as independent evidence.
+Suggested image-quality cutoffs and trial counts are not calibrated.

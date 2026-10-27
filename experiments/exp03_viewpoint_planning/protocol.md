@@ -68,3 +68,14 @@ protocol release. No confirmation data may be used to tune these choices.
 
 Manuscript: [paper 03](../../papers/paper03/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Literature-derived humanoid ablation (unfrozen)
+
+The [literature intake](../../docs/literature.md) motivates an additional
+whole-body-aware versus fixed-base/manipulator-adapted feasibility ablation.
+Keep candidate views, budget and independent collision/stability oracle
+identical, and record infeasible views and planning overhead. This is
+**secondary to the prespecified joint-versus-decoupled primary contrast**;
+adding an illustrative humanoid model is not evidence of stability or
+physical executability. Do not transplant predicted t statistics from
+unverified draft hypotheses into a result or power claim.
