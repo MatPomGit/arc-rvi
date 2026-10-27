@@ -277,7 +277,7 @@ def _factorial_population(spec_path: Path, output_dir: Path) -> dict:
                     relative = f"scenes/{split}/{scene['scene_id']}.json"
                     encoded = _encoded(scene)
                     payloads[relative] = encoded
-                    grouped[cell].append("../" + relative)
+                    grouped[cell].append("../../" + relative)
                     manifest["scenes"].append({
                         "path": relative, "scene_id": scene["scene_id"],
                         "partition": split, "family": family,
