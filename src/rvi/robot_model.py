@@ -9,7 +9,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 MAX_URDF_BYTES = 2_000_000
-JOINT_TYPES = {"fixed", "revolute", "continuous", "prismatic"}
+JOINT_TYPES = {"fixed", "revolute", "continuous", "prismatic", "floating"}
 
 
 def _vector(text: str, size: int, context: str) -> tuple[float, ...]:
@@ -97,6 +97,7 @@ def inspect_urdf(
     joint_names = set()
     types = Counter()
     neutral_outside = []
+    floating_parents = []
     for joint in xml.findall("joint"):
         identifier, kind = joint.get("name", ""), joint.get("type")
         if not identifier.strip() or identifier in joint_names or kind not in JOINT_TYPES:
@@ -111,12 +112,14 @@ def inspect_urdf(
                 or child in child_parent):
             raise ValueError("unknown, self-linked or multiply parented link")
         child_parent[child] = parent
+        if kind == "floating":
+            floating_parents.append(parent)
         origin = joint.find("origin")
         xyz = _vector(origin.get("xyz", "0 0 0") if origin is not None else "0 0 0",
                       3, "joint xyz in metres")
         rpy = _vector(origin.get("rpy", "0 0 0") if origin is not None else "0 0 0",
                       3, "joint roll/pitch/yaw in radians")
-        if kind != "fixed":
+        if kind not in ("fixed", "floating"):
             axis = joint.find("axis")
             v = _vector(axis.get("xyz", "1 0 0") if axis is not None else "1 0 0",
                         3, "joint axis")
@@ -138,6 +141,8 @@ def inspect_urdf(
     if len(roots) != 1 or len(joint_names) != len(links) - 1:
         raise ValueError("URDF joints must form exactly one rooted tree")
     root = next(iter(roots))
+    if len(floating_parents) > 1 or any(parent != root for parent in floating_parents):
+        raise ValueError("only one virtual floating-base joint at the root is supported")
     poses: dict[str, tuple] = {root: (IDENTITY, (0.0, 0.0, 0.0))}
     depth = {root: 0}
     queue = deque([root])
@@ -170,6 +175,7 @@ def inspect_urdf(
         "root_link": root, "link_count": len(links),
         "joint_count": len(joint_names), "joint_types": dict(sorted(types.items())),
         "max_tree_depth": max(depth.values()),
+        "floating_base_zero_pose_assumed": bool(floating_parents),
         "zero_joint_pose_within_declared_limits": not neutral_outside,
         "zero_pose_limit_violations": sorted(neutral_outside),
         "camera_frame": camera,
