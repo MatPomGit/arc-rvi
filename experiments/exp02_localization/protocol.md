@@ -52,5 +52,14 @@ Before confirmation, record numeric thresholds, sample-size justification, datas
 partitions, exact baseline revisions and the analysis implementation in an immutable
 protocol release. No confirmation data may be used to tune these choices.
 
+## Exploratory sensor proxy
+
+An [initial generated-observation check](../../docs/localization.md) now
+compares anonymous horizontal-bearing and range features using the
+unchanged selection/abstention mechanism. It includes present/absent
+target requests and independently held evaluator correspondence. These
+proxies are **not** appearance embeddings or full spatial-visual fusion;
+the protocol's main hypothesis remains untested.
+
 Manuscript: [paper 02](../../papers/paper02/manuscript.tex).
 Publication boundaries: [research program](../README.md).

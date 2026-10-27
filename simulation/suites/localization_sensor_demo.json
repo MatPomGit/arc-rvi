@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "study_id": "02",
+  "evidence_type": "simulation",
+  "stage": "exploratory_not_confirmatory",
+  "suite_id": "study02_sensor_toy",
+  "scene": "../worlds/localization_2d.json",
+  "sensor": "../conditions/sensor_exploratory.json",
+  "threshold": 0.25,
+  "ambiguity_margin": 0.015,
+  "requests": [
+    {
+      "request_id": "centre_request",
+      "capture_index": 0,
+      "expected_u_px": 320,
+      "expected_range_m": 3,
+      "ground_truth_patch_id": "centre"
+    },
+    {
+      "request_id": "left_request",
+      "capture_index": 0,
+      "expected_u_px": 189,
+      "expected_range_m": 3.1622776601683795,
+      "ground_truth_patch_id": "left"
+    },
+    {
+      "request_id": "absent_distractor",
+      "capture_index": 0,
+      "expected_u_px": 320,
+      "expected_range_m": 3,
+      "ground_truth_patch_id": null
+    }
+  ]
+}

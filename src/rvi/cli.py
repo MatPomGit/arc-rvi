@@ -10,7 +10,7 @@ from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
 from .conditions import generate_conditions
 from .experiment import run_experiment
-from .localization import run_localization_fixture
+from .localization import run_localization_fixture, run_sensor_localization
 from .pilot import analyze_pilot
 from .planning import plan_family_sample
 from .power_mc import analyze_cluster_monte_carlo
@@ -35,7 +35,10 @@ def make_parser() -> argparse.ArgumentParser:
     conditions.add_argument("--spec", required=True, type=Path)
     conditions.add_argument("--output-dir", required=True, type=Path)
     localize = sub.add_parser("localize", help="evaluate synthetic instance-assignment fixtures")
-    localize.add_argument("--fixture", required=True, type=Path)
+    localize_input = localize.add_mutually_exclusive_group(required=True)
+    localize_input.add_argument("--fixture", type=Path)
+    localize_input.add_argument("--sensor-study", type=Path)
+
     localize.add_argument("--output", required=True, type=Path)
     pilot = sub.add_parser("pilot", help="analyze exploratory study01 paired geometric pilot")
     pilot.add_argument("--manifest", required=True, type=Path)
@@ -70,13 +73,15 @@ def main(argv: list[str] | None = None) -> int:
         if arguments.command == "localize":
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
-            payload = run_localization_fixture(arguments.fixture)
+            payload = (run_localization_fixture(arguments.fixture)
+                       if arguments.fixture is not None else
+                       run_sensor_localization(arguments.sensor_study))
             serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
                                     indent=2, allow_nan=False) + "\n"
             arguments.output.parent.mkdir(parents=True, exist_ok=True)
             with arguments.output.open("x", encoding="utf-8") as stream:
                 stream.write(serialized)
-            print(f"Saved fixture localization report to {arguments.output}")
+            print(f"Saved {payload['evidence_type']} localization report to {arguments.output}")
             return 0
         if arguments.command == "batch":
             receipt = run_experiment(manifest=arguments.manifest, suite=arguments.suite,

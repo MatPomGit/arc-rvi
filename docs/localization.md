@@ -21,7 +21,7 @@ wrong object.
 
 ## Initial deterministic reference methods
 
-The implemented fixture-level API accepts **precomputed, normalized distances**
+The initial fixture-level API accepts **precomputed, normalized distances**
 in \([0,1]\). They are not extracted from images by ARC-RVI.
 
 | Method | Lower-is-better score | Meaning |
@@ -40,6 +40,36 @@ The scores intentionally encode the ranking problem but not vision, temporal
 association, perspective projection, identity embeddings, occlusion handling,
 camera calibration or sensor uncertainty. Better performance on constructed
 scores cannot establish the proposed scientific fusion hypothesis.
+
+## Exploratory sensor-based association
+
+The existing `rvi localize` command also accepts a simulated sensor study:
+
+```bash
+rvi localize --sensor-study simulation/suites/localization_sensor_demo.json --output results/study02_sensor.json
+```
+
+This uses the [planar feature sensor](simulation.md). A target request
+supplies an expected horizontal pixel and range cue. Methods compare that cue
+with **actually generated anonymous sensor detections** using three fixed
+scores: `bearing_proxy` (pixel mismatch/width), `range_proxy`
+(range mismatch/maximum scene range), and `joint_proxy` (their mean).
+This reuses the existing selector and abstention rules; the labels intentionally
+do **not** claim visual appearance recognition or metric 3D pose recovery.
+
+Patch identity and detection correspondence are withheld until selection
+is complete. The report keeps `observations[].policy` separate from
+`observations[].evaluator`, includes source/input/sensor hashes and records
+every matched method/request, including absent targets, missing observations,
+wrong selections and abstentions. A one-scene synthetic example is a software
+replay, not independent experimental replication. Association remains based
+on externally supplied cues; the source, uncertainty and validity of those
+cues have not been calibrated.
+
+This is partial progress on [Issue #23](https://github.com/MatPomGit/arc-rvi/issues/23)
+and [Issue #24](https://github.com/MatPomGit/arc-rvi/issues/24).
+Actual image descriptors, multi-instance family sampling, session separation,
+physical pose metrology and prospective confirmation remain outstanding.
 
 ## Reproduce the software fixture
 
@@ -99,7 +129,8 @@ the included hand-constructed fixtures.
    Hash exact inputs and archive the source revision.
 2. **Observation adapter.** Define frame IDs, UTC timestamps, camera-to-world
    transforms, coordinate conventions, calibration hashes, confidence ranges
-   and a no-reference-leakage boundary. This is **not implemented**.
+   and a no-reference-leakage boundary. Anonymous 1D features and separate
+   evaluation records are implemented; full imaging and calibration are pending.
 3. **Simulation study.** Create independent object-set families with
    distractor similarity, separation and occlusion crossed prospectively;
    freeze the input representations and record simulator/renderer limitations.
