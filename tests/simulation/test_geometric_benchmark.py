@@ -172,6 +172,14 @@ class GeometricBenchmarkTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "require a simulation suite"):
             run_benchmark(ROOT / "simulation/suites/fixture_smoke.json", sensor)
         with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "holdout.json"
+            target.write_text(json.dumps({
+                "schema_version": "1.0.0", "suite_id": "study01_holdout",
+                "evidence_type": "simulation",
+                "scenes": ["../worlds/planar_inspection.json"],
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "held-out"):
+                run_benchmark(target, sensor)
             output = Path(temp) / "sensor.json"
             args = ["benchmark", "--suite", str(SUITE),
                     "--sensor", str(sensor), "--output", str(output)]
