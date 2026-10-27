@@ -58,10 +58,14 @@ def _validate_spec(path: Path) -> tuple[dict, bytes, Path, bytes]:
     if type(repeats) is not int or not 1 <= repeats <= 4:
         raise ValueError("replicates_per_cell must be an integer in [1,4]")
     sensor = spec["sensor"]
-    if type(sensor) is not str or not sensor or Path(sensor).is_absolute():
-        raise ValueError("sensor needs a relative file path")
+    if (type(sensor) is not str or not sensor or Path(sensor).is_absolute()
+            or ".." in Path(sensor).parts):
+        raise ValueError("sensor needs a contained relative file path")
     source_root = path.resolve(strict=True).parent
-    source = (source_root / sensor).resolve(strict=True)
+    try:
+        source = (source_root / sensor).resolve(strict=True)
+    except OSError as exc:
+        raise ValueError("sensor file is missing") from exc
     if not source.is_relative_to(source_root) or not source.is_file():
         raise ValueError("sensor file must be inside specification directory")
     load_sensor_config(source)
