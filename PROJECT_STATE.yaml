@@ -21,6 +21,10 @@ reference_robot:
   integration_status: not_implemented
   exact_variant_and_sensor_payload: not_verified
   firmware_sdk_and_calibration: not_recorded
+  vendor_description_repository: unitreerobotics/unitree_ros
+  vendor_description_reference_commit: "7919cba47a3f68888f3b084945b0ffbf3bb3763a"
+  actual_machine_mode_and_selected_urdf: not_verified
+  offline_model_auditor: implemented_but_not_verified_on_exact_delivered_robot
 research_phase: exploratory_p01_factorial_scene_generation
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
@@ -39,6 +43,7 @@ implemented:
   - "Exploratory P01 observed-feature route selection with evaluator-only detected-area scoring"
   - "Balanced 12-cell P01 toy-factorial generator with disjoint 2–4 patch families and hashed cell suites"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
+  - "Offline hash-pinned URDF topology/joint-limit and zero-pose camera-frame audit; no hardware control"
   - "MkDocs source staging and verified GitHub Pages deployment"
 evidence_state:
   fixtures: software_correctness_checks_only
@@ -59,6 +64,8 @@ evidence_state:
   pages_deployment: verified_success_main_08a62569d407bca3cdcb1646d3ceec4d9060182c
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
+  robot_description_audit: static_urdf_structure_and_zero_joint_pose_only
+  selected_robot_urdf_validated: not_yet
   physical_robot_adapter: not_implemented
   physical_measurements: absent
   manuscripts: templates_not_results
@@ -115,6 +122,7 @@ verification_history:
     scope: "Prior planar-simulation source tree; does not certify later revisions"
 verification_commands:
   - "python scripts/validate.py"
+  - "rvi robot-model --urdf /path/to/selected.urdf --expected-sha256 YOUR_SHA256 --camera-frame YOUR_VERIFIED_URDF_LINK --output results/robot_model_audit.json"
   - "rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json"
   - "rvi benchmark --suite simulation/suites/geometric_smoke.json --sensor simulation/conditions/sensor_exploratory.json --output results/observed.json"
   - "rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions"
@@ -147,6 +155,7 @@ current_blockers:
   - "Frozen thresholds, baseline revisions and sample-size calculations"
   - "Literature verification and distinct publication contributions"
   - "Calibrated physical reference measurements and authorized equipment access"
+  - "Identify actual G1 EDU mode_machine, URDF joint layout and measured sensor mount"
 next_actions:
   - order: 1
     id: RVI01_CONDITIONS
