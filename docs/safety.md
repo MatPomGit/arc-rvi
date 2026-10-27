@@ -1,5 +1,12 @@
 # Physical experiment safety
 
+A non-actuating initial inventory can be requested through
+`scripts/inspect_robot_ssh.py` via SSH from an authorized developer
+computer. It does not publish to DDS command channels, start a motor,
+change services, or modify robot configuration. The optional DDS read
+still requires permission to access the network and is no substitute
+for on-site safety checks. Store the resulting JSON locally.
+
 No real robot control exists in the initial repository. Before enabling one,
 document emergency stop tests, workspace boundaries, protected distances,
 human supervisor, safe speeds, collision handling, loss-of-localization
