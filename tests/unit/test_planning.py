@@ -111,6 +111,29 @@ class FamilyPlanningTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     plan_family_sample(SPEC, path)
 
+    def test_generated_pilot_diagnostics_integration(self):
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_pilot
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            generated = root / "generated"
+            generate_population(
+                ROOT / "simulation/conditions/study01_population_pilot.json",
+                generated,
+            )
+            pilot = analyze_pilot(generated / "manifest.json")
+            summary_path = root / "pilot_summary.json"
+            summary_path.write_text(
+                json.dumps(pilot, sort_keys=True, allow_nan=False),
+                encoding="utf-8",
+            )
+            report = plan_family_sample(SPEC, summary_path)
+            self.assertEqual(report["pilot_diagnostics"]["family_count"], 12)
+            self.assertEqual(report["scenario_results"], plan_family_sample(SPEC)["scenario_results"])
+            self.assertEqual(report["pilot_diagnostics"]["status"],
+                             "diagnostic_only_not_used_to_size_confirmation")
+
     def test_cli_report_cannot_overwrite(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "planning.json"
