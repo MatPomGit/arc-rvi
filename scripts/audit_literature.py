@@ -20,7 +20,7 @@ NAMES = (
     "ARC_RVI_Gap_Analysis_Publication_Strategy.md",
     "ARC_RVI_Hypotheses_Experimental_Recommendations.md",
 )
-DOI = re.compile(r"\b10\.\d{4,9}/[^\s|,;)\]>]+", re.IGNORECASE)
+DOI = re.compile(r"\b10\.\d{4,9}/[^\s|,;>\]]+", re.IGNORECASE)
 STUDY = re.compile(r"^## A\.\d+ RVI-(0[1-8]):")
 REFERENCE = re.compile(r"^\[(\d{1,3})\]\s*(.+)$")
 
@@ -144,14 +144,160 @@ def audit(root: Path = DRAFTS) -> dict:
     }
 
 
+
+VERIFIED = ROOT / "research" / "literature" / "verified_doi_metadata.json"
+VERIFIED_FIELDS = {
+    "doi", "title", "first_author", "year", "venue", "source_url",
+    "source_kind", "relevance", "aliases",
+}
+
+
+def _verified_metadata(path: Path) -> tuple[dict[str, dict], dict[str, str], str]:
+    """Validate curated metadata, including documented DOI typo aliases."""
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("missing or symlinked verified metadata")
+    raw = path.read_bytes()
+    document = json.loads(raw.decode("utf-8"))
+    if (not isinstance(document, dict)
+            or set(document) != {"schema_version", "verification_date",
+                                 "verification_scope", "records"}
+            or document["schema_version"] != "1.0.0"
+            or document["verification_scope"] !=
+            "publisher_or_institutional_metadata_only_no_full_article_claim_verification"
+            or not isinstance(document["verification_date"], str)
+            or not re.fullmatch(r"\d{4}-\d{2}-\d{2}",
+                                document["verification_date"])):
+        raise ValueError("invalid verified metadata manifest")
+    from datetime import date
+    try:
+        date.fromisoformat(document["verification_date"])
+    except ValueError as exc:
+        raise ValueError("invalid verification date") from exc
+    values = document["records"]
+    if not isinstance(values, list) or not 1 <= len(values) <= 200:
+        raise ValueError("invalid verified record count")
+    accepted: dict[str, dict] = {}
+    aliases: dict[str, str] = {}
+    for record in values:
+        if not isinstance(record, dict) or set(record) != VERIFIED_FIELDS:
+            raise ValueError("unexpected reviewed metadata fields")
+        raw_doi = record["doi"]
+        if (not isinstance(raw_doi, str) or doi_from(raw_doi) != raw_doi
+                or raw_doi in accepted or raw_doi in aliases):
+            raise ValueError("noncanonical or duplicate reviewed DOI")
+        if (not isinstance(record["title"], str) or not record["title"].strip()
+                or not isinstance(record["venue"], str) or not record["venue"].strip()
+                or not isinstance(record["relevance"], str)
+                or not record["relevance"].strip()
+                or record["source_kind"] not in
+                ("publisher", "institutional_repository", "bibliographic_index")
+                or not isinstance(record["source_url"], str)
+                or not record["source_url"].startswith("https://")
+                or " " in record["source_url"]
+                or type(record["year"]) is not int
+                or not 1900 <= record["year"] <= 2026
+                or (record["first_author"] is not None
+                    and (not isinstance(record["first_author"], str)
+                         or not record["first_author"].strip()))
+                or not isinstance(record["aliases"], list)):
+            raise ValueError("invalid reviewed publication metadata")
+        accepted[raw_doi] = record
+        for alias in record["aliases"]:
+            if (not isinstance(alias, str) or doi_from(alias) != alias
+                    or alias == raw_doi or alias in accepted or alias in aliases):
+                raise ValueError("ambiguous or invalid DOI alias")
+            aliases[alias] = raw_doi
+    if set(aliases).intersection(accepted):
+        raise ValueError("reviewed alias collides with canonical DOI")
+    return accepted, aliases, sha256(raw).hexdigest()
+
+
+def catalog(root: Path = DRAFTS, verified_path: Path = VERIFIED) -> dict:
+    """Stable DOI-keyed mention groups without changing the archived drafts.
+
+    DOI text establishes an *identity candidate*, not proof of metadata correctness.
+    DOI-free items use local provisional IDs until a verified identifier exists.
+    """
+    source = audit(root)
+    reviewed, aliases, review_sha = _verified_metadata(verified_path)
+    groups: dict[str, dict] = {}
+    for record in source["rows"]:
+        raw_doi = record["matrix_doi"]
+        resolved = aliases.get(raw_doi, raw_doi) if raw_doi else None
+        if resolved is None:
+            # A local slug is explicitly provisional; no DOI is inferred.
+            raw_title = record["paper"].rsplit(" [", 1)[0]
+            slug = re.sub(r"[^a-z0-9]+", "-", raw_title.lower()).strip("-")
+            identity = f"unresolved:{record['study'].lower()}:{slug}"
+        else:
+            identity = "doi:" + resolved
+        verified_record = reviewed.get(resolved) if resolved else None
+        if identity not in groups:
+            groups[identity] = {
+                "key": identity,
+                "canonical_doi": resolved,
+                "metadata_status": (
+                    "reviewed_metadata" if verified_record else
+                    "unresolved_no_doi" if resolved is None else
+                    "draft_doi_unverified"),
+                "verified_metadata": (
+                    {key: value for key, value in verified_record.items()
+                     if key != "aliases"} if verified_record else None),
+                "mentions": [],
+            }
+        groups[identity]["mentions"].append({
+            "study": record["study"],
+            "matrix_line": record["matrix_line"],
+            "draft_paper": record["paper"],
+            "matrix_doi": raw_doi,
+            "reference_label": record["citation_label"],
+            "source_reference_status": record["reference_status"],
+            "resolution": (
+                "curated_doi_typo_alias" if raw_doi in aliases else
+                "raw_doi_only" if resolved else
+                "identifier_missing"),
+        })
+    unseen = sorted(set(reviewed) - {
+        item["canonical_doi"] for item in groups.values()
+        if item["canonical_doi"] is not None
+    })
+    if unseen:
+        raise ValueError(f"verified metadata has DOI absent from source matrix: {unseen}")
+    keyed = [groups[key] for key in sorted(groups)]
+    return {
+        "schema_version": "1.0.0",
+        "catalog_scope": "source_derived_doi_keys_not_a_verified_systematic_review",
+        "source_draft_sha256": {key: value["sha256"] for key, value
+                                 in source["sources"].items()},
+        "verified_metadata_sha256": review_sha,
+        "source_mention_count": len(source["rows"]),
+        "distinct_candidate_work_keys": len(keyed),
+        "reviewed_metadata_work_count": sum(
+            item["metadata_status"] == "reviewed_metadata" for item in keyed),
+        "unverified_doi_work_count": sum(
+            item["metadata_status"] == "draft_doi_unverified" for item in keyed),
+        "unresolved_no_doi_work_count": sum(
+            item["metadata_status"] == "unresolved_no_doi" for item in keyed),
+        "curated_doi_typo_mentions": sum(
+            row["resolution"] == "curated_doi_typo_alias"
+            for item in keyed for row in item["mentions"]),
+        "legacy_label_doi_mismatch_count": source["citation_status_counts"].get(
+            "numbered_reference_doi_mismatch", 0),
+        "records": keyed,
+    }
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-dir", type=Path, default=DRAFTS)
+    parser.add_argument("--catalog", action="store_true",
+                        help="export DOI-keyed work candidates and reviewed metadata")
+    parser.add_argument("--verified-metadata", type=Path, default=VERIFIED)
     parser.add_argument("--output", type=Path,
                         help="write machine-readable JSON (exclusive creation)")
     args = parser.parse_args()
     try:
-        report = audit(args.source_dir)
+        report = (catalog(args.source_dir, args.verified_metadata)
+                  if args.catalog else audit(args.source_dir))
         serialized = json.dumps(report, indent=2, sort_keys=True,
                                 ensure_ascii=False, allow_nan=False) + "\n"
         if args.output is None:
@@ -160,7 +306,7 @@ def main() -> int:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             with args.output.open("x", encoding="utf-8") as stream:
                 stream.write(serialized)
-    except (OSError, UnicodeError, ValueError) as error:
+    except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
         parser.error(str(error))
     return 0
 

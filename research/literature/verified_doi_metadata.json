@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0.0",
+  "verification_date": "2026-10-27",
+  "verification_scope": "publisher_or_institutional_metadata_only_no_full_article_claim_verification",
+  "records": [
+    {
+      "doi": "10.1007/s11263-021-01469-5",
+      "title": "VPR-Bench: An Open-Source Visual Place Recognition Evaluation Framework with Quantifiable Viewpoint and Appearance Change",
+      "first_author": "Mubariz Zaffar",
+      "year": 2021,
+      "venue": "International Journal of Computer Vision",
+      "source_url": "https://link.springer.com/article/10.1007/s11263-021-01469-5",
+      "source_kind": "publisher",
+      "relevance": "P01: benchmark for viewpoint and appearance variation, not inspection-specific validation",
+      "aliases": []
+    },
+    {
+      "doi": "10.3390/s26154757",
+      "title": "ROEP: A Robotics-Oriented Evaluation Protocol for Deployment-Facing Vision–Language–Action Manipulation Policies",
+      "first_author": "Sangwoo Han",
+      "year": 2026,
+      "venue": "Sensors",
+      "source_url": "https://www.mdpi.com/1424-8220/26/15/4757",
+      "source_kind": "publisher",
+      "relevance": "P01: deployment-facing VLA manipulation evaluation, not physical humanoid inspection",
+      "aliases": []
+    },
+    {
+      "doi": "10.1016/j.cacaie.2026.100007",
+      "title": "Toward next-generation autonomous structural health monitoring and inspection with humanoid robots",
+      "first_author": null,
+      "year": 2026,
+      "venue": "Computer-Aided Civil and Infrastructure Engineering",
+      "source_url": "https://www.sciencedirect.com/science/article/pii/S1093968726018153",
+      "source_kind": "publisher",
+      "relevance": "P08/P03: physical humanoid inspection prior art, two indoor case studies",
+      "aliases": []
+    },
+    {
+      "doi": "10.1051/matecconf/202541305002",
+      "title": "NEAT-based 3D path planning for mobile robotic arms in NDT with offline inverse kinematics validation",
+      "first_author": "Mengyuan Zhang",
+      "year": 2025,
+      "venue": "MATEC Web of Conferences",
+      "source_url": "https://bura.brunel.ac.uk/handle/2438/32281",
+      "source_kind": "institutional_repository",
+      "relevance": "P03: simulation-based mobile manipulator offline IK; source matrix DOI wrongly appends /pdf",
+      "aliases": [
+        "10.1051/matecconf/202541305002/pdf"
+      ]
+    },
+    {
+      "doi": "10.3390/app16189389",
+      "title": "Quality-Aware Active Re-Observation for Constrained Eye-in-Hand Robotic Manipulators",
+      "first_author": "Le Zhao",
+      "year": 2026,
+      "venue": "Applied Sciences",
+      "source_url": "https://www.mdpi.com/2076-3417/16/18/9389",
+      "source_kind": "publisher",
+      "relevance": "P06: existing quality-aware active re-observation prior art",
+      "aliases": []
+    },
+    {
+      "doi": "10.3390/app12042250",
+      "title": "Comparative Analysis of Human Operators and Advanced Technologies in the Visual Inspection of Aero Engine Blades",
+      "first_author": "Jonas Aust",
+      "year": 2022,
+      "venue": "Applied Sciences",
+      "source_url": "https://www.mdpi.com/2076-3417/12/4/2250",
+      "source_kind": "publisher",
+      "relevance": "P08: human versus inspection technology comparison; not a humanoid controlled trial",
+      "aliases": []
+    },
+    {
+      "doi": "10.1061/(asce)co.1943-7862.0002322",
+      "title": "Benchmarking Human versus Robot Performance in Emergency Structural Inspection",
+      "first_author": "Pengxiang Xia",
+      "year": 2022,
+      "venue": "Journal of Construction Engineering and Management",
+      "source_url": "https://ascelibrary.com/doi/10.1061/%28ASCE%29CO.1943-7862.0002322",
+      "source_kind": "publisher",
+      "relevance": "P08: controlled comparison using simulated post-earthquake task, not physical G1 EDU study",
+      "aliases": []
+    },
+    {
+      "doi": "10.3390/s22030835",
+      "title": "Auto-Exposure Algorithm for Enhanced Mobile Robot Localization in Challenging Light Conditions",
+      "first_author": "Marc-André Bégin",
+      "year": 2022,
+      "venue": "Sensors",
+      "source_url": "https://www.mdpi.com/1424-8220/22/3/835",
+      "source_kind": "publisher",
+      "relevance": "P06: exposure control for visual odometry, not end-to-end inspection quality",
+      "aliases": []
+    },
+    {
+      "doi": "10.1109/tro.2020.2985597",
+      "title": "Proactive Camera Attribute Control Using Bayesian Optimization for Illumination-Resilient Visual Navigation",
+      "first_author": "Joowan Kim",
+      "year": 2020,
+      "venue": "IEEE Transactions on Robotics",
+      "source_url": "https://snu.elsevierpure.com/en/publications/proactive-camera-attribute-control-using-bayesian-optimization-fo/",
+      "source_kind": "institutional_repository",
+      "relevance": "P06: proactive exposure/gain adjustment for visual navigation, not independently scored reinspection",
+      "aliases": []
+    },
+    {
+      "doi": "10.1109/icra.2018.8461098",
+      "title": "Surface Edge Explorer (see): Planning Next Best Views Directly from 3D Observations",
+      "first_author": "Rowan Border",
+      "year": 2018,
+      "venue": "IEEE ICRA",
+      "source_url": "https://dblp.org/rec/conf/icra/BorderG018.html",
+      "source_kind": "bibliographic_index",
+      "relevance": "P04: next-best-view planning from observations, not robot G1 physical validation",
+      "aliases": []
+    }
+  ]
+}

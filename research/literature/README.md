@@ -26,3 +26,11 @@ to export the machine-readable DOI/numbering audit. This script never
 contacts Crossref, arXiv or publisher servers and **does not verify** authors,
 publication dates, experimental claims or the 1,908/240 search denominators.
 All four archival drafts remain byte-for-byte unchanged.
+
+## DOI-keyed research catalogue
+
+Run `python scripts/audit_literature.py --catalog --output results/literature_work_catalog.json`.
+The ten checked-metadata DOI records reside in `verified_doi_metadata.json` with
+review date and source URLs. Catalogued unverified DOI strings and provisional
+DOI-free items **must not** be copied into `papers/references.bib` or cited
+as verified primary evidence. Duplicate DOI mentions are grouped across studies.

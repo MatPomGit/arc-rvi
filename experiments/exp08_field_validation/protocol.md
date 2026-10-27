@@ -69,3 +69,15 @@ noninferiority comparison against standardized manual documentation**
 under independent object/session blocks, a clinically or operationally
 justified margin and signed safety/measurement approvals. Such evidence
 is not yet collected in ARC-RVI.
+
+## Prior human-versus-technology experiments (2026-10-27)
+
+[Aust & Pons (2022)](https://doi.org/10.3390/app12042250) compared humans with
+image processing, AI and 3D scanning during engine-blade inspection; this
+was not a humanoid-robot comparison. [Xia et al. (2022)](https://doi.org/10.1061/(ASCE)CO.1943-7862.0002322)
+benchmarked human versus robot performance in a **simulated** emergency
+structural inspection task. Alongside RoboInspect, these establish that broad
+claims of the first human-versus-automation inspection study are not justified.
+The distinct intended test is physical, paired, assessor-blinded inspection
+**documentation** against manual capture, with a frozen noninferiority margin,
+common tasks and independent reference quality metrics.

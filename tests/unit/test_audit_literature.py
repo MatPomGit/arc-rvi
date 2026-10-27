@@ -1,10 +1,12 @@
 """Literature inventory tests verify source arithmetic, not metadata truth."""
+import json
 import shutil
 import tempfile
 from pathlib import Path
 import unittest
 
-from scripts.audit_literature import DRAFTS, NAMES, audit, doi_from, matrix_rows, references
+from scripts.audit_literature import (DRAFTS, NAMES, VERIFIED, audit, catalog, doi_from,
+                                      matrix_rows, references)
 
 
 class LiteratureInventoryTests(unittest.TestCase):
@@ -39,6 +41,8 @@ class LiteratureInventoryTests(unittest.TestCase):
         self.assertEqual(doi_from("DOI: 10.1007/S11263-021-01469-5."),
                          "10.1007/s11263-021-01469-5")
         self.assertIsNone(doi_from("—"))
+        self.assertEqual(doi_from("10.1061/(ASCE)CO.1943-7862.0002322"),
+                         "10.1061/(asce)co.1943-7862.0002322")
         rows = matrix_rows(
             "## A.1 RVI-01: Sample\n"
             "| Example [3] | Person | 10.1234/example | a | b | c | d | e | f | g | h |\n",
@@ -58,6 +62,61 @@ class LiteratureInventoryTests(unittest.TestCase):
         altered = matrix_rows(changed, entries)
         self.assertEqual(next(x for x in altered if x["paper"].startswith("VPR-Bench"))[
             "reference_status"], "numbered_reference_doi_mismatch")
+
+
+    def test_doi_keyed_catalog_and_grouped_citation_mentions(self):
+        result = catalog()
+        self.assertEqual(result["source_mention_count"], 79)
+        self.assertEqual(result["distinct_candidate_work_keys"], 77)
+        self.assertEqual(result["reviewed_metadata_work_count"], 10)
+        self.assertEqual(result["unverified_doi_work_count"], 61)
+        self.assertEqual(result["unresolved_no_doi_work_count"], 6)
+        self.assertEqual(result["curated_doi_typo_mentions"], 1)
+        self.assertEqual(result["legacy_label_doi_mismatch_count"], 64)
+        entries = {r["key"]: r for r in result["records"]}
+        self.assertEqual(len(entries["doi:10.48550/arxiv.2603.16471"]["mentions"]), 2)
+        self.assertEqual(len(entries["doi:10.1088/1361-6501/adf3d4"]["mentions"]), 2)
+        near = entries["doi:10.1051/matecconf/202541305002"]
+        self.assertEqual(near["metadata_status"], "reviewed_metadata")
+        self.assertEqual(near["mentions"][0]["resolution"], "curated_doi_typo_alias")
+        self.assertEqual(near["mentions"][0]["matrix_doi"],
+                         "10.1051/matecconf/202541305002/pdf")
+        self.assertEqual(near["verified_metadata"]["year"], 2025)
+        self.assertNotIn("aliases", near["verified_metadata"])
+        self.assertTrue(all(r["key"].startswith(("doi:", "unresolved:"))
+                            for r in result["records"]))
+
+    def test_unchecked_doi_never_receives_false_metadata_confirmation(self):
+        result = catalog()
+        entries = {r["key"]: r for r in result["records"]}
+        item = entries["doi:10.48550/arxiv.2503.11163"]
+        self.assertEqual(item["metadata_status"], "draft_doi_unverified")
+        self.assertIsNone(item["verified_metadata"])
+        missing = [r for r in result["records"]
+                   if r["metadata_status"] == "unresolved_no_doi"]
+        self.assertEqual(len(missing), 6)
+        self.assertTrue(all(item["verified_metadata"] is None for item in missing))
+        self.assertEqual(catalog(), result)
+
+    def test_malformed_external_verified_metadata_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "verified.json"
+            document = json.loads(VERIFIED.read_text(encoding="utf-8"))
+            document["records"][0]["doi"] = "10.9999/not-in-matrix"
+            path.write_text(json.dumps(document), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "absent from source matrix"):
+                catalog(verified_path=path)
+            document = json.loads(VERIFIED.read_text(encoding="utf-8"))
+            document["records"][3]["aliases"] = ["10.1051/matecconf/202541305002/pdf",
+                                                    "10.1051/matecconf/202541305002/pdf"]
+            path.write_text(json.dumps(document), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "ambiguous"):
+                catalog(verified_path=path)
+            document = json.loads(VERIFIED.read_text(encoding="utf-8"))
+            document["records"][0]["year"] = True
+            path.write_text(json.dumps(document), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "invalid reviewed"):
+                catalog(verified_path=path)
 
     def test_missing_and_modified_source_not_miscounted(self):
         with tempfile.TemporaryDirectory() as tmp:

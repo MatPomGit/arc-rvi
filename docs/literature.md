@@ -99,6 +99,94 @@ The external spot checks cover only these **four individual DOI records**,
 not the full matrix, all abstracts or any reported quantitative gap rate.
 Do not label the entire bibliography verified based on this table.
 
+## DOI-keyed work catalogue and metadata gate (v1.21)
+
+The machine-readable catalogue **replaces ambiguous bracket numbers in the
+working index**, but **does not silently rewrite the four original drafts**.
+An identifier is constructed from a DOI in a matrix cell, not from the
+incompatible appended bibliography. DOI-less entries get visibly provisional
+`unresolved:pXX:...` keys. Multiple study mentions of the same normalized
+DOI are grouped under one candidate work. DOI string equality and a
+matching key do **not** demonstrate the existence or relevance of an article.
+
+```bash
+python scripts/audit_literature.py --catalog \
+  --output results/literature_work_catalog.json
+```
+
+The catalogue includes each source matrix row and line, its original bracket
+number, original and corrected DOI when applicable, source collision status,
+and one of three verification levels:
+
+- `reviewed_metadata`: DOI/title/year and first-author information where
+  available inspected at the explicitly recorded publisher, university
+  repository or scholarly index page; **not** article-level evidence verification
+- `draft_doi_unverified`: the DOI appears only in the submitted draft; it has
+  **not** been checked against publisher metadata
+- `unresolved_no_doi`: no reliable source identifier supplied; **do not
+  invent a DOI or import the item into BibTeX**
+
+One reviewed alias corrects the P03 matrix's trailing `/pdf`
+(`10.1051/matecconf/202541305002/pdf`) to the actual DOI
+`10.1051/matecconf/202541305002`, supported by the university
+repository. Original matrix text remains untouched.
+
+**Current source-derived catalogue:** 79 mentions map to **77 distinct
+candidate keys**: **10 checked-metadata DOI works**, **61 unchecked DOI
+works** and **6 unresolved DOI-free records**. Two DOI records occur
+twice across studies. The pre-existing **64 legacy number↔DOI conflicts**
+remain documented as defects of the input drafts; the new stable keys bypass
+them in downstream indexing rather than pretending that the draft has been
+repaired.
+
+The curated metadata manifest is
+[`research/literature/verified_doi_metadata.json`](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/verified_doi_metadata.json).
+Its DOI, title, venue/year, editorial relevance, verification date and
+source URLs are reviewed inputs. The catalogue rejects malformed metadata,
+ambiguous correction aliases and reviewed DOIs missing from the matrix.
+Both the raw drafts and curated manifest are SHA-256 pinned in the report.
+
+### Ten matrix DOI records checked against external bibliographic pages
+
+| Study | DOI | Bibliographic record / primary relevance |
+| --- | --- | --- |
+| P01 | [10.1007/s11263-021-01469-5](https://link.springer.com/article/10.1007/s11263-021-01469-5) | Zaffar et al., 2021, *VPR-Bench*; visual place recognition, **not** inspection-specific physical coverage |
+| P01 | [10.3390/s26154757](https://www.mdpi.com/1424-8220/26/15/4757) | Han & Choi, 2026, ROEP; VLA manipulation evaluation |
+| P08 | [10.1016/j.cacaie.2026.100007](https://www.sciencedirect.com/science/article/pii/S1093968726018153) | 2026 RoboInspect; **existing physical humanoid inspection case studies** |
+| P03 | [10.1051/matecconf/202541305002](https://bura.brunel.ac.uk/handle/2438/32281) | Zhang et al., 2025; offline-IK mobile arm planning, corrected malformed DOI |
+| P06 | [10.3390/app16189389](https://www.mdpi.com/2076-3417/16/18/9389) | Zhao et al., 2026; quality-aware active re-observation prior art |
+| P08 | [10.3390/app12042250](https://www.mdpi.com/2076-3417/12/4/2250) | Aust & Pons, 2022; human vs machine blade inspection, **not humanoid** |
+| P08 | [10.1061/(asce)co.1943-7862.0002322](https://ascelibrary.com/doi/10.1061/%28ASCE%29CO.1943-7862.0002322) | Xia et al., 2022; human–robot **simulated** emergency structural inspection |
+| P06 | [10.3390/s22030835](https://www.mdpi.com/1424-8220/22/3/835) | Bégin & Hunter, 2022; auto-exposure for mobile robot localization |
+| P06 | [10.1109/tro.2020.2985597](https://snu.elsevierpure.com/en/publications/proactive-camera-attribute-control-using-bayesian-optimization-fo/) | Kim et al., 2020; proactive camera attribute control for navigation |
+| P04 | [10.1109/icra.2018.8461098](https://dblp.org/rec/conf/icra/BorderG018.html) | Border et al., 2018, Surface Edge Explorer, checked via bibliographic index |
+
+**Limit:** these ten records verify *bibliographic identification* against
+a named external page, not experimental validity, data independence,
+replication, novelty, a full abstract-by-abstract review or search
+completeness. A separate older checked eye-tracker DOI
+(`10.7717/peerj.7086`) appears in the appended reference list but
+**not** the 79-row evidence matrix; it is not part of the ten-item
+working catalogue.
+
+### Methodological consequences
+
+- P06 cannot claim that *quality-aware re-observation* or proactive
+  camera attribute control is itself new. The possible research question
+  is whether an **independently scored, budget-matched closed-loop
+  recovery policy** improves inspection-valid coverage on a humanoid.
+- P08 cannot claim the first human–machine comparison or first
+  humanoid inspection demonstration. Its prospective contribution is an
+  **assessor-blinded, common-task manual vs autonomous acquisition
+  comparison** with explicit physical validity and uncertainty.
+- P03's coupling of whole-body feasibility and acquisition quality is
+  a candidate comparison, but prior offline-IK mobile-manipulator work
+  constrains simplistic claims of novelty.
+
+Before writing any verified scientific claim, inspect the source's
+methods and measurements separately, not just the DOI metadata.
+The claimed 1,908→240 screening flow remains **unreconstructed**.
+
 ## Research directions and evidence thresholds
 
 | Study | Candidate contribution from supplied review | Provisional primary outcome (see canonical protocol) | Publication blocker / competing scope |
