@@ -112,6 +112,23 @@ class PilotAnalysisTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
                 analyze_pilot(generated / "manifest.json")
 
+    def test_holdout_not_accessed_and_duplicate_manifest_rejected(self):
+        from rvi.conditions import generate_conditions
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "generated"
+            generate_conditions(SPEC, root)
+            manifest = root / "manifest.json"
+            baseline = analyze_pilot(manifest)
+            # Holdout files must not be read by exploratory pilot analysis.
+            holdout = next((root / "scenes/holdout").glob("*.json"))
+            holdout.write_bytes(b"unread holdout scenario")
+            self.assertEqual(analyze_pilot(manifest)["estimated_effects"], baseline["estimated_effects"])
+            raw = manifest.read_text(encoding="utf-8")
+            self.assertIn('"study_id": "01"', raw)
+            manifest.write_text(raw.replace('"study_id": "01"', '"study_id": "01", "study_id": "01"', 1), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
+                analyze_pilot(manifest)
+
 
     def test_cli_pilot_report_is_saved_once(self):
         from rvi.conditions import generate_conditions

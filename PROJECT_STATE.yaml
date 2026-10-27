@@ -5,13 +5,13 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.4.0
+  software_version: 1.6.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
-  documentation: README.md
+  documentation: mkdocs.yml
 research_phase: exploratory_paired_geometric_pilot_analysis
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
@@ -20,14 +20,18 @@ implemented:
   - "Input/source hashes, partial outcomes and repeatable JSON reports"
   - "Eight prospective protocols and shared statistical design"
   - "Seeded paired geometric conditions, disjoint family partitions and hash manifests"
-  - "Pilot-only analysis with paired geometry-family contrasts, integrity checks and guarded cluster bootstrap"
+  - "Pilot-only paired geometric analysis with SHA-256 input checks and family aggregation"
+  - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
+  - "MkDocs source staging and GitHub Pages workflow (deployment unverified)"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
   policy_visibility: known_geometry_oracle_not_unknown_surface_perception
   collected_research_dataset: absent
   seeded_conditions: exploratory_generator_only
-  pilot_analysis: exploratory_software_pipeline_not_confirmatory_evidence
+  pilot_analysis: software_only_descriptive_two_family_pilot
+  instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
+  pages_deployment: verified_success_main_502127a3e906a162cf13764ef08b8d328a423c95
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   physical_robot_adapter: not_implemented
@@ -36,6 +40,13 @@ evidence_state:
   literature_and_novelty_review: pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "502127a3e906a162cf13764ef08b8d328a423c95"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 76
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40418374958"
+    scope: "Offline tests and MkDocs build on merged main; no scientific or physical validation"
   - source_tree_sha: "4ae7456aae602ecbf07a19cddeab19947d5a8ca6"
     corresponding_main_commit: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
     command: "python scripts/validate.py"
@@ -47,6 +58,8 @@ verification_commands:
   - "rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json"
   - "rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions"
   - "rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json"
+  - "rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json"
+  - "python scripts/build_docs.py && python -m mkdocs build --strict"
 publication_portfolio:
   status: eight_candidate_studies_not_submitted
   protocol_index: experiments/README.md

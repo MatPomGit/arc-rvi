@@ -33,6 +33,7 @@ rvi benchmark --suite simulation/suites/fixture_smoke.json --output results/benc
 rvi simulate --scene simulation/worlds/planar_inspection.json --output results/simulation.json
 rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json
 rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions
+rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json
 rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json
 ```
 
@@ -44,9 +45,8 @@ The [planar simulator](docs/simulation.md) computes visibility, swept-footprint 
 and model time from a geometric scene and a supplied route.
 The [seeded condition generator](docs/conditions.md) creates separate exploratory
 geometry families and matched nominal/occluded scenes with a SHA-256 manifest.
-The [exploratory pilot analysis](docs/pilot-analysis.md) checks file provenance,
-retains failed trials, and summarizes family-paired effects. It does not constitute
-confirmatory inference or physical validation.
+The [exploratory paired pilot analysis](docs/pilot-analysis.md) checks input hashes,
+retains failed trials and summarizes family-paired effects without claiming confirmation.
 
 ## Research integrity
 
@@ -60,3 +60,21 @@ The canonical [project state](PROJECT_STATE.yaml) lists current evidence and nex
 The [ARC plan](AUTOPILOT_PLAN.md) defines its portfolio role and proposed sensor interfaces.
 
 For contribution rules, see `AGENTS.md`.
+
+
+## Research documentation (MkDocs)
+
+The canonical documentation can be assembled into a navigable MkDocs site
+without duplicating the eight experiment protocols:
+
+```bash
+python -m pip install mkdocs==1.6.1
+python scripts/build_docs.py
+python -m mkdocs build --strict
+```
+
+Documentation is published at https://matpomgit.github.io/arc-rvi/.
+See [publication instructions](docs/website.md) and the
+[Study 02 localization specification](docs/localization.md).
+The initial deployment is verified by GitHub Actions run 40418374958;
+future changes must pass the strict site build before release.

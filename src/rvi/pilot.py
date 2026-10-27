@@ -38,10 +38,20 @@ def _check_hash(root: Path, record: dict) -> Path:
     return path
 
 
+def _strict_pairs(entries: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in entries:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
 def _read_manifest(path: Path) -> tuple[dict, Path, str]:
     raw = path.read_bytes()
     try:
-        manifest = json.loads(raw, parse_constant=lambda _: (_ for _ in ()).throw(ValueError("non-finite JSON")))
+        manifest = json.loads(raw.decode("utf-8"), object_pairs_hook=_strict_pairs,
+                              parse_constant=lambda _: (_ for _ in ()).throw(ValueError("non-finite JSON")))
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise ValueError("invalid manifest JSON") from exc
     if not isinstance(manifest, dict) or (manifest.get("study_id"), manifest.get("evidence_type"),
@@ -52,9 +62,13 @@ def _read_manifest(path: Path) -> tuple[dict, Path, str]:
     suites, scenes = manifest.get("suites"), manifest.get("scenes")
     if not isinstance(suites, dict) or set(suites) != {"development", "pilot", "holdout"}:
         raise ValueError("manifest partitions are incomplete")
-    if not isinstance(scenes, list) or not scenes:
-        raise ValueError("manifest scenes are missing")
-    for record in [*suites.values(), *scenes]:
+    if not isinstance(scenes, list) or not scenes or any(not isinstance(row, dict) for row in scenes):
+        raise ValueError("manifest scenes are missing or malformed")
+    pilot_records = [row for row in scenes if row.get("partition") == "pilot"]
+    if not pilot_records:
+        raise ValueError("manifest does not include pilot scenes")
+    # Holdout scene files are not accessed during pilot analysis.
+    for record in pilot_records:
         _check_hash(root, record)
     return manifest, _check_hash(root, suites["pilot"]), _sha(raw)
 

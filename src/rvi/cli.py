@@ -9,6 +9,7 @@ from pathlib import Path
 from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
 from .conditions import generate_conditions
+from .localization import run_localization_fixture
 from .pilot import analyze_pilot
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
@@ -29,7 +30,10 @@ def make_parser() -> argparse.ArgumentParser:
     conditions = sub.add_parser("conditions", help="generate paired study01 geometric scenes and split manifests")
     conditions.add_argument("--spec", required=True, type=Path)
     conditions.add_argument("--output-dir", required=True, type=Path)
-    pilot = sub.add_parser("pilot", help="exploratory family-clustered study01 pilot analysis")
+    localize = sub.add_parser("localize", help="evaluate synthetic instance-assignment fixtures")
+    localize.add_argument("--fixture", required=True, type=Path)
+    localize.add_argument("--output", required=True, type=Path)
+    pilot = sub.add_parser("pilot", help="analyze exploratory study01 paired geometric pilot")
     pilot.add_argument("--manifest", required=True, type=Path)
     pilot.add_argument("--output", required=True, type=Path)
     pilot.add_argument("--reference", default="fixed_order", choices=("fixed_order", "greedy_coverage", "greedy_distance"))
@@ -42,6 +46,17 @@ def main(argv: list[str] | None = None) -> int:
     parser = make_parser()
     arguments = parser.parse_args(argv)
     try:
+        if arguments.command == "localize":
+            if arguments.output.exists():
+                raise ValueError("output already exists; choose a new path")
+            payload = run_localization_fixture(arguments.fixture)
+            serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                                    indent=2, allow_nan=False) + "\n"
+            arguments.output.parent.mkdir(parents=True, exist_ok=True)
+            with arguments.output.open("x", encoding="utf-8") as stream:
+                stream.write(serialized)
+            print(f"Saved fixture localization report to {arguments.output}")
+            return 0
         if arguments.command == "conditions":
             manifest = generate_conditions(arguments.spec, arguments.output_dir)
             print(f"Saved {len(manifest['scenes'])} exploratory scenes to {arguments.output_dir}")
