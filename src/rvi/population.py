@@ -165,6 +165,146 @@ def _write_artifacts(output_dir: Path, payloads: dict[str, bytes]) -> None:
                 pass
         raise
 
+def _factorial_spec(path: Path) -> tuple[dict, bytes]:
+    spec, raw = read_json(path)
+    required = {"schema_version", "study_id", "design", "master_seed",
+                "replicates_per_family", "family_counts", "factors"}
+    if not isinstance(spec, dict) or set(spec) != required:
+        raise ValueError("invalid factorial specification fields")
+    if (spec["schema_version"], spec["study_id"], spec["design"]) != (
+            VERSION, "01", FACTORIAL_DESIGN):
+        raise ValueError("unsupported factorial design")
+    if spec["factors"] != {key: list(levels)
+                          for key, levels in FACTOR_LEVELS.items()}:
+        raise ValueError("unsupported factorial levels or order")
+    seed, repeats, counts = (spec[key] for key in
+                             ("master_seed", "replicates_per_family", "family_counts"))
+    if type(seed) is not int or not 0 <= seed < 2**64:
+        raise ValueError("invalid factorial master_seed")
+    if type(repeats) is not int or not 1 <= repeats <= 4:
+        raise ValueError("factorial replicates must be in [1, 4]")
+    if not isinstance(counts, dict) or set(counts) != set(PARTITIONS):
+        raise ValueError("invalid factorial partitions")
+    if any(type(counts[split]) is not int or not 3 <= counts[split] <= 48
+           or counts[split] % 3 for split in PARTITIONS):
+        raise ValueError("family counts must be multiples of 3 in [3, 48]")
+    total = sum(counts.values())
+    cells = math.prod(len(levels) for levels in FACTOR_LEVELS.values())
+    if total > MAX_FAMILIES or total * repeats * cells > MAX_SCENES:
+        raise ValueError("factorial generation exceeds configured scene limit")
+    return spec, raw
+
+
+def _factorial_obstacles(scene: dict, occlusion: str, clutter: str) -> list[dict]:
+    """Occlude patch one and optionally add two nuisance discs near patch two."""
+    obstacles = []
+    target, candidate = scene["patches"][0], scene["route"][0]
+    radius = OCCLUDER_RADIUS_M[occlusion]
+    if radius:
+        obstacles.append({"x": target["x"] / 2,
+                          "y": (target["y"] + candidate["y"]) / 2,
+                          "radius_m": radius})
+    if clutter == "dense":
+        patch, view = scene["patches"][1], scene["route"][1]
+        for ratio in (0.4, 0.65):
+            obstacles.append({"x": patch["x"] * ratio,
+                              "y": view["y"] + ratio * (patch["y"] - view["y"]),
+                              "radius_m": 0.12})
+    return obstacles
+
+
+def _factor_sensor(seed: int, illumination: str) -> dict:
+    config = SensorConfig(640, ILLUMINATION_RELATIVE[illumination], 1, 1, 0,
+                          0.5, 0.01, 2, 0.05, 0, seed)
+    return {"schema_version": VERSION, "evidence_type": "simulation",
+            "calibration_state": "uncalibrated_synthetic", **asdict(config)}
+
+
+def _factorial_population(spec_path: Path, output_dir: Path) -> dict:
+    """Generate separate crossed pilot/development/holdout *synthetic* suites."""
+    spec, raw = _factorial_spec(spec_path)
+    members: dict[str, list[str]] = {}
+    index = 0
+    for split in PARTITIONS:
+        members[split] = []
+        for _ in range(spec["family_counts"][split]):
+            index += 1
+            members[split].append(f"factor_{index:04d}")
+    cells = []
+    for occlusion, illumination, clutter in product(*FACTOR_LEVELS.values()):
+        cell_id = f"o_{occlusion}__i_{illumination}__c_{clutter}"
+        cells.append((cell_id, {
+            "occlusion": occlusion, "illumination": illumination,
+            "clutter": clutter,
+        }))
+    manifest = {
+        "schema_version": VERSION, "study_id": "01",
+        "design": FACTORIAL_DESIGN, "evidence_type": "simulation",
+        "stage": "exploratory_not_confirmatory",
+        "visibility_access": "evaluator_only_when_sensor_mode_enabled",
+        "master_seed": spec["master_seed"],
+        "replicates_per_family": spec["replicates_per_family"],
+        "partitions": members, "factor_levels": spec["factors"],
+        "geometry_strata_patch_counts": [2, 3, 4],
+        "cells": [{"cell_id": cell, **factors} for cell, factors in cells],
+        "source_generator_sha256": _hash(Path(__file__).read_bytes()),
+        "spec_sha256": _hash(raw), "scenes": [], "suites": {},
+        "sensor_configs": {}, "holdout_state": "generated_not_blinded_or_frozen",
+    }
+    payloads: dict[str, bytes] = {}
+    for illumination in FACTOR_LEVELS["illumination"]:
+        relative = f"sensors/{illumination}.json"
+        encoded = _encoded(_factor_sensor(spec["master_seed"], illumination))
+        payloads[relative] = encoded
+        manifest["sensor_configs"][illumination] = {
+            "path": relative, "sha256": _hash(encoded),
+            "illumination_relative": ILLUMINATION_RELATIVE[illumination],
+        }
+    for split in PARTITIONS:
+        grouped = {cell: [] for cell, _ in cells}
+        for family_index, family in enumerate(members[split]):
+            patch_count = 2 + family_index % 3
+            layout = _family_layout(spec["master_seed"], family, patch_count)
+            for replicate in range(spec["replicates_per_family"]):
+                seed = _seed(spec["master_seed"], family, replicate, "replicate")
+                pair_id = f"{family}_r{replicate:03d}"
+                base = _scene(family, replicate, seed, "nominal", layout)
+                for cell, factors in cells:
+                    scene = dict(base)
+                    scene["scene_id"] = f"{pair_id}__{cell}"
+                    scene["obstacles"] = _factorial_obstacles(
+                        scene, factors["occlusion"], factors["clutter"])
+                    relative = f"scenes/{split}/{scene['scene_id']}.json"
+                    encoded = _encoded(scene)
+                    payloads[relative] = encoded
+                    grouped[cell].append("../" + relative)
+                    manifest["scenes"].append({
+                        "path": relative, "scene_id": scene["scene_id"],
+                        "partition": split, "family": family,
+                        "pair_id": pair_id, "replicate": replicate,
+                        "paired_seed": seed, "geometry_patch_count": patch_count,
+                        "cell_id": cell, "factors": dict(factors),
+                        "sha256": _hash(encoded),
+                    })
+        manifest["suites"][split] = {}
+        for cell, factors in cells:
+            relative = f"suites/{split}/{cell}.json"
+            encoded = _encoded({
+                "schema_version": VERSION,
+                "suite_id": f"study01_{split}_{cell}",
+                "evidence_type": "simulation", "scenes": grouped[cell],
+            })
+            payloads[relative] = encoded
+            manifest["suites"][split][cell] = {
+                "path": relative, "sha256": _hash(encoded),
+                "sensor_config": manifest["sensor_configs"][
+                    factors["illumination"]]["path"],
+            }
+    payloads["manifest.json"] = _encoded(manifest)
+    _write_artifacts(output_dir, payloads)
+    return manifest
+
+
 def generate_population(spec_path: Path, output_dir: Path) -> dict:
     """Generate paired, disjoint, synthetic families with hashes and no overwrites.
 
