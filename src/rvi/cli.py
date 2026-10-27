@@ -13,6 +13,7 @@ from .experiment import run_experiment
 from .localization import run_localization_fixture
 from .pilot import analyze_pilot
 from .planning import plan_family_sample
+from .power_mc import analyze_cluster_monte_carlo
 from .population import generate_population
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
@@ -56,6 +57,9 @@ def make_parser() -> argparse.ArgumentParser:
     batch.add_argument("--partition", default="pilot", choices=("development", "pilot"))
     batch.add_argument("--output-dir", required=True, type=Path)
     batch.add_argument("--resume", action="store_true", help="verify existing outputs without modifying them")
+    cluster_mc = sub.add_parser("power-mc", help="exploratory family-level Monte Carlo power and CI diagnostics")
+    cluster_mc.add_argument("--spec", required=True, type=Path)
+    cluster_mc.add_argument("--output", required=True, type=Path)
     return parser
 
 
@@ -88,7 +92,7 @@ def main(argv: list[str] | None = None) -> int:
             manifest = generate_conditions(arguments.spec, arguments.output_dir)
             print(f"Saved {len(manifest['scenes'])} exploratory scenes to {arguments.output_dir}")
             return 0
-        if arguments.command in ("benchmark", "simulate", "pilot", "precision"):
+        if arguments.command in ("benchmark", "simulate", "pilot", "precision", "power-mc"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
             if arguments.command == "pilot":
@@ -96,6 +100,8 @@ def main(argv: list[str] | None = None) -> int:
                                         arguments.comparator, seed=arguments.seed)
             elif arguments.command == "precision":
                 payload = plan_family_sample(arguments.spec, arguments.pilot_summary)
+            elif arguments.command == "power-mc":
+                payload = analyze_cluster_monte_carlo(arguments.spec)
             else:
                 payload = (run_benchmark(arguments.suite) if arguments.command == "benchmark"
                            else run_simulation(arguments.scene))

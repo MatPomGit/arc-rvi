@@ -1,6 +1,6 @@
 # Shared statistical analysis plan
 
-Version: 1.3.0
+Version: 1.4.0
 
 Status: prospective confirmation specification; an exploratory geometric pilot analyzer is available.
 The [pilot implementation](../../docs/pilot-analysis.md) uses family-level paired
@@ -48,6 +48,10 @@ within-cluster dependence, expected failure and planned paired analysis.
 For study 08, use the justified non-inferiority margin rather than a superiority effect.
 Record assumptions, calculation code and sensitivity to variance and dropout.
 No universal trial count is prescribed while these quantities remain unknown.
+An additional [exploratory family Monte Carlo check](../../docs/cluster-monte-carlo.md)
+now contrasts approximate t and normal family-level intervals under heavy tails
+and missingness; it does not implement exact small-sample inference, crossed
+sessions/operators, or validated domain-specific power.
 The [P01 family sample-size sensitivity tool](../../docs/sample-size.md) now
 provides an assumption-driven **known-variance normal approximation** for
 independent family counts and attrition inflation. Pilot diagnostics never
