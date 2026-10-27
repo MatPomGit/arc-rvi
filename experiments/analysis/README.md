@@ -1,6 +1,6 @@
 # Shared statistical analysis plan
 
-Version: 1.2.0
+Version: 1.3.0
 
 Status: prospective confirmation specification; an exploratory geometric pilot analyzer is available.
 The [pilot implementation](../../docs/pilot-analysis.md) uses family-level paired
@@ -48,6 +48,11 @@ within-cluster dependence, expected failure and planned paired analysis.
 For study 08, use the justified non-inferiority margin rather than a superiority effect.
 Record assumptions, calculation code and sensitivity to variance and dropout.
 No universal trial count is prescribed while these quantities remain unknown.
+The [P01 family sample-size sensitivity tool](../../docs/sample-size.md) now
+provides an assumption-driven **known-variance normal approximation** for
+independent family counts and attrition inflation. Pilot diagnostics never
+automatically determine those assumptions. This is not a validated or locked
+confirmatory sample-size justification.
 
 Stop at the frozen independent-unit count. Predefine permitted replacements for
 external measurement failures. Do not stop because an observed result looks favourable.
