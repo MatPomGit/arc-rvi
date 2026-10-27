@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_type": "simulation",
+  "calibration_state": "uncalibrated_synthetic",
+  "width_px": 640,
+  "illumination_relative": 1,
+  "exposure_relative": 1,
+  "focus_fraction": 1,
+  "motion_blur_fraction": 0,
+  "pixel_noise_sd": 0.5,
+  "range_noise_sd_m": 0.01,
+  "brightness_noise_sd": 2,
+  "detection_dropout": 0.05,
+  "frame_dropout": 0,
+  "master_seed": 20261027
+}

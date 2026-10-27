@@ -49,7 +49,10 @@ by total declared area weight. Repeated observations count a patch once.
 Visibility of a representative point assigns its whole patch weight. This is a
 sampling approximation, not polygon clipping or an exact visible mesh-area measure.
 Refine the patch sampling before interpreting area estimates on a real surface.
-The model does not generate images, focus metrics, lighting or sensor noise.
+The geometric model does not generate images or measured sensor signals. The
+separate **uncalibrated planar feature generator** in `rvi.perception` adds
+synthetic horizontal pixel locations, range estimates, brightness and sharpness
+proxies, and seeded sensor noise/dropouts. It does not render images.
 
 ## Collision, budget and termination
 
@@ -92,6 +95,33 @@ The initial capture observes only the first patch. Moving one metre laterally re
 the second. With 1 m/s travel and 1 s per capture, the route takes 3 s and travels 1 m.
 The analytic tests also check angle wrap, incidence/range boundaries, tangent occlusion,
 mid-segment collision, weighted coverage, partial outcomes and action timing.
+
+For a local developer-level synthetic feature check:
+
+```python
+from rvi.adapters.simulator import load_scene
+from rvi.perception import load_sensor_config, simulate_sensor
+from pathlib import Path
+
+scene, _ = load_scene(Path("simulation/worlds/planar_inspection.json"))
+settings, _ = load_sensor_config(Path("simulation/conditions/sensor_exploratory.json"))
+policy_observation, evaluator_truth = simulate_sensor(scene, scene.start, settings)
+```
+
+Only `policy_observation` may be passed to an algorithm. `evaluator_truth`
+retains ground-truth patch identities and ideal geometric visibility exclusively
+for evaluation. The projection uses a **1D horizontal pinhole approximation**:
+`u_px = width_px * (0.5 - relative_bearing_rad / horizontal_fov_rad)`.
+`+y` is camera-left, so pixel coordinates increase toward camera-right. Range
+noise is expressed in metres, pixel noise in pixels; light/exposure/focus/blur
+factors are **dimensionless synthetic proxies**, not physical or measured image
+quality. Independent SHA-derived seeded streams preserve matched perturbations
+between factor settings. Missing frames and undetected patches remain explicit.
+
+No physical sensor calibration, target recognition, true image production, or
+unknown-surface inference is established. The existing benchmark still uses
+known-geometry visibility and is **not** sensor-conditioned. See Issue #17
+for the unfinished full sensor model and calibration gates.
 
 Candidate selection is connected through the [paired geometric benchmark](benchmark.md).
 Next: generate paired scene conditions and disjoint geometry families. Physics/sensor calibration is required before transferring this model
