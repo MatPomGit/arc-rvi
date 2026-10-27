@@ -61,6 +61,9 @@ assumptions; it is not a frozen confirmatory design.
 The [cluster Monte Carlo tool](docs/cluster-monte-carlo.md) explores synthetic
 null rejection, interval coverage and assumed alternative power at the
 **family** level under normal/heavy-tailed effects and missingness stress.
+The [planar feature sensor](docs/simulation.md) provides reusable, seeded
+horizontal camera observations with evaluator-only geometric truth. It is
+uncalibrated and does not change the known-geometry benchmark.
 The [immutable experiment batch interface](docs/experiment-batches.md) stores
 paired trial records, independent-unit metadata and provenance receipts for
 exploratory Study 01. It blocks holdout access and does not cover physical studies.
