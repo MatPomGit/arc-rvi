@@ -31,6 +31,7 @@ nav:
       - Seeded conditions: docs/conditions.md
       - Paired pilot analysis: docs/pilot-analysis.md
       - Sampled geometry population: docs/population.md
+      - Sample-size sensitivity: docs/sample-size.md
       - Data interface: docs/data-interface.md
   - Research integrity:
       - Methodology: docs/methodology.md
