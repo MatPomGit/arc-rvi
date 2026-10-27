@@ -26,6 +26,25 @@ to pilot/emergency stop and another to diagnostics; avoid competing
 SDK/ROS 2 controllers. Check optional dexterous-hand cabling and
 posture restrictions before any movement.
 
+## Photographic laboratory walkthrough (2026-10-27)
+
+Three user-supplied still photographs show an upright, humanoid-shaped robot
+identified by the user as G1 EDU, with its feet on a tiled floor. Visible
+straps near the body and a wheeled overhead/adjacent structure **may** be part
+of a support arrangement; the pictures cannot establish attachment,
+load-rating, correct fit, fall arrest or active supervision. Nearby chairs,
+bags and floor-level cables warrant a **site-specific** inspection for
+trip hazards, reachable obstructions and the fall/motion envelope.
+
+**No safety clearance is established by the photographs.** Motion state,
+power, physical robot revision, emergency-stop availability, pilot takeover,
+controller exclusivity, support load path and operator authorization cannot
+be verified from these images. Before work beyond read-only inspection,
+perform the documented M0/M1/M2 checks on site, log results, mark and clear
+an approved operating perimeter and verify the support manufacturer's
+instructions with qualified personnel. Keep photos outside public Git; do
+not count them as a physical experiment or safety test.
+
 Do not place default passwords, device-specific IPs or access instructions
 from training materials in this public repository. Manufacturer safety
 guidance and the actual hardware configuration take precedence over
