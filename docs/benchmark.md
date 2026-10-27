@@ -1,6 +1,6 @@
 # Paired fixture benchmark
 
-Application version: 1.4.0
+Application version: 1.5.0
 
 ## Run
 
@@ -89,6 +89,40 @@ remain feasible; one makes the roof unreachable. The distance-aware method succe
 in two of three cases; the other methods in one of three. These deliberately constructed
 cases verify scoring and failure accounting. They do not estimate comparative research
 performance or provide confirmation data for study 01.
+
+## Exploratory observation-driven simulation
+
+```bash
+rvi benchmark --suite simulation/suites/geometric_smoke.json --sensor simulation/conditions/sensor_exploratory.json --output results/observed.json
+```
+
+The optional `--sensor` mode keeps the existing simulator, candidate poses,
+collision and time limits, but **does not give oracle visibility to the policies**.
+It compares `fixed_order`, `nearest_pose` and `sensor_parallax`: the last
+selects the candidate with the largest mean angle change to **previously
+detected, anonymously reconstructed 2D points**, using noisy pixel bearing/range
+and public camera geometry. With no detections it falls back to the nearest pose.
+It is an angular-baseline heuristic, not calibrated information gain or NBV.
+
+An action's sensor noise is keyed by original candidate index, so identical
+candidate acquisitions receive paired noise even when policies choose different
+orders. A failed move generates no capture. Frame or feature dropout counts as
+missing evidence, **not successful geometric visibility**. `observations`
+holds only candidate pose, executed motion and policy-visible sensor features;
+`evaluator` separately records reference identities, detected/missed patches
+and area-weighted *detected* coverage. These evaluation fields are never passed
+to view selection. `status: completed` means all selected moves were executed;
+`coverage_complete` separately means every patch was detected.
+
+The two fixed smoke scenes demonstrate the data boundary, not effectiveness.
+The mode has no independent scene families, calibrated appearance/photometry,
+unknown-surface model, confirmed power or physical validation. Existing
+unsensored reports remain **known-geometry oracle**. This experimental interface
+does not open held-out partition suites through `rvi batch`; the forthcoming
+study-specific split gate and factorial P01 benchmark remain required.
+Track that work in [Issues #17](https://github.com/MatPomGit/arc-rvi/issues/17),
+[#21](https://github.com/MatPomGit/arc-rvi/issues/21) and
+[#22](https://github.com/MatPomGit/arc-rvi/issues/22).
 
 ## Paired geometric simulation
 
