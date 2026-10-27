@@ -58,6 +58,17 @@ provides illustrative normal-model estimates of independent family counts,
 conditioning on externally specified effects, between-family SD and attrition.
 The locked confirmation design and its validated power analysis remain pending.
 
+## Exploratory observation-only view selection
+
+The [sensor-aware smoke benchmark](../../docs/benchmark.md) now ranks candidate
+views using public poses and past anonymous pixel/range features only, and
+scores coverage from actually detected surfaces in an evaluator-only channel.
+Its three policies (route order, nearest pose, parallax from prior detections)
+are **engineering comparators**, not the prospectively defined and frozen
+coverage-greedy primary baselines. A full crossed scenario population, independent
+sensor validation, sample-size gate and confirmatory split remain unimplemented.
+Do not mix results of this mode with existing known-geometry oracle benchmarks.
+
 ## Provenance and confirmation gate
 
 Apply the [shared analysis plan](../analysis/README.md) and
