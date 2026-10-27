@@ -236,3 +236,69 @@ physical timestamps, synchronized sensors or independently calibrated
 ground truth. Further work must replace synthetic crops with
 rights-cleared measured imagery and frozen object/session-disjoint
 validation before the proposed scientific hypothesis can be assessed.
+
+
+## Offline image-crop input from local datasets (v1.19)
+
+The next step accepts **operator-supplied grayscale image crops** as real
+file bytes, rather than generating pixels from a known scene. The reader
+supports Portable Graymap **P2/P5, 8-bit, maxval 255**, cropped images
+with equal dimensions (up to 256×256). Convert any rights-cleared PNG/JPEG
+crops to PGM *outside* this package before importing; the tool does not
+segment objects, register cameras, resample images, or infer depth.
+
+```bash
+rvi localize --image-manifest /local/private_study02/manifest.json \
+  --partition pilot --output results/study02_local_images.json
+```
+
+The dataset is read-only. Its manifest declares: `schema_version=1.0.0`,
+`study_id=02`, `evidence_type=image_observation`,
+`stage=exploratory_not_confirmatory`,
+`data_origin=synthetic_test|operator_supplied`,
+`data_rights=operator_declared_authorized`, `threshold`,
+`ambiguity_margin`, `max_range_m`, and `records`. Each record has
+a disjoint `object_family_id`, a unique `session_id`, a partition
+(`development`, `pilot`, or `holdout`) and two SHA-256-pinned
+file references (`observations` and `reference`), in the form
+`{"path": "sessions/s01.json", "sha256": "<64 lowercase hex digits>"}`.
+
+Each observation file uses `schema_version=1.0.0`, `session_id` and
+`requests`. A request has `request_id`, timezone-aware
+`timestamp_utc`, `status=captured|missing_frame`,
+`expected_range_m`, a SHA-256-pinned `template` image and a list of
+anonymous `candidates`. Each candidate contains only `id`,
+`range_m`, and a SHA-256-pinned `image` crop. A missing frame has
+no candidates. The separate reference file holds `schema_version`,
+`session_id` and `labels`, each with `request_id`,
+`target_present` (boolean) and nullable `target_candidate_id`.
+A present but unobserved target is represented by
+`target_present=true, target_candidate_id=null`; an absent target
+uses `target_present=false, target_candidate_id=null`.
+
+**Identity isolation:** all image and range decisions for a session are
+computed *before* opening its reference annotations. The evaluator checks
+the labels only afterward. The same request is compared using normalized
+pixel MAE (`image_mae`), range difference (`range_only`), and
+equal-weight fusion (`image_range`), using existing selection and
+abstention rules. Crop dimensions must match, and range readings are
+**user-supplied values in metres**, not independently calibrated by this
+reader.
+
+The report includes failures, absent-target requests, wrong selections,
+abstentions, session summaries and equally weighted family-level risk,
+plus source/input hashes. Only `development` and `pilot` are
+available: the CLI refuses `holdout` and does not read those files.
+Source records never embed image pixels or raw reference annotations
+in the output.
+
+**Validity boundary:** a successful software replay verifies input
+integrity and bookkeeping, *not* accuracy on real images, rights,
+the identity of the measured objects, pose calibration, reference
+independence or session independence. The data-origin and rights fields
+are operator declarations, not certifications. Datasets stay outside
+Git and GitHub Pages. This is an ingestion and evaluation interface;
+the repository still has **no collected camera dataset** or physical
+localization result. Clustering labels must reflect genuinely distinct
+object families, not arbitrary renamed copies. No inferential interval
+or confirmatory claim is computed.
