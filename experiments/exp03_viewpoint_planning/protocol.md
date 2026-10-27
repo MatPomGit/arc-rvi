@@ -79,3 +79,14 @@ identical, and record infeasible views and planning overhead. This is
 adding an illustrative humanoid model is not evidence of stability or
 physical executability. Do not transplant predicted t statistics from
 unverified draft hypotheses into a result or power claim.
+
+## Prior-art qualification, 2026-10-27
+
+The publisher record for [RoboInspect (Wang et al., 2026)](https://doi.org/10.1016/j.cacaie.2026.100007)
+documents physical humanoid navigation and crack-inspection case studies.
+A claim that humanoid autonomous inspection has **never** been validated
+physically would be false. Study 03 instead proposes a narrower, independently
+testable difference: coupled feasible viewpoint/motion selection under a
+common validated motion budget, with explicit whole-body/stability checks.
+No novelty or improvement claim is established until reproducible
+method-by-method evaluation and full prior-art review.
