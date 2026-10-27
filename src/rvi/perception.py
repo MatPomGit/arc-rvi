@@ -96,7 +96,8 @@ def simulate_sensor(
         raise ValueError("timestamp_s must be nonnegative and finite")
     validate_pose(pose)
     visible = set(PlanarSimulator(scene).visible_patches(pose))
-    missing = _stream(config.master_seed, scene.identifier, capture_index, "frame").random() < config.frame_dropout
+    frame_rng = _stream(config.master_seed, scene.identifier, capture_index, "frame")
+    missing = frame_rng.random() < config.frame_dropout
     detections = []
     references = []
     for patch in sorted(scene.patches, key=lambda item: item.identifier):
@@ -112,9 +113,11 @@ def simulate_sensor(
                 pixel_u = config.width_px * (0.5 - angle / scene.camera.horizontal_fov_rad)
                 brightness = 128 * config.illumination_relative * config.exposure_relative
                 detection = {
-                    "u_px": min(config.width_px, max(0.0, pixel_u + rng.gauss(0, config.pixel_noise_sd))),
+                    "u_px": min(config.width_px, max(
+                        0.0, pixel_u + rng.gauss(0, config.pixel_noise_sd))),
                     "range_m": max(0.0, hypot(dx, dy) + rng.gauss(0, config.range_noise_sd_m)),
-                    "brightness_gray_8bit": round(min(255, max(0, brightness + rng.gauss(0, config.brightness_noise_sd)))),
+                    "brightness_gray_8bit": round(min(255, max(
+                        0, brightness + rng.gauss(0, config.brightness_noise_sd)))),
                     "sharpness_proxy": config.focus_fraction * (1 - config.motion_blur_fraction),
                 }
                 detections.append((patch.identifier, detection))
