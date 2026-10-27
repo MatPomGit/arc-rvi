@@ -5,14 +5,14 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.6.0
+  software_version: 1.7.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
   documentation: mkdocs.yml
-research_phase: exploratory_paired_geometric_pilot_analysis
+research_phase: exploratory_sampled_geometry_family_design
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
   - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
@@ -21,6 +21,7 @@ implemented:
   - "Eight prospective protocols and shared statistical design"
   - "Seeded paired geometric conditions, disjoint family partitions and hash manifests"
   - "Pilot-only paired geometric analysis with SHA-256 input checks and family aggregation"
+  - "Additional seeded family-level synthetic geometry generator with disjoint experimental partitions"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
   - "MkDocs source staging and GitHub Pages workflow (deployment unverified)"
 evidence_state:
@@ -29,7 +30,8 @@ evidence_state:
   policy_visibility: known_geometry_oracle_not_unknown_surface_perception
   collected_research_dataset: absent
   seeded_conditions: exploratory_generator_only
-  pilot_analysis: software_only_descriptive_two_family_pilot
+  pilot_analysis: fixed_templates_descriptive_and_sampled_model_exploratory_only
+  sampled_families: synthetic_independent_model_draws_not_physical_population
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
   pages_deployment: verified_success_main_502127a3e906a162cf13764ef08b8d328a423c95
   independent_family_sample: not_established
@@ -65,6 +67,8 @@ verification_commands:
   - "rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json"
   - "rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions"
   - "rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json"
+  - "rvi population --spec simulation/conditions/study01_population_pilot.json --output-dir results/study01_population"
+  - "rvi pilot --manifest results/study01_population/manifest.json --output results/study01_population_analysis.json"
   - "rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json"
   - "python scripts/build_docs.py && python -m mkdocs build --strict"
 publication_portfolio:
