@@ -9,7 +9,6 @@ from pathlib import Path
 import random
 
 from .conditions import CONDITIONS, PARTITIONS, VERSION, _encoded, _hash
-from .adapters.simulator import PlanarSimulator, load_scene
 
 DESIGN = "sampled_geometry_v1"
 DISTRIBUTION = {
