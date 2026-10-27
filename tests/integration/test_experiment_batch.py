@@ -42,7 +42,8 @@ class ExperimentBatchTests(unittest.TestCase):
             self.assertEqual({r["method"] for r in rows},
                              {"fixed_order", "greedy_distance", "greedy_coverage"})
             self.assertEqual({r["condition"] for r in rows}, {"nominal", "occluded"})
-            self.assertTrue(any(r["status"] == "algorithm_failure" for r in rows))
+            self.assertEqual(sum(stats["statuses"].values()), len(rows))
+            self.assertTrue(all(r["status"] in ("completed", "algorithm_failure") for r in rows))
             self.assertEqual({r["seeds"]["sensor"] for r in rows}, {None})
             self.assertEqual(len({r["trial_id"] for r in rows}), 36)
             self.assertTrue(all(r["independent_unit"] in source["partitions"]["pilot"]
@@ -67,6 +68,8 @@ class ExperimentBatchTests(unittest.TestCase):
             self.assertEqual(stats["trials"], 9)
             self.assertEqual(stats["families"], 3)
             self.assertEqual(stats["partition"], "fixture_smoke")
+            self.assertTrue(any(r["status"] == "algorithm_failure" for r in rows))
+            self.assertEqual(sum(stats["statuses"].values()), len(rows))
             self.assertEqual(r, run_experiment(suite=FIXTURE, output_dir=output, resume=True))
             with self.assertRaisesRegex(ValueError, "exactly one"):
                 run_experiment(output_dir=root / "neither")
