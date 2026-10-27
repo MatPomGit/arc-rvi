@@ -14,6 +14,7 @@ from .localization import run_localization_fixture, run_sensor_localization
 from .pilot import analyze_pilot
 from .planning import plan_family_sample
 from .power_mc import analyze_cluster_monte_carlo
+from .robot_model import inspect_urdf
 from .population import generate_population
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
@@ -65,6 +66,12 @@ def make_parser() -> argparse.ArgumentParser:
     cluster_mc = sub.add_parser("power-mc", help="exploratory family-level Monte Carlo power and CI diagnostics")
     cluster_mc.add_argument("--spec", required=True, type=Path)
     cluster_mc.add_argument("--output", required=True, type=Path)
+    robot_model = sub.add_parser("robot-model",
+                                 help="audit hash-pinned local URDF without robot I/O")
+    robot_model.add_argument("--urdf", required=True, type=Path)
+    robot_model.add_argument("--expected-sha256", required=True)
+    robot_model.add_argument("--camera-frame")
+    robot_model.add_argument("--output", required=True, type=Path)
     return parser
 
 
@@ -99,10 +106,14 @@ def main(argv: list[str] | None = None) -> int:
             manifest = generate_conditions(arguments.spec, arguments.output_dir)
             print(f"Saved {len(manifest['scenes'])} exploratory scenes to {arguments.output_dir}")
             return 0
-        if arguments.command in ("benchmark", "simulate", "pilot", "precision", "power-mc"):
+        if arguments.command in ("benchmark", "simulate", "pilot", "precision",
+                                 "power-mc", "robot-model"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
-            if arguments.command == "pilot":
+            if arguments.command == "robot-model":
+                payload = inspect_urdf(arguments.urdf, arguments.expected_sha256,
+                                       camera_frame=arguments.camera_frame)
+            elif arguments.command == "pilot":
                 payload = analyze_pilot(arguments.manifest, arguments.reference,
                                         arguments.comparator, seed=arguments.seed)
             elif arguments.command == "precision":
