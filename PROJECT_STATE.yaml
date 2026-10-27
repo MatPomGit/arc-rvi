@@ -1,5 +1,5 @@
 version: 1
-updated: "2026-10-26"
+updated: "2026-10-27"
 purpose: "Canonical scientific and implementation status for arc-rvi and the ARC portfolio"
 repository:
   canonical_branch: main
@@ -40,6 +40,13 @@ evidence_state:
   literature_and_novelty_review: pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "0b25bee674083549558c6e4a0cd61e3f3db8886f"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 83
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40452886102"
+    scope: "Merged v1.6.0 software tests, 33 staged documents and published MkDocs; not research confirmation"
   - corresponding_main_commit: "502127a3e906a162cf13764ef08b8d328a423c95"
     command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
     outcome: PASS
