@@ -99,7 +99,7 @@ def inspect_urdf(
     neutral_outside = []
     for joint in xml.findall("joint"):
         identifier, kind = joint.get("name", ""), joint.get("type")
-        if not identifier or identifier in joint_names or kind not in JOINT_TYPES:
+        if not identifier.strip() or identifier in joint_names or kind not in JOINT_TYPES:
             raise ValueError("invalid, duplicate or unsupported URDF joint")
         joint_names.add(identifier)
         types[kind] += 1
@@ -164,7 +164,7 @@ def inspect_urdf(
             "relative_to": root,
         }
     return {
-        "schema_version": "1.0.0", "evidence_type": "simulation",
+        "schema_version": "1.0.0", "evidence_type": "fixture",
         "status": "offline_description_structure_only",
         "robot_name": xml.get("name"), "source_sha256": digest,
         "root_link": root, "link_count": len(links),
