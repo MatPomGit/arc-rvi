@@ -155,7 +155,7 @@ def _utc(value: object) -> datetime:
 
 
 def _predictions(root: Path, observed: dict, threshold: float,
-                 margin: float, max_range: float) -> tuple[list[dict], set[str]]:
+                 margin: float, max_range: float) -> tuple[list[dict], dict[str, set[str]]]:
     _fields(observed, {"schema_version", "session_id", "requests"}, "observations")
     if observed["schema_version"] != "1.0.0":
         raise ValueError("unsupported observation schema")
@@ -164,6 +164,7 @@ def _predictions(root: Path, observed: dict, threshold: float,
         raise ValueError("session request count exceeds supported limit")
     results: list[dict] = []
     seen: set[str] = set()
+    candidate_ids: dict[str, set[str]] = {}
     previous_time = None
     for request in requests:
         _fields(request, {"request_id", "timestamp_utc", "status", "template",
@@ -199,22 +200,24 @@ def _predictions(root: Path, observed: dict, threshold: float,
                 "spatial_distance": abs(expected - _number(
                     detection["range_m"], "candidate range", max_range)) / max_range,
             })
+        candidate_ids[request_id] = ids
         for label, method in METHODS.items():
             decision = select_instance(candidates, method, threshold, margin)
             results.append({
                 "request_id": request_id, "timestamp_utc": request["timestamp_utc"],
                 "measurement_status": request["status"], "method": label, **decision,
             })
-    return results, seen
+    return results, candidate_ids
 
 
-def _score(predictions: list[dict], reference: dict, request_ids: set[str],
+def _score(predictions: list[dict], reference: dict,
+           candidate_ids: dict[str, set[str]],
            session_id: str, family: str) -> list[dict]:
     _fields(reference, {"schema_version", "session_id", "labels"}, "reference")
     if reference["schema_version"] != "1.0.0" or reference["session_id"] != session_id:
         raise ValueError("reference session does not match observations")
     labels = reference["labels"]
-    if not isinstance(labels, list) or len(labels) != len(request_ids):
+    if not isinstance(labels, list) or len(labels) != len(candidate_ids):
         raise ValueError("reference request count does not match observations")
     truth = {}
     for label in labels:
@@ -225,8 +228,10 @@ def _score(predictions: list[dict], reference: dict, request_ids: set[str],
                 or (chosen is not None and (not present or type(chosen) is not str
                                              or not chosen.strip()))):
             raise ValueError("invalid or duplicate reference identity")
+        if chosen is not None and chosen not in candidate_ids.get(request_id, set()):
+            raise ValueError("reference points to an unknown detection")
         truth[request_id] = (present, chosen)
-    if set(truth) != request_ids:
+    if set(truth) != set(candidate_ids):
         raise ValueError("reference request IDs do not match observations")
     scored = []
     for prediction in predictions:
@@ -309,21 +314,30 @@ def evaluate_image_manifest(manifest_path: Path, partition: str = "pilot") -> di
         if observed.get("session_id") != record["session_id"]:
             raise ValueError("observation session differs from manifest")
         # Only observations and pixel crops reach the policy.
-        decisions, ids = _predictions(root, observed, threshold, margin, max_range)
+        decisions, candidate_ids = _predictions(
+            root, observed, threshold, margin, max_range)
         # Load evaluator-only truth after all decisions for this session.
         reference_path = _safe_file(root, record["reference"], maximum=MAX_BYTES)
         reference, _ = read_json(reference_path)
-        all_rows.extend(_score(decisions, reference, ids, record["session_id"],
+        all_rows.extend(_score(decisions, reference, candidate_ids,
+                               record["session_id"],
                                record["object_family_id"]))
     groups: dict[str, list[dict]] = defaultdict(list)
+    sessions: dict[str, list[dict]] = defaultdict(list)
     strata: dict[str, list[dict]] = defaultdict(list)
     for trial in all_rows:
         groups[trial["object_family_id"]].append(trial)
+        sessions[trial["session_id"]].append(trial)
         strata["present" if trial["target_present"] else "absent"].append(trial)
     family_summary = {
         family: {method: _summary([r for r in rows if r["method"] == method])
                  for method in METHODS}
         for family, rows in sorted(groups.items())
+    }
+    session_summary = {
+        session: {method: _summary([r for r in rows if r["method"] == method])
+                  for method in METHODS}
+        for session, rows in sorted(sessions.items())
     }
     family_mean = {
         method: sum(group[method]["wrong_selection_rate"]
@@ -340,7 +354,8 @@ def evaluate_image_manifest(manifest_path: Path, partition: str = "pilot") -> di
         "family_count": len(family_summary), "session_count": len(selected),
         "methods": list(METHODS), "manifest_sha256": digest(raw),
         "source": software_provenance(),
-        "family_summary": family_summary, "mean_family_wrong_risk": family_mean,
+        "family_summary": family_summary, "session_summary": session_summary,
+        "mean_family_wrong_risk": family_mean,
         "paired_difference_fusion_minus_image": (
             family_mean["image_range"] - family_mean["image_mae"]),
         "target_strata": {
