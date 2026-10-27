@@ -270,6 +270,7 @@ def run_experiment(*, manifest: Path | None = None, suite: Path | None = None,
     output_dir = Path(output_dir)
     # Validate/replay before inspecting a stored receipt: changing input or code
     # makes a mismatched resume fail without touching previous evidence.
+    started = datetime.now(timezone.utc).isoformat()
     payloads, provenance, _ = _payload(manifest, suite, partition)
     hashes = {filename: {"sha256": _sha(raw), "size_bytes": len(raw)}
               for filename, raw in payloads.items()}
@@ -289,7 +290,6 @@ def run_experiment(*, manifest: Path | None = None, suite: Path | None = None,
             if path.is_symlink() or not path.is_file() or _sha(path.read_bytes()) != expected["sha256"]:
                 raise ValueError("existing experiment artifact was modified or corrupted")
         return receipt
-    started = datetime.now(timezone.utc).isoformat()
     receipt = {
         "schema_version": VERSION, "provenance": provenance, "artifacts": hashes,
         "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(),
