@@ -44,7 +44,7 @@ class RobotModelAuditTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path, checksum = write_model(Path(tmp), TOY)
             report = inspect_urdf(path, checksum, camera_frame="camera")
-            self.assertEqual(report["evidence_type"], "simulation")
+            self.assertEqual(report["evidence_type"], "fixture")
             self.assertEqual(report["robot_name"], "neutral_test")
             self.assertEqual(report["link_count"], 4)
             self.assertEqual(report["joint_count"], 3)
@@ -132,7 +132,7 @@ class RobotModelAuditTests(unittest.TestCase):
                 '<child link="orphan1"/></joint></robot>',
             )
             path, digest = write_model(root, xml)
-            with self.assertRaisesRegex(ValueError, "rooted tree"):
+            with self.assertRaisesRegex(ValueError, "disconnected or cyclic"):
                 inspect_urdf(path, digest)
 
     def test_zero_pose_outside_joint_limits_is_not_validated(self):
