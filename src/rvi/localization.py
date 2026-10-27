@@ -6,6 +6,7 @@ computed here. Ground truth is passed only to the separate evaluator.
 from __future__ import annotations
 
 import json
+from hashlib import sha256
 from math import isfinite
 from pathlib import Path
 
@@ -145,4 +146,145 @@ def run_localization_fixture(path: Path) -> dict:
         "input_sha256": sha256_file(path),
         "threshold": threshold, "ambiguity_margin": margin,
         "trials": trials, "summary": summary,
+    }
+
+# Sensor comparisons reuse the fixture selector with honest method labels.
+# Pixel bearing is not a learned visual descriptor or physical pose estimate.
+SENSOR_METHODS = {
+    "bearing_proxy": "visual",
+    "range_proxy": "spatial",
+    "joint_proxy": "fused",
+}
+
+
+def _study_file(study_path: Path, relative: object) -> Path:
+    """Confine included files to the study directory's parent data tree."""
+    if not isinstance(relative, str) or not relative or Path(relative).is_absolute():
+        raise ValueError("study input needs a relative path")
+    root = study_path.resolve(strict=True).parent.parent
+    target = (study_path.parent / relative).resolve(strict=True)
+    if not target.is_file() or not target.is_relative_to(root):
+        raise ValueError("study input path escapes the study data tree")
+    return target
+
+
+def run_sensor_localization(study_path: Path) -> dict:
+    """Compare bearing/range association on actual synthetic sensor features.
+
+    The target cue is an externally supplied expected pixel/range pair.
+    Reference patch identities are accessed only after all method selections.
+    """
+    from .adapters.simulator import PlanarSimulator, load_scene
+    from .perception import load_sensor_config, simulate_sensor
+    from .scenarios import read_json
+
+    spec, raw = read_json(Path(study_path))
+    _fields(spec, {"schema_version", "study_id", "evidence_type", "stage",
+                   "suite_id", "scene", "sensor", "threshold",
+                   "ambiguity_margin", "requests"}, "sensor study")
+    if (spec["schema_version"], spec["study_id"], spec["evidence_type"],
+            spec["stage"]) != ("1.0.0", "02", "simulation",
+                                "exploratory_not_confirmatory"):
+        raise ValueError("unsupported or non-exploratory sensor study")
+    suite_id = _id(spec["suite_id"], "suite id")
+    threshold = _fraction(spec["threshold"], "threshold")
+    margin = _fraction(spec["ambiguity_margin"], "ambiguity_margin")
+    scene_path = _study_file(Path(study_path), spec["scene"])
+    sensor_path = _study_file(Path(study_path), spec["sensor"])
+    scene, _ = load_scene(scene_path)
+    sensor, _ = load_sensor_config(sensor_path)
+    PlanarSimulator(scene)  # Fail invalid geometric and motion models up front.
+    patch_ids = {patch.identifier for patch in scene.patches}
+    requests = spec["requests"]
+    if not isinstance(requests, list) or not 1 <= len(requests) <= 256:
+        raise ValueError("sensor study requires 1 to 256 target requests")
+    observed_ids = set()
+    rows, observations = [], []
+    for request in requests:
+        _fields(request, {"request_id", "capture_index", "expected_u_px",
+                          "expected_range_m", "ground_truth_patch_id"}, "target request")
+        request_id = _id(request["request_id"], "request id")
+        if request_id in observed_ids:
+            raise ValueError("duplicate target request id")
+        observed_ids.add(request_id)
+        capture_index = request["capture_index"]
+        if type(capture_index) is not int or not 0 <= capture_index < 2**32:
+            raise ValueError("capture_index must be an unsigned 32-bit integer")
+        u = request["expected_u_px"]
+        expected_range = request["expected_range_m"]
+        if (type(u) not in (int, float) or not isfinite(u)
+                or not 0 <= u <= sensor.width_px):
+            raise ValueError("invalid requested horizontal pixel")
+        if (type(expected_range) not in (int, float)
+                or not isfinite(expected_range)
+                or not 0 <= expected_range <= scene.camera.max_range_m):
+            raise ValueError("invalid requested range in metres")
+        # Ground truth is validated but is NEVER part of candidate construction.
+        truth = request["ground_truth_patch_id"]
+        if truth is not None and (type(truth) is not str or truth not in patch_ids):
+            raise ValueError("unknown evaluator-only patch identity")
+        policy, reference = simulate_sensor(
+            scene, scene.start, sensor, capture_index=capture_index)
+        candidates = [{
+            "id": detection["id"],
+            "visual_distance": abs(detection["u_px"] - u) / sensor.width_px,
+            "spatial_distance": min(
+                1.0, abs(detection["range_m"] - expected_range)
+                / scene.camera.max_range_m),
+        } for detection in policy["detections"]]
+        decisions = {label: select_instance(candidates, internal, threshold, margin)
+                     for label, internal in SENSOR_METHODS.items()}
+        # Only the evaluator reads identity correspondence after predictions.
+        visible_truth = {item["detection_id"]: item["patch_id"]
+                         for item in reference["geometry_references"]
+                         if item["detection_id"] is not None}
+        observations.append({"request_id": request_id, "policy": policy,
+                             "evaluator": reference})
+        for method, decision in decisions.items():
+            predicted = visible_truth.get(decision["selected_id"])
+            # Absent reference target + any selection is a wrong selection.
+            outcome = _outcome(predicted if decision["selected_id"] else None, truth)
+            rows.append({
+                "request_id": request_id, "capture_index": capture_index,
+                "method": method, "selected_id": decision["selected_id"],
+                "selected_reference_patch_id": predicted,
+                "ground_truth_patch_id": truth, "score": decision["score"],
+                "decision": decision["decision"], "status": outcome,
+                "wrong_selection": outcome == "wrong_selection",
+                "target_present": truth is not None,
+                "measurement_status": policy["status"],
+            })
+    summary = {}
+    for method in SENSOR_METHODS:
+        method_rows = [row for row in rows if row["method"] == method]
+        counts = {label: sum(row["status"] == label for row in method_rows)
+                  for label in ("correct_selection", "correct_rejection",
+                                "wrong_selection", "abstained")}
+        n = len(method_rows)
+        summary[method] = {
+            "eligible_requests": n, **counts,
+            "wrong_selection_rate": counts["wrong_selection"] / n,
+            "correct_selection_rate": counts["correct_selection"] / n,
+            "abstention_rate": sum(r["selected_id"] is None for r in method_rows) / n,
+            "missing_frames": sum(r["measurement_status"] == "measurement_missing"
+                                  for r in method_rows),
+        }
+    return {
+        "schema_version": "1.0.0", "evidence_type": "simulation",
+        "status": "exploratory_not_confirmatory", "study_id": "02",
+        "suite_id": suite_id, "model": "planar_bearing_range_proxy_v1",
+        "independent_unit": "one_hand_constructed_scene_not_population",
+        "selection_modes": list(SENSOR_METHODS),
+        "method_semantics": {
+            "bearing_proxy": "horizontal_pixel_difference_not_appearance",
+            "range_proxy": "sensor_range_difference_not_3d_pose",
+            "joint_proxy": "equal_weight_normalized_bearing_range",
+        },
+        "source": software_provenance(),
+        "input_sha256": sha256(raw).hexdigest(),
+        "scene_sha256": sha256_file(scene_path),
+        "sensor_sha256": sha256_file(sensor_path),
+        "visibility_access": "evaluator_only_geometry",
+        "threshold": threshold, "ambiguity_margin": margin,
+        "observations": observations, "trials": rows, "summary": summary,
     }
