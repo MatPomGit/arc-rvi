@@ -35,7 +35,7 @@ evidence_state:
   sampled_families: synthetic_independent_model_draws_not_physical_population
   family_count_planning: illustrative_known_variance_normal_assumptions_only
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
-  pages_deployment: verified_success_main_b519aa122d13bab9cd3d030c6884e232bbfd4c38
+  pages_deployment: verified_success_main_b2b4f8b42be984cf10d3fc6747f7f2cf462c1305
   independent_family_sample: not_established
   external_physics_adapter: not_implemented
   physical_robot_adapter: not_implemented
@@ -44,6 +44,13 @@ evidence_state:
   literature_and_novelty_review: pending
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
+  - corresponding_main_commit: "b2b4f8b42be984cf10d3fc6747f7f2cf462c1305"
+    command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
+    outcome: PASS
+    tests_passed: 94
+    documentation_deployment: PASS
+    workflow_run: "https://github.com/MatPomGit/arc-rvi/actions/runs/40462959603"
+    scope: "Merged v1.8.0 normal-model family sensitivity planning and strict MkDocs release; not confirmatory sample size"
   - corresponding_main_commit: "b519aa122d13bab9cd3d030c6884e232bbfd4c38"
     command: "python scripts/validate.py && python scripts/build_docs.py && python -m mkdocs build --strict"
     outcome: PASS
