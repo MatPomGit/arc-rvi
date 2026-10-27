@@ -61,3 +61,17 @@ same-view-retry question, with a shared deadline, matched disturbances and a
 reference evaluator independent from the policy score. This trial must not
 reuse P04's online incomplete-geometry endpoint as independent evidence.
 Suggested image-quality cutoffs and trial counts are not calibrated.
+
+## Publication overlap guard (2026-10-27)
+
+[Zhao et al. (2026)](https://doi.org/10.3390/app16189389) already present
+quality-aware active re-observation for constrained eye-in-hand manipulators.
+[Bégin & Hunter (2022)](https://doi.org/10.3390/s22030835) study active exposure
+control for visual localization and [Kim et al. (2020)](https://doi.org/10.1109/TRO.2020.2985597)
+study proactive camera control for visual navigation. Therefore this proposal
+cannot treat quality-aware re-observation or proactive exposure as novel on
+their own. The **unconfirmed** study contribution is independent quality-
+scored inspection coverage at a common action/time budget, with clear failure
+and re-observation denominators. Bibliographic matching alone does not verify
+these papers' experimental performance claims; consult the full methods before
+freezing baselines.

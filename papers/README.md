@@ -18,3 +18,10 @@ reviews, unresolved bibliographic provenance and cross-paper novelty risks.
 Do not transfer draft references to `references.bib` or characterize a manuscript
 as submission-ready until each claim has an independently verified source and
 its prospective experimental gate has been satisfied.
+
+Stable DOI-derived **candidate identifiers** are available via
+`python scripts/audit_literature.py --catalog` and the ten reviewed bibliographic
+records are documented in [the literature audit](../docs/literature.md).
+An ID is not peer review or replication. The full article must be examined
+for the actual claimed experimental evidence and rechecked for rights before
+using its citation in a manuscript.
