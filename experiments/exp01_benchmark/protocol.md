@@ -52,7 +52,10 @@ The [sampled-geometry implementation](../../docs/population.md) can draw
 independent synthetic latent family parameters and preserve disjoint family splits.
 Its sample space is prescribed by an uncalibrated 2D model. Its 12 pilot families
 are **computational draws**, not real-world independent objects and not a
-pre-registered confirmatory sample. Illumination and clutter are not modeled.
+pre-registered confirmatory sample. The separate [12-cell exploratory factor
+matrix](../../docs/population.md) now crosses model occlusion, illumination
+proxy and nuisance discs over stratified 2–4-patch families. It has not been
+calibrated, estimated with a factorial analysis or locked for confirmation.
 The [pre-confirmatory sensitivity calculator](../../docs/sample-size.md)
 provides illustrative normal-model estimates of independent family counts,
 conditioning on externally specified effects, between-family SD and attrition.
@@ -65,8 +68,9 @@ views using public poses and past anonymous pixel/range features only, and
 scores coverage from actually detected surfaces in an evaluator-only channel.
 Its three policies (route order, nearest pose, parallax from prior detections)
 are **engineering comparators**, not the prospectively defined and frozen
-coverage-greedy primary baselines. A full crossed scenario population, independent
-sensor validation, sample-size gate and confirmatory split remain unimplemented.
+coverage-greedy primary baselines. A crossed **toy-model generation matrix** now
+exists, but independent sensor validation, factorial effect estimation,
+sample-size gate and sealed confirmatory split remain unimplemented.
 Do not mix results of this mode with existing known-geometry oracle benchmarks.
 
 ## Provenance and confirmation gate
