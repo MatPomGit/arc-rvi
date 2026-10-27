@@ -14,7 +14,7 @@ Independent research software for autonomous perception, mobile inspection, view
 choice, not an implemented robot integration or confirmation of available
 hardware. The exact EDU variant, sensor payload and firmware must be verified
 before importing a robot model or conducting physical tests. Shared algorithms
-remain hardware-independent; see [the robot configuration](config/robot.yaml)
+remain hardware-independent; see `config/robot.yaml`
 and [physical test safety gates](docs/safety.md).
 
 ## Repository map
