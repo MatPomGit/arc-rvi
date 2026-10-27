@@ -46,6 +46,42 @@ remain outside the public repository. The next identification step is an
 operator-approved **read-only** hardware/firmware and `mode_machine`
 inventory, followed by matching and auditing the manufacturer's URDF.
 
+### Read-only SSH hardware inventory
+
+Run `scripts/inspect_robot_ssh.py` through SSH on the robot's **developer
+computer** without copying or installing anything on the robot. On your
+local Linux workstation, from the repository root:
+
+```bash
+# Passive inventory first; the output file is stored LOCALLY.
+(umask 077; ssh -T USER@ROBOT_HOST 'python3 -' \
+  < scripts/inspect_robot_ssh.py > g1_edu_inventory.json)
+
+# Once the DDS network interface is known (e.g. eth0), optionally request
+# only one rt/lowstate message, bounded to nine seconds:
+(umask 077; ssh -T USER@ROBOT_HOST 'python3 - --dds-interface eth0' \
+  < scripts/inspect_robot_ssh.py > g1_edu_inventory_dds.json)
+```
+
+The script only inspects OS/Python/ROS/SDK versions, interface names and
+link state, USB vendor/product IDs **without serials**, video and IIO
+device names and a few known local URDF directories with file SHA-256.
+The DDS option uses a temporary **subscriber only** for
+`rt/lowstate` to collect `mode_machine`; no command topic, motion or
+SDK install. The tool intentionally omits passwords, hostnames,
+serial numbers, IP/MAC addresses and raw IMU/motor readings.
+An Ethernet LiDAR may not appear in USB enumeration; missing devices
+or packages in this report do **not** prove they are absent.
+
+If DDS shows `sdk_or_dds_error`, use the existing onboard Python
+environment where `unitree_sdk2py` is already installed, or first
+review the passive interface list. Do not change network, firmware,
+ROS 2 configuration or robot operating mode merely to run this inventory.
+The numeric `mode_machine` must still be matched against a **pinned**
+official Unitree description revision and the physical hand/sensor
+installation separately. Keep local JSON reports out of public Git
+and review them before sharing.
+
 The exact hardware variant is **not yet known**. Do not assume a 29-DoF
 robot, a D435 camera, particular joint limits or a calibrated camera mount.
 

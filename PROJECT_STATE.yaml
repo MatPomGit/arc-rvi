@@ -24,6 +24,8 @@ reference_robot:
   vendor_description_repository: unitreerobotics/unitree_ros
   vendor_description_reference_commit: "7919cba47a3f68888f3b084945b0ffbf3bb3763a"
   actual_machine_mode_and_selected_urdf: not_verified
+  offline_ssh_inventory: implemented_not_executed_on_robot
+  mode_machine_readout: pending_operator_approved_read_only_dds
   laboratory_photos:
     provided: "2026-10-27"
     source: user_supplied_not_committed_to_public_repo
@@ -57,6 +59,7 @@ implemented:
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
   - "Offline hash-pinned URDF topology/joint-limit and zero-pose camera-frame audit; no hardware control"
   - "One virtual root floating joint supported with explicit identity-base assumption"
+  - "Read-only SSH G1 EDU system and device inventory with optional bounded rt/lowstate mode_machine subscription"
   - "MkDocs source staging and verified GitHub Pages deployment"
 evidence_state:
   fixtures: software_correctness_checks_only
@@ -80,6 +83,7 @@ evidence_state:
   robot_description_audit: static_urdf_structure_and_zero_joint_pose_only
   external_g1_schematic_sources: triaged_with_hardware_verification_pending
   physical_safety_gate: M0_M1_M2_documented_not_executed
+  ssh_robot_inventory: software_tests_only_no_robot_measurement
   selected_robot_urdf_validated: not_yet
   physical_robot_adapter: not_implemented
   physical_measurements: absent
