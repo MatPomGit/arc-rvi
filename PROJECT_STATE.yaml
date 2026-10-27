@@ -24,6 +24,15 @@ reference_robot:
   vendor_description_repository: unitreerobotics/unitree_ros
   vendor_description_reference_commit: "7919cba47a3f68888f3b084945b0ffbf3bb3763a"
   actual_machine_mode_and_selected_urdf: not_verified
+  laboratory_photos:
+    provided: "2026-10-27"
+    source: user_supplied_not_committed_to_public_repo
+    physical_robot_presence: visually_documented
+    g1_edu_identity: user_identified_not_serial_verified
+    observed_robot_state: upright_in_still_images_motion_and_power_unknown
+    visible_environment: nearby_chairs_wheeled_structure_and_floor_cabling
+    harness_and_safety_rating: not_verified
+    study_evidence: site_reference_only_not_robot_measurement
   provisional_user_document_claims: 29dof_D435i_MID360_four_microphones_unconfirmed
   user_source_documents: G1_EDU_basic_description_and_teaching_manual_v1_8
   sensor_topics_and_transforms: illustrative_not_measured
