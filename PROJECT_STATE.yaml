@@ -5,14 +5,14 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.12.0
+  software_version: 1.13.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
   documentation: mkdocs.yml
-research_phase: exploratory_p02_sensor_association
+research_phase: exploratory_p01_observation_driven_view_selection
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
   - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
@@ -27,12 +27,13 @@ implemented:
   - "Study01 synthetic family-level Monte Carlo CI coverage/type-I/power and missingness sensitivity checks"
   - "Reusable planar sensor observation features and separate evaluator-only geometric truth"
   - "Exploratory P02 bearing/range-proxy selection on generated anonymous features"
+  - "Exploratory P01 observed-feature route selection with evaluator-only detected-area scoring"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
   - "MkDocs source staging and verified GitHub Pages deployment"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
-  policy_visibility: known_geometry_oracle_not_unknown_surface_perception
+  policy_visibility: legacy_benchmark_oracle_and_optional_observation_only_smoke
   collected_research_dataset: absent
   seeded_conditions: exploratory_generator_only
   pilot_analysis: fixed_templates_descriptive_and_sampled_model_exploratory_only
@@ -42,6 +43,7 @@ evidence_state:
   cluster_monte_carlo: uncalibrated_synthetic_assumptions_only
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
   sensor_observations: uncalibrated_horizontal_1d_synthetic_features_only
+  p01_observation_planning: two_hand_constructed_scenes_only_not_factorial_or_confirmation
   p02_sensor_association: single_toy_scene_proxy_features_not_image_appearance_or_physical_localization
   pages_deployment: verified_success_main_08a62569d407bca3cdcb1646d3ceec4d9060182c
   independent_family_sample: not_established
@@ -103,6 +105,7 @@ verification_history:
 verification_commands:
   - "python scripts/validate.py"
   - "rvi benchmark --suite simulation/suites/geometric_smoke.json --output results/geometric.json"
+  - "rvi benchmark --suite simulation/suites/geometric_smoke.json --sensor simulation/conditions/sensor_exploratory.json --output results/observed.json"
   - "rvi conditions --spec simulation/conditions/study01_pilot.json --output-dir results/study01_conditions"
   - "rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json"
   - "rvi population --spec simulation/conditions/study01_population_pilot.json --output-dir results/study01_population"
