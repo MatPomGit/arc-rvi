@@ -129,7 +129,8 @@ the included hand-constructed fixtures.
    Hash exact inputs and archive the source revision.
 2. **Observation adapter.** Define frame IDs, UTC timestamps, camera-to-world
    transforms, coordinate conventions, calibration hashes, confidence ranges
-   and a no-reference-leakage boundary. This is **not implemented**.
+   and a no-reference-leakage boundary. Anonymous 1D features and separate
+   evaluation records are implemented; full imaging and calibration are pending.
 3. **Simulation study.** Create independent object-set families with
    distractor similarity, separation and occlusion crossed prospectively;
    freeze the input representations and record simulator/renderer limitations.
