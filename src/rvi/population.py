@@ -190,7 +190,7 @@ def generate_population(spec_path: Path, output_dir: Path) -> dict:
             while parent != output_dir:
                 directories.add(parent)
                 parent = parent.parent
-            parent.mkdir(parents=True, exist_ok=True)
+            destination.parent.mkdir(parents=True, exist_ok=True)
             with destination.open("xb") as file:
                 written.append(destination)
                 file.write(raw_file)
