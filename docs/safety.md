@@ -15,3 +15,18 @@ manufacturer safety/operating guidance, emergency stop, manual enable, fall
 zone, speed/force limits, supervisor and independently tested motion disable.
 Record hardware, firmware and safety-check revisions per session. The current
 `adapter: not_configured` must remain unchanged until these gates pass.
+
+The user-supplied G1 EDU teaching manual v1.8 (sections 3, 7–10, 14)
+describes a useful staged preflight: **M0** supervised workspace and
+manual emergency takeover; **M1** verified communication; **M2**
+read-only joint/IMU telemetry with synchronized, complete logs. Treat
+these as prerequisites, **not permission**, for an independently reviewed
+motion-stage protocol. During hardware work, assign a distinct operator
+to pilot/emergency stop and another to diagnostics; avoid competing
+SDK/ROS 2 controllers. Check optional dexterous-hand cabling and
+posture restrictions before any movement.
+
+Do not place default passwords, device-specific IPs or access instructions
+from training materials in this public repository. Manufacturer safety
+guidance and the actual hardware configuration take precedence over
+unverified teaching examples.

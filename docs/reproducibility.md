@@ -58,6 +58,15 @@ thresholds and sample-size calculation under immutable revisions with hashes.
 A protocol draft in Git is not proof of public preregistration.
 Record any registration service and identifier only after registration actually occurs.
 
+The user-supplied programming instruction v1.8 (sections 8, 11, 14 and
+the ROS 2/TF2 exercise) identifies specific **future capture checks**:
+joint/IMU state and action timestamps, RGB/depth acquisition completeness,
+LiDAR `frame_id`, TF2 tree connectivity, and logs of commands, actual
+states, failures and operator intervention. Record clock source, time offset,
+sensor frame conventions and dropped-message counts. Its example RGB/depth
+timestamp tolerance is a *teaching target*, not a calibrated or frozen
+research threshold. Do not record example values as measured outcomes.
+
 For planned Unitree G1 EDU test sessions, include the exact hardware/EDU
 variant, installed actuator and sensor configuration, calibration, firmware/SDK
 versions, robot description/model revision, coordinate frames and safety-check

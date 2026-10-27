@@ -9,6 +9,14 @@ reference_platform:
   firmware_revision: not_recorded
   sdk_revision: not_recorded
   mode_machine: not_recorded
+  # Candidate attributes cited by two user-supplied descriptions, NOT a device inventory.
+  provisional_user_document_claims:
+    source: G1_EDU_description_and_teaching_manual_v1_8
+    claimed_body_dof: 29
+    claimed_depth_camera: Intel_RealSense_D435i
+    claimed_lidar: Livox_MID360
+    claimed_microphone_count: 4
+    verification: pending_hardware_inventory_and_mode_machine_readout
   reference_description:
     repository: unitreerobotics/unitree_ros
     source_commit: 7919cba47a3f68888f3b084945b0ffbf3bb3763a

@@ -48,7 +48,13 @@ The planned Unitree G1 EDU embodiment will use a version-pinned,
 manufacturer-provided URDF **only after** its actual machine variant has
 been identified. An [offline model audit](../../docs/architecture.md) now
 checks imported joint-tree consistency, numeric limits and static
-zero-joint camera-frame transforms. It does **not** implement articulated
+zero-joint camera-frame transforms. The source-audit supports the virtual root `floating` joint using an
+explicit identity-base convention only, not physical base localization.
+User-supplied G1 material proposes staged read-only telemetry and TF2
+checks before control; P03 must first verify `mode_machine`, camera and
+LiDAR extrinsics and pose synchronization against independent references.
+The source examples do **not** prove functioning G1 ROS 2 controllers.
+It does **not** implement articulated
 collision/reachability, full forward/inverse kinematics, stability or
 actual G1 physical verification. Issue #25 remains open.
 

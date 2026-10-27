@@ -106,7 +106,7 @@ class RobotModelAuditTests(unittest.TestCase):
             ('<link name="mast"/>', '<link name="pelvis"/>'),
             ('<child link="camera"/>', '<child link="missing"/>'),
             ('<child link="mast"/>', '<child link="pelvis"/>'),
-            ('type="revolute"', 'type="floating"'),
+            ('type="revolute"', 'type="planar"'),
             ('<axis xyz="0 0 1"/>', '<axis xyz="0 0 0"/>'),
             ('lower="-1.0" upper="1.0"', 'lower="2" upper="-2"'),
             ('lower="-1.0" upper="1.0"', 'lower="nan" upper="1"'),
@@ -134,6 +134,31 @@ class RobotModelAuditTests(unittest.TestCase):
             path, digest = write_model(root, xml)
             with self.assertRaisesRegex(ValueError, "disconnected or cyclic"):
                 inspect_urdf(path, digest)
+
+    def test_one_root_floating_joint_uses_virtual_identity_not_robot_pose(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            prefix = (
+                '<link name="world"/>'
+                '<joint name="floating_base" type="floating">'
+                '<parent link="world"/><child link="pelvis"/>'
+                '</joint>'
+            )
+            path, checksum = write_model(
+                Path(tmp), TOY.replace('<link name="pelvis"/>',
+                                        prefix + '<link name="pelvis"/>'))
+            report = inspect_urdf(path, checksum, camera_frame="camera")
+            self.assertEqual(report["root_link"], "world")
+            self.assertEqual(report["joint_types"]["floating"], 1)
+            self.assertTrue(report["floating_base_zero_pose_assumed"])
+            self.assertEqual(report["camera_frame"]["zero_joint_pose"]["relative_to"],
+                             "world")
+            self.assertEqual(report["physical_or_collision_validation"], "not_performed")
+
+            misplaced = TOY.replace('name="camera_mount" type="fixed"',
+                                    'name="camera_mount" type="floating"')
+            path, checksum = write_model(Path(tmp), misplaced)
+            with self.assertRaisesRegex(ValueError, "floating-base"):
+                inspect_urdf(path, checksum)
 
     def test_zero_pose_outside_joint_limits_is_not_validated(self):
         with tempfile.TemporaryDirectory() as tmp:
