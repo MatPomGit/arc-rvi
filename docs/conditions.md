@@ -1,5 +1,8 @@
 # Seeded geometric scene conditions (study 01)
 
+The original fixed six-family generator is retained as a regression design.
+For separately sampled geometry families, see [population sampling](population.md).
+
 This package generates an **exploratory software pilot**, not a confirmatory
 scientific dataset. No imagery, illumination model, clutter sensor or physical
 robot data is generated. The evaluated planners have known-geometry oracle
