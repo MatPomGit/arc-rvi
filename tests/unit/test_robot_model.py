@@ -154,7 +154,8 @@ class RobotModelAuditTests(unittest.TestCase):
                              "world")
             self.assertEqual(report["physical_or_collision_validation"], "not_performed")
 
-            misplaced = TOY.replace('type="revolute"', 'type="floating"')
+            misplaced = TOY.replace('name="camera_mount" type="fixed"',
+                                    'name="camera_mount" type="floating"')
             path, checksum = write_model(Path(tmp), misplaced)
             with self.assertRaisesRegex(ValueError, "floating-base"):
                 inspect_urdf(path, checksum)
