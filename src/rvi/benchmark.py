@@ -283,6 +283,9 @@ def _simulation_suite(path: Path, suite: dict, raw: bytes,
     if suite["schema_version"] != "1.0.0":
         raise ValueError("only version 1.0.0 simulation suites are supported")
     suite_id = name(suite["suite_id"], "suite_id")
+    if sensor is not None and ("holdout" in suite_id.lower()
+                               or "confirm" in suite_id.lower()):
+        raise ValueError("observation-only exploratory mode refuses held-out suites")
     if not isinstance(suite["scenes"], list) or not suite["scenes"]:
         raise ValueError("scenes must be a nonempty list of relative paths")
     trials, manifests = [], []
@@ -292,6 +295,10 @@ def _simulation_suite(path: Path, suite: dict, raw: bytes,
         relative = Path(name(entry, "scene path"))
         if relative.is_absolute():
             raise ValueError("scene paths must be relative to the suite")
+        if sensor is not None and any(
+                "holdout" in part.lower() or "confirm" in part.lower()
+                for part in relative.parts):
+            raise ValueError("observation-only exploratory mode refuses held-out paths")
         scene_path = (path.parent / relative).resolve(strict=True)
         scene, scene_raw = load_scene(scene_path)
         if scene_path in seen_paths or scene.identifier in seen_ids:
