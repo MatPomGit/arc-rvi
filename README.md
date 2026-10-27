@@ -47,6 +47,8 @@ rvi localize --fixture simulation/suites/localization_fixture.json --output resu
 rvi localize-population --spec simulation/conditions/study02_population_pilot.json --output-dir results/study02_population
 rvi localize-population --spec simulation/conditions/study02_image_pilot.json --output-dir results/study02_images
 rvi localize --population-manifest results/study02_images/manifest.json --partition pilot --output results/study02_image_pilot.json
+# Optional operator-supplied offline PGM dataset, not included in Git:
+# rvi localize --image-manifest /local/private_study02/manifest.json --partition pilot --output results/study02_local_images.json
 rvi localize --population-manifest results/study02_population/manifest.json --partition pilot --output results/study02_pilot.json
 rvi pilot --manifest results/study01_conditions/manifest.json --output results/study01_pilot_analysis.json
 rvi population --spec simulation/conditions/study01_population_pilot.json --output-dir results/study01_population
@@ -80,6 +82,9 @@ assumptions; it is not a frozen confirmatory design.
 The [cluster Monte Carlo tool](docs/cluster-monte-carlo.md) explores synthetic
 null rejection, interval coverage and assumed alternative power at the
 **family** level under normal/heavy-tailed effects and missingness stress.
+The [offline Study 02 PGM reader](docs/localization.md) accepts operator-supplied
+8-bit grayscale image crops, hashed references and split evaluator annotations;
+no dataset is bundled and no camera calibration or physical result is implied.
 The [synthetic grayscale Study 02 pilot](docs/localization.md) extends
 association from 1D bearing/range proxies to generated 8×8 grayscale pixel
 arrays with controlled appearance similarity and simulated-session noise;

@@ -89,3 +89,21 @@ All methods see the same requests, including absent-target hard negatives.
 Only family-aggregated descriptive contrasts are permitted. A successful
 software test does not establish natural-image accuracy, calibration or
 the protocol's visual-spatial fusion hypothesis.
+
+
+## Operator-supplied image replay (offline)
+
+The [versioned PGM dataset interface](../../docs/localization.md) can
+consume separately recorded anonymous image crops and independent
+evaluator annotations, with strict source hashes, UTC-aware timestamps,
+object-family/session metadata and a sealed exploratory holdout mode.
+The evaluation reuses exactly three simple baselines: image MAE, declared
+range difference and equal-weight fusion. Missing frames and absent
+targets remain in the denominator; groups must be genuinely independent
+for scientific interpretation.
+
+The interface cannot confirm that supplied images came from a calibrated
+sensor, that annotations were independently measured or that cropped
+appearances generalize to new objects. Operator declarations do not replace
+calibration records, a verified sampling population, data-rights review or
+prospective confirmation. Thresholds remain exploratory.
