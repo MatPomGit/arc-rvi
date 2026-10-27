@@ -12,6 +12,34 @@ acquisition, quality control and evidence generation via one adapter boundary.
 6. Replan/retry if quality or coverage is insufficient.
 7. Store a versioned package of images, hashes, provenance and outcomes.
 
+## Offline reference-model preflight
+
+The selected Unitree G1 EDU requires identification of the **particular
+machine variant** before choosing a URDF. The manufacturer publishes several
+23- and 29-joint G1 descriptions, distinguished by the device
+`mode_machine` identifier. The source reference is
+[Unitree's G1 description repository](https://github.com/unitreerobotics/unitree_ros/tree/7919cba47a3f68888f3b084945b0ffbf3bb3763a/robots/g1_description)
+at commit `7919cba47a3f68888f3b084945b0ffbf3bb3763a`.
+The exact hardware variant is **not yet known**. Do not assume a 29-DoF
+robot, a D435 camera, particular joint limits or a calibrated camera mount.
+
+With a locally obtained URDF from the matching manufacturer revision,
+calculate its **SHA-256 independently** and run (no network, simulator,
+dependencies or robot required):
+
+```bash
+rvi robot-model --urdf /path/to/selected.urdf --expected-sha256 YOUR_SHA256 --camera-frame YOUR_VERIFIED_URDF_LINK --output results/robot_model_audit.json
+```
+
+The audit rejects changed/untrusted bytes, invalid topology, unsupported joint
+types, degenerate axes and invalid joint bounds. It reconstructs the zero-joint
+tree transforms and checks whether a specifically requested camera link exists.
+An unknown camera frame is **not** silently replaced by a guessed transform.
+The output is `evidence_type: fixture`: static source consistency only.
+This is not inverse kinematics, stability, collision, gait, hardware
+calibration or physical authorization. The original vendor URDF/meshes and
+their license remain with the upstream source, outside this repository.
+
 Current implementation: deterministic planar greedy viewpoint baseline, mission
 state guards, threshold decisions on supplied measurements, file hashing, paired fixture
 benchmarking and a planar geometric simulator. The simulator has a separate observation
