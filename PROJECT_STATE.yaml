@@ -5,14 +5,14 @@ repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.8.0
+  software_version: 1.9.0
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
   research_programme: experiments/README.md
   plan: AUTOPILOT_PLAN.md
   documentation: mkdocs.yml
-research_phase: exploratory_family_sample_size_sensitivity
+research_phase: exploratory_experiment_batch_runner
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
   - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
@@ -23,6 +23,7 @@ implemented:
   - "Pilot-only paired geometric analysis with SHA-256 input checks and family aggregation"
   - "Additional seeded family-level synthetic geometry generator with disjoint experimental partitions"
   - "Assumption-only independent-family precision and normal-model power sensitivity planner"
+  - "Study01 exploratory batch runner with immutable receipts, trials, metrics and resume verification"
   - "Deterministic fixture-only instance association with explicit abstention and evaluator-only truth"
   - "MkDocs source staging and verified GitHub Pages deployment"
 evidence_state:
@@ -34,6 +35,7 @@ evidence_state:
   pilot_analysis: fixed_templates_descriptive_and_sampled_model_exploratory_only
   sampled_families: synthetic_independent_model_draws_not_physical_population
   family_count_planning: illustrative_known_variance_normal_assumptions_only
+  common_experiment_runner: study01_fixture_and_exploratory_simulation_only
   instance_localization: supplied_normalized_fixture_distances_only_not_image_perception
   pages_deployment: verified_success_main_b2b4f8b42be984cf10d3fc6747f7f2cf462c1305
   independent_family_sample: not_established
@@ -86,6 +88,7 @@ verification_commands:
   - "rvi population --spec simulation/conditions/study01_population_pilot.json --output-dir results/study01_population"
   - "rvi pilot --manifest results/study01_population/manifest.json --output results/study01_population_analysis.json"
   - "rvi precision --spec simulation/conditions/study01_precision_sensitivity.json --output results/study01_precision.json"
+  - "rvi batch --suite simulation/suites/fixture_smoke.json --output-dir results/study01_fixture_batch"
   - "rvi localize --fixture simulation/suites/localization_fixture.json --output results/localization.json"
   - "python scripts/build_docs.py && python -m mkdocs build --strict"
 publication_portfolio:
