@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.0
+Protocol version: 1.1.1
 
 Status: prospective design, not preregistered or frozen
 
@@ -90,6 +90,34 @@ testable difference: coupled feasible viewpoint/motion selection under a
 common validated motion budget, with explicit whole-body/stability checks.
 No novelty or improvement claim is established until reproducible
 method-by-method evaluation and full prior-art review.
+
+## Additional comparator gate: photometric + kinematic + routing prior art (2026-10-28)
+
+The institutional [doctoral-thesis record of Staderini (2026)](https://repositum.tuwien.at/handle/20.500.12708/226537)
+reports integrated viewpoint generation with **photometric visibility,
+kinematic pose feasibility and inspection-route optimisation** plus
+synthetic/physical evaluations (3/6/8 DoF systems). This overlaps with the
+proposed P03 coupling of feasibility, imaging and motion. Its abstract does
+not supply independently extractable numeric effect sizes, and it may
+share data with [Staderini et al., IROS 2024](https://doi.org/10.1109/IROS58592.2024.10802791).
+Do **not** count these two outputs as independent validations without a
+study-level overlap audit.
+
+**Pre-confirmation baseline decision:** in addition to the primary
+joint-versus-decoupled matched comparison above, specify and validate a
+**strong joint quality/kinematics/route comparator** representative of
+existing methods. Use exactly the same feasible camera poses, safety
+oracle, planner deadlines and accepted-coverage evaluator where possible;
+label any approximation to the published algorithm explicitly. A
+heuristic reconstruction is **not** an external-method replication. This
+is an unfrozen baseline requirement, not evidence of a whole-body result.
+
+The [Bettles et al. preprint](https://arxiv.org/abs/2603.16471)
+already reports physical mobile-manipulator NBV inspection with uncertain
+obstacles; its abstract does not establish a verified independent
+surface-coverage denominator. ARC-RVI must compare *executed* accepted
+views rather than planned visibility alone. Full sources and evidence
+levels are tabulated in the [critical review](../../docs/prior-art-critical.md).
 
 ## Direct comparative baselines and reported evidence
 

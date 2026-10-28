@@ -78,6 +78,55 @@ novelty or findings. See the
 [version review](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/work_version_review_2026-10-28.md)
 and [manual source screening](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/manual_screening_decisions.json).
 
+## Additional comparator appraisal: inspected 2026 sources
+
+The full source-to-study extraction is maintained in the
+[P03/P04/P06 evidence matrix](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md).
+The appraisal date is **2026-10-28**; sources and evidence levels must not be conflated:
+
+- **Staderini, 2026 [TU Wien doctoral thesis](https://repositum.tuwien.at/handle/20.500.12708/226537),
+  DOI `10.34726/hss.2026.138640` (institutional abstract inspected):**
+  combines spatial-resolution-aware and photometric visibility, kinematic
+  pose refinement and optimised inspection routing. Its abstract reports
+  synthetic and real work on systems of 3/6/8 DoF. This is more
+  directly competing with P03/P06 than geometric NBV alone.
+  **Do not assume independence** from the overlapping
+  [Staderini et al., IROS 2024](https://doi.org/10.1109/IROS58592.2024.10802791)
+  paper; numerical effects, sample independence and complete thesis
+  methods have not been extracted.
+- **Bettles et al., 2026
+  [arXiv preprint](https://arxiv.org/abs/2603.16471), abstract inspected:**
+  report physical mobile-manipulator coverage in a confined pipe
+  mock-up using online geometry estimation and chance-constrained
+  collision avoidance. The available abstract does not establish an
+  independently calibrated coverage denominator, numerical effect
+  size or confidence interval. It does preclude a claim that
+  physically executed inspection NBV with uncertainty-aware
+  obstacle avoidance is unprecedented.
+- **Zhao et al., 2026
+  [*Applied Sciences* full HTML](https://www.mdpi.com/2076-3417/16/18/9389),
+  DOI `10.3390/app16189389`:**
+  4-DoF eye-in-hand Dobot stereo arm, six scenes and 60 samples.
+  Source-reported ROI evaluability is **70.0% initially,
+  76.7% with an online proxy, 93.3% for operator-selected offline views**.
+  The author-reported paired online-minus-initial mean Q interval is
+  **95% bootstrap [−0.008, 0.060]**, which includes zero.
+  The source reports **30 of 60 online cases** improved or
+  recovered, but **does not provide independent ground-truth depth**.
+  Quality-gated, constrained re-observation is established prior art.
+  The 60 samples nested within only six scenes require careful
+  interpretation of inferential independence.
+
+For **P03**, a reference baseline now needs to represent *coupled*
+viewpoint quality, kinematic feasibility and route planning, not merely
+naive coverage greedy. For **P04**, compare observation-driven unknown-surface
+coverage with withheld evaluator geometry and time-capped failures.
+For **P06**, compare against bounded, quality-gated feasible-view recovery
+as well as same-view retries and exposure controls. A source's ROI
+stereo-quality score is **not** independent inspection-valid area or
+absolute 3D measurement accuracy. See the prospective
+[P03/P04/P06 protocols](../experiments/README.md) for acceptance gates.
+
 ## Revised research differentiation
 
 - **P02:** paired identity association in clutter with target-absent

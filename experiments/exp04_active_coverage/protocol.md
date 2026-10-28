@@ -1,6 +1,6 @@
 # Study 04: Uncertainty-Aware Active Visual Coverage of Partially Unknown Objects
 
-Protocol version: 1.1.0
+Protocol version: 1.1.1
 
 Status: prospective design, not preregistered or frozen
 
@@ -51,6 +51,29 @@ protocol release. No confirmation data may be used to tune these choices.
 
 Manuscript: [paper 04](../../papers/paper04/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Updated comparator requirement (2026-10-28)
+
+A second independently identified source, [Staderini's 2026 doctoral
+thesis](https://repositum.tuwien.at/handle/20.500.12708/226537),
+integrates surface sampling, photometric visibility and inspection-route
+optimisation. Its model assumes CAD-derived mesh geometry and therefore
+is **not** directly equivalent to the unknown-surface online P04 task.
+When using it as a reference, distinguish **geometry-known offline
+planning** from **policy-observation-only active coverage** and disclose
+the differing information available to each method.
+
+[Bettles et al. (arXiv, 2026)](https://arxiv.org/abs/2603.16471)
+already describe physical NBV coverage with online geometric estimation
+and chance-constrained obstacle avoidance. Their abstract alone supplies
+no independently checked physical surface-denominator definition,
+trial count or uncertainty interval. A P04 comparison needs withheld
+reference geometry, a documented physical/simulated measurement model,
+paired scene families and time-capped failures; do not quote abstract-level
+coverage as a numerically validated matched baseline.
+
+These requirements refine **comparability**, not the previously stated
+primary contrast or a claim of successful ARC-RVI experiments.
 
 ## Reported physical NBV prior art
 
