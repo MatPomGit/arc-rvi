@@ -43,3 +43,17 @@ records by itself validates the eight ARC-RVI research contributions.
 ## Additional exported bibliographic search corpus (2026-10-28)
 
 The contributor's later archive has a different SHA-256 and different MD-draft hashes from the four archival source files above. It has **not** replaced those files. See the [pinned eight-export audit](export_audit_2026-10-28.md), [critical synthesis](critical_synthesis_2026-10-28.md), and [prospective evidence-to-experiment map](evidence_to_experiments_2026-10-28.md). The reproducible import command is documented in the audit; the private/local ZIP itself is not committed. Neither 1907 export rows nor 1695 candidate keys should be cited as a systematic screening denominator. The [identifier and relevance triage](identifier_review_2026-10-28.md) records seven flagged identity groups, a corrected 435-key initial screening queue and two manually assessed example works; these are not a completed review.
+
+
+## Reviewed DOI-version relations (2026-10-28)
+
+See [work-version review](work_version_review_2026-10-28.md) and [machine-readable decisions](work_version_relations.json). Four explicitly verified title/author/DOI relations may be grouped at work level; two uncertain version relations remain separate. This **does not revise** the original 1907 export records, 1695 candidate keys, earlier 79-row evidence catalogue or manuscript references. 
+
+Reconcile after the eight-export audit:
+
+```bash
+python -m scripts.reconcile_literature_versions \
+  --candidates /tmp/rvi-literature-20261028/work_candidates.csv \
+  --inventory-summary /tmp/rvi-literature-20261028/summary.json \
+  --output-dir /tmp/rvi-literature-work-links
+```
