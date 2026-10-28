@@ -92,7 +92,7 @@ sample count from the external paper is imported as a calibrated
 ARC-RVI parameter.
 
 Source grading and the 2026 Staderini thesis overlap are documented
-in the [evidence matrix](../../research/literature/evidence_to_experiments_2026-10-28.md).
+in the [evidence matrix](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md).
 
 ## Publication overlap guard (2026-10-27)
 
