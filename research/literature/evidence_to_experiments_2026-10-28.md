@@ -79,3 +79,28 @@ For each paper ultimately cited as a direct comparator, record: DOI/publisher or
 Initially prioritize **P01/P02 offline validation**, then matched P03/P04/P06 simulation with explicit separation of evaluation truth, and only afterward authorized physical P03/P05/P07/P08 studies. The present status is **NO-GO for claims of empirical superiority, publication-ready effects, or physical G1 EDU validation**. The work programme can support protocol drafting and study feasibility, but final journal selection depends on completed, independently evaluated results.
 
 Sources: [export audit](export_audit_2026-10-28.md), [critical synthesis](critical_synthesis_2026-10-28.md), [prior-art appraisal](../../docs/prior-art-critical.md), [curated DOI records](verified_doi_metadata.json).
+
+## Secondary-source evidence-to-baseline registration (2026-10-28)
+
+Source-row provenance, evidence grades, work-family collision flags and
+explicit unsupported claims are now preserved in the
+[reviewed comparator ledger](secondary_comparator_decisions.json).
+Use `python -m scripts.validate_secondary_comparators` for an offline
+schema audit and add `--archive /path/to/agent-artifacts-rvi.zip`
+to validate the actual six CSV row locations and exact source ZIP SHA-256.
+The remaining seventh record, VertInspect 2026, is explicitly an
+**external follow-up**, not misrepresented as a secondary-CSV row.
+
+| Study | Newly screened prior-art DOI(s) | Source-backed comparator or construct | Required independent endpoint and unresolved blocker |
+| --- | --- | --- | --- |
+| P03 | [Monica 2019](https://doi.org/10.1109/IROS40897.2019.8968239); [Chai 2025](https://doi.org/10.1109/AIHCIR67580.2025.11404946); [VertInspect 2026](https://doi.org/10.1016/j.aei.2026.104590) | Humanoid NBV body movement; inspection-specific humanoid motion control. **Monica method full text pending**; Chai/VertInspect are motion controls, *not* claimed source-faithful NBV planner baselines | Independently measured inspection-valid coverage with verified G1 EDU physical whole-body safety, common candidate poses and deadlines; Chai work-version relation pending |
+| P04 | [FRA-NBV 2026](https://doi.org/10.1109/LRA.2026.3728374); [RASP 2025](https://doi.org/10.1109/TASE.2025.3604455); [Shahid 2019](https://doi.org/10.1016/j.rcim.2018.11.009) | Incidence-based missing-depth recovery, joint view planning/depth completion, and **contextual** surface-treatment coverage measurement | Hidden scene/surface truth and grouped accepted-coverage differences at identical budget; source-faithful implementation and datasets not yet inspected |
+| P06 | [FRA-NBV 2026](https://doi.org/10.1109/LRA.2026.3728374); [RASP 2025](https://doi.org/10.1109/TASE.2025.3604455) | Reflectivity-aware reorientation and joint perception compete with generic active recovery, in addition to [Zhao 2026](https://doi.org/10.3390/app16189389) | Independent inspection-acceptance endpoint, safety/timeout denominator, matched time/sensor budgets; physical motion/quality calibration absent |
+| P08 | [CAIS 2024](https://doi.org/10.1109/IROS58592.2024.10802162); [Chai 2025](https://doi.org/10.1109/AIHCIR67580.2025.11404946); [VertInspect 2026](https://doi.org/10.1016/j.aei.2026.104590) | Prior autonomous confined-space inspection and physical humanoid inspection motions, neither a validated G1 EDU versus standardised manual noninferiority test | Paired and blinded valid required-region completeness, prespecified margin and independent adjudication across approved terrain; no physical ARC-RVI dataset |
+
+These are **seven selected DOI records but not seven independent experimental
+works**: at least the Chai 2025/2026 articles have a potential related-work
+relation. No secondary-only DOI was automatically admitted into the eight
+final-export inventory. The table is a prospective baseline/novelty-risk
+crosswalk, not a claim that a published method was replicated, a PRISMA
+screen was completed, or the proposed eight manuscripts are ready.
