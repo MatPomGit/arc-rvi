@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "execution_mode": "fixture_only",
+  "mission_id": "synthetic-full-car-001",
+  "handoff_anchor_id": "staging_operator_1",
+  "command": {
+    "text": "Obfotografuj cały wskazany samochód, wszystkie ujęcia z listy, potem wróć.",
+    "vehicle_description": "samochód pokazany przez operatora na parkingu",
+    "scope": "vehicle",
+    "component": null
+  },
+  "shot_plan": {
+    "approval_kind": "versioned_protocol",
+    "approval_ref": "synthetic-eight-angle-example/v1-not-a-general-completeness-standard",
+    "required": [
+      {
+        "slot_id": "vehicle-front",
+        "part": "whole_vehicle",
+        "view": "front"
+      },
+      {
+        "slot_id": "vehicle-front_left",
+        "part": "whole_vehicle",
+        "view": "front_left"
+      },
+      {
+        "slot_id": "vehicle-left",
+        "part": "whole_vehicle",
+        "view": "left"
+      },
+      {
+        "slot_id": "vehicle-rear_left",
+        "part": "whole_vehicle",
+        "view": "rear_left"
+      },
+      {
+        "slot_id": "vehicle-rear",
+        "part": "whole_vehicle",
+        "view": "rear"
+      },
+      {
+        "slot_id": "vehicle-rear_right",
+        "part": "whole_vehicle",
+        "view": "rear_right"
+      },
+      {
+        "slot_id": "vehicle-right",
+        "part": "whole_vehicle",
+        "view": "right"
+      },
+      {
+        "slot_id": "vehicle-front_right",
+        "part": "whole_vehicle",
+        "view": "front_right"
+      }
+    ]
+  },
+  "quality_limits": {
+    "max_glare_fraction": 0.12,
+    "max_occlusion_fraction": 0.1
+  },
+  "target_grounding": {
+    "candidates": [
+      {
+        "id": "car-A",
+        "matches_description": true
+      },
+      {
+        "id": "car-B",
+        "matches_description": true
+      }
+    ],
+    "decision": {
+      "status": "resolved",
+      "selected_instance_id": "car-B",
+      "clarification_confirmed": true,
+      "observation_ids": [
+        "observation-1",
+        "operator-disambiguation-2"
+      ]
+    }
+  },
+  "part_grounding": null,
+  "photo_attempts": [
+    {
+      "id": "shot-front",
+      "slot_id": "vehicle-front",
+      "vehicle_instance_id": "car-B",
+      "part": "whole_vehicle",
+      "view": "front",
+      "observation_id": "fixture-observation-front",
+      "image_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "shot-front_left",
+      "slot_id": "vehicle-front_left",
+      "vehicle_instance_id": "car-B",
+      "part": "whole_vehicle",
+      "view": "front_left",
+      "observation_id": "fixture-observation-front_left",
+      "image_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "shot-left",
+      "slot_id": "vehicle-left",
+      "vehicle_instance_id": "car-B",
+      "part": "whole_vehicle",
+      "view": "left",
+      "observation_id": "fixture-observation-left",
+      "image_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "shot-rear_left",
+      "slot_id": "vehicle-rear_left",
+      "vehicle_instance_id": "car-B",
+      "part": "whole_vehicle",
+      "view": "rear_left",
+      "observation_id": "fixture-observation-rear_left",
+      "image_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "shot-rear",
+      "slot_id": "vehicle-rear",
+      "vehicle_instance_id": "car-B",
+      "part": "whole_vehicle",
+      "view": "rear",
+      "observation_id": "fixture-observation-rear",
+      "image_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "shot-rear_right",
+      "slot_id": "vehicle-rear_right",
+      "vehicle_instance_id": "car-B",
+      "part": "whole_vehicle",
+      "view": "rear_right",
+      "observation_id": "fixture-observation-rear_right",
+      "image_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "shot-right",
+      "slot_id": "vehicle-right",
+      "vehicle_instance_id": "car-B",
+      "part": "whole_vehicle",
+      "view": "right",
+      "observation_id": "fixture-observation-right",
+      "image_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "shot-front_right",
+      "slot_id": "vehicle-front_right",
+      "vehicle_instance_id": "car-B",
+      "part": "whole_vehicle",
+      "view": "front_right",
+      "observation_id": "fixture-observation-front_right",
+      "image_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    }
+  ],
+  "return_evidence": {
+    "anchor_id": "staging_operator_1",
+    "status": "arrived",
+    "safe_route_verified": true,
+    "operator_handoff_confirmed": true
+  }
+}
