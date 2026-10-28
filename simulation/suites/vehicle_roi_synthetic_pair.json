@@ -1,0 +1,61 @@
+{
+  "mode": "pair",
+  "before": {
+    "schema_version": 1,
+    "image": {
+      "path": "vehicle_roi_synthetic_before.ppm",
+      "sha256": "cde9f9db66113b6ffb0c235da2d158f58d3e6b5cdd1b3e1be61b14a167a044ea"
+    },
+    "roi_mask": {
+      "path": "vehicle_roi_synthetic_mask.pgm",
+      "sha256": "b8f1d8cc887820e97a5b582c400deeaefa4fbf3a795c2bc19a1db7386fb59353"
+    },
+    "association": {
+      "vehicle_instance_id": "synthetic-car-001",
+      "part_label": "rear_bumper",
+      "slot_id": "bumper-centre",
+      "annotation_id": "synthetic-human-mask-template",
+      "annotation_origin": "simulation_only",
+      "observation_id": "synthetic-before"
+    },
+    "photometric_policy": {
+      "white_channel_clip_threshold": 250,
+      "bright_luma_threshold": 235,
+      "neutral_channel_spread_max": 25,
+      "dark_luma_threshold": 15,
+      "max_white_clipped_fraction": 0.25,
+      "max_bright_neutral_fraction": 0.25,
+      "max_dark_fraction": 0.5,
+      "min_roi_pixels": 4
+    }
+  },
+  "after": {
+    "schema_version": 1,
+    "image": {
+      "path": "vehicle_roi_synthetic_after.ppm",
+      "sha256": "e530c45491970b5250869205a257726f5251233cf1f7a0def57cbb191e53edea"
+    },
+    "roi_mask": {
+      "path": "vehicle_roi_synthetic_mask.pgm",
+      "sha256": "b8f1d8cc887820e97a5b582c400deeaefa4fbf3a795c2bc19a1db7386fb59353"
+    },
+    "association": {
+      "vehicle_instance_id": "synthetic-car-001",
+      "part_label": "rear_bumper",
+      "slot_id": "bumper-centre",
+      "annotation_id": "synthetic-human-mask-template",
+      "annotation_origin": "simulation_only",
+      "observation_id": "synthetic-after"
+    },
+    "photometric_policy": {
+      "white_channel_clip_threshold": 250,
+      "bright_luma_threshold": 235,
+      "neutral_channel_spread_max": 25,
+      "dark_luma_threshold": 15,
+      "max_white_clipped_fraction": 0.25,
+      "max_bright_neutral_fraction": 0.25,
+      "max_dark_fraction": 0.5,
+      "min_roi_pixels": 4
+    }
+  }
+}
