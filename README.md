@@ -117,22 +117,7 @@ protocol and [shared analysis plan](experiments/analysis/README.md).
 The canonical [project state](PROJECT_STATE.yaml) lists current evidence and next actions.
 The [ARC plan](AUTOPILOT_PLAN.md) defines its portfolio role and proposed sensor interfaces.
 
+Technical documentation build and publication instructions are maintained in
+[Documentation build](docs/website.md).
+
 For contribution rules, see `AGENTS.md`.
-
-
-## Research documentation (MkDocs)
-
-The canonical documentation can be assembled into a navigable MkDocs site
-without duplicating the eight experiment protocols:
-
-```bash
-python -m pip install mkdocs==1.6.1
-python scripts/build_docs.py
-python -m mkdocs build --strict
-```
-
-Documentation is published at https://matpomgit.github.io/arc-rvi/.
-See [publication instructions](docs/website.md) and the
-[Study 02 localization specification](docs/localization.md).
-The initial deployment is verified by GitHub Actions run 40418374958;
-future changes must pass the strict site build before release.
