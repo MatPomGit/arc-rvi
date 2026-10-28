@@ -120,3 +120,33 @@ These precedents preclude general 'first physical robotic inspection' or
 'first human comparison' claims. The proposed original endpoint, if
 validated, is balanced manual versus humanoid **documentation quality**
 under a frozen noninferiority margin and independent judges.
+
+## Secondary comparator registration: physical inspection versus assessment (2026-10-28, unfrozen)
+
+The [source-row-grounded review ledger](../../research/literature/secondary_comparator_decisions.json)
+adds [CAIS (Le et al., IROS 2024)](https://doi.org/10.1109/IROS58592.2024.10802162)
+as confined-access autonomous visual/instrumented inspection prior art
+and [VertInspect (Chai et al., 2026)](https://doi.org/10.1016/j.aei.2026.104590)
+as physical humanoid curtain-wall inspection-motion prior art.
+The latter's publisher reports real-world motion task successes, but this
+is **not** assessor-blinded documentation noninferiority and is not
+independent ARC-RVI data. The related 2025
+[conference article](https://doi.org/10.1109/AIHCIR67580.2025.11404946)
+is a possible overlapping work version; do not count both as independent
+support until study samples, methods and versions are reconciled.
+
+A controlled P08 design must specify *assigned* required regions before
+randomisation, maintain identical acquisition-validity thresholds where
+measurable, and hide method labels and trial order from assessors. Log
+assessor blinding checks, independent reference coverage, image omissions,
+operator interventions, emergency takeovers, aborted missions, exposure
+time and unreachable/unsafe terrain *in the original denominator*.
+The primary estimand is paired **valid required-region proportion**,
+not locomotion success, motion-tracking error or visual reconstruction.
+
+The manual comparator is a standardised inspection procedure, not an
+unspecified operator or an external system with different sensors.
+Report the approved-terrain envelope and deviations; no claim of
+noninferiority, safe G1 EDU autonomous operation or novelty of humanoid
+inspection is warranted until physical approvals, preregistered margin,
+frozen analysis and independent session data exist.
