@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.1.0",
+  "terrain_class": "slope",
+  "contacts": [
+    {
+      "id": "foot_a",
+      "contact_state": "assumed",
+      "footprint_xyz_m": [
+        [
+          -0.1,
+          -0.2,
+          -0.02
+        ],
+        [
+          0.1,
+          -0.2,
+          0.02
+        ],
+        [
+          0.1,
+          -0.1,
+          0.02
+        ],
+        [
+          -0.1,
+          -0.1,
+          -0.02
+        ]
+      ]
+    },
+    {
+      "id": "foot_b",
+      "contact_state": "assumed",
+      "footprint_xyz_m": [
+        [
+          -0.1,
+          0.1,
+          -0.02
+        ],
+        [
+          0.1,
+          0.1,
+          0.02
+        ],
+        [
+          0.1,
+          0.2,
+          0.02
+        ],
+        [
+          -0.1,
+          0.2,
+          -0.02
+        ]
+      ]
+    }
+  ],
+  "com_xyz_m": [
+    0,
+    0,
+    0.9
+  ],
+  "required_margin_m": 0.05
+}
