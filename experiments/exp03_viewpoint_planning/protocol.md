@@ -254,3 +254,30 @@ The primary proposed difference is a validated Unitree G1 EDU whole-body,
 balance-aware **coupled** viewpoint/motion plan under a common budget,
 not novelty for generic kinematics-aware view planning, NBV in clutter or
 hardware inspection. Full methods review remains outstanding.
+
+## Secondary comparator registration: humanoid NBV and motion control (2026-10-28, unfrozen)
+
+The [source-row-grounded review ledger](../../research/literature/secondary_comparator_decisions.json)
+registers [Monica et al. IROS 2019](https://doi.org/10.1109/IROS40897.2019.8968239)
+as directly overlapping **humanoid next-best-view planning with occlusions
+and body movement primitives**. The conference programme/DOI record confirms
+bibliographic prior art, **not** its detailed implementation or numerical
+performance. An ARC-RVI policy labelled `Monica-inspired` must remain a
+documented *surrogate* until the primary method and necessary inputs are read.
+
+The [Chai et al. 2025 conference study](https://doi.org/10.1109/AIHCIR67580.2025.11404946)
+and [VertInspect 2026](https://doi.org/10.1016/j.aei.2026.104590)
+establish prior humanoid whole-body inspection motions, **not** a matched
+NBV/terrain planner. Keep these as *platform/inspection comparators*,
+not a falsely equivalent P03 algorithm baseline. Their overlapping authors
+and domain are a **potential related-work family**, not two independent
+confirmatory deployments pending a full-text version audit.
+
+Before any confirmatory P03 comparison, predeclare (a) input geometry
+and observation accessibility per arm; (b) identical candidate viewpoints,
+collision/contact oracle and mission deadline; (c) energy/motion time and
+image validity as **separate** outcomes; (d) safety-stop, loss-of-foot-support
+and unreached-view counts in the originally assigned denominator; and
+(e) independent scene-family and terrain-stratum partitions.
+A geometric-only or floating-base proxy is **not** demonstrated
+feasible bipedal gait. These are protocol requirements, not completed tests.
