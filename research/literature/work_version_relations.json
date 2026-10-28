@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "reviewed_on": "2026-10-28",
+  "source_archive_sha256": "603a6d1369466b160c29234bb4db8dd6d2247999f62835d0964ad95fb9a6e69f",
+  "scope": "Manual bibliographic same-work relationships only; not a full-text methods appraisal, not eligibility screening.",
+  "relations": [
+    {
+      "canonical_doi": "10.1109/iros47612.2022.9982063",
+      "other_doi": "10.48550/arxiv.2208.04391",
+      "status": "verified_same_work",
+      "title": "A Method For Automated Drone Viewpoints to Support Remote Robot Manipulation",
+      "source_urls": [
+        "https://graphics.cs.wisc.edu/Papers/2022/SHPRZGM22/",
+        "https://arxiv.org/abs/2208.04391"
+      ],
+      "basis": "Authors' university bibliography lists the IEEE DOI and arXiv manuscript together; title and authors match.",
+      "scope": "P02/P03/P06: drone-assisted telemanipulation viewpoints, not autonomous inspection on a humanoid."
+    },
+    {
+      "canonical_doi": "10.1109/iros47612.2022.9981472",
+      "other_doi": "10.48550/arxiv.2207.10543",
+      "status": "verified_same_work",
+      "title": "Closed-Loop Next-Best-View Planning for Target-Driven Grasping",
+      "source_urls": [
+        "https://doi.org/10.1109/IROS47612.2022.9981472",
+        "https://arxiv.org/abs/2207.10543"
+      ],
+      "basis": "IEEE primary listing and arXiv preprint share full title and authors, with arXiv explicitly identifying IROS 2022 submission.",
+      "scope": "P02/P04: active view planning for grasping, not an inspection coverage benchmark."
+    },
+    {
+      "canonical_doi": "10.1145/3570731",
+      "other_doi": "10.48550/arxiv.2307.15363",
+      "status": "verified_same_work",
+      "title": "Robotic Vision for Human-Robot Interaction and Collaboration: A Survey and Systematic Review",
+      "source_urls": [
+        "https://arxiv.org/abs/2307.15363",
+        "https://doi.org/10.1145/3570731"
+      ],
+      "basis": "arXiv primary record explicitly contains the related ACM DOI, journal volume, issue and article number.",
+      "scope": "P01/P08: secondary HRI vision review; not a direct experimental robotic inspection comparator."
+    },
+    {
+      "canonical_doi": "10.3390/robotics12040108",
+      "other_doi": "10.48550/arxiv.2306.06969",
+      "status": "verified_same_work",
+      "title": "Viewpoint Generation Using Feature-Based Constrained Spaces for Robot Vision Systems",
+      "source_urls": [
+        "https://www.mdpi.com/2218-6581/12/4/108",
+        "https://arxiv.org/abs/2306.06969"
+      ],
+      "basis": "Publisher full article and arXiv primary record have matching full title, all four authors and methods; no distinct study indicated.",
+      "scope": "P03/P06: constrained geometric viewpoint generation including reported real robot system; no validated G1 EDU system."
+    },
+    {
+      "canonical_doi": "10.1109/tfr.2026.3733788",
+      "other_doi": "10.48550/arxiv.2603.04284",
+      "status": "pending_publisher_relation",
+      "title": "OmniPlanner: Universal Exploration and Inspection Path Planning Across Robot Morphologies",
+      "source_urls": [
+        "https://arxiv.org/abs/2603.04284",
+        "https://eurekamag.com/research/110/972/110972090.php"
+      ],
+      "basis": "arXiv lists accepted IEEE T-FR paper; a secondary bibliographic index gives the journal DOI with the same authors/title. Direct publisher DOI-to-manuscript link not yet inspected.",
+      "scope": "P03/P04: especially close inspection/mobility comparator, with field claims reported in the abstract."
+    },
+    {
+      "canonical_doi": "10.1016/j.oceaneng.2019.106420",
+      "other_doi": "10.5281/zenodo.4253168",
+      "status": "pending_repository_relation",
+      "title": "On the use of robots and vision technologies for the inspection of vessels: A survey on recent advances",
+      "source_urls": [
+        "https://cordis.europa.eu/project/id/779776/results",
+        "https://zenodo.org/records/4253168"
+      ],
+      "basis": "European Commission CORDIS confirms 2019 Ocean Engineering DOI, title and authors; the Zenodo record's contents/version relation could not be verified.",
+      "scope": "P06/P08: related survey literature; do not merge a repository deposit until provenance is checked."
+    }
+  ]
+}
