@@ -18,6 +18,7 @@ from .pilot import analyze_pilot
 from .planning import plan_family_sample
 from .power_mc import analyze_cluster_monte_carlo
 from .robot_model import inspect_urdf
+from .support import inspect_support_file
 from .population import generate_population
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
@@ -81,6 +82,9 @@ def make_parser() -> argparse.ArgumentParser:
     robot_model.add_argument("--expected-sha256", required=True)
     robot_model.add_argument("--camera-frame")
     robot_model.add_argument("--output", required=True, type=Path)
+    stance = sub.add_parser("stance", help="audit synthetic static foot support; no gait or safety clearance")
+    stance.add_argument("--spec", required=True, type=Path)
+    stance.add_argument("--output", required=True, type=Path)
     return parser
 
 
@@ -126,10 +130,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Saved {len(manifest['scenes'])} exploratory scenes to {arguments.output_dir}")
             return 0
         if arguments.command in ("benchmark", "simulate", "pilot", "precision",
-                                 "power-mc", "robot-model"):
+                                 "power-mc", "robot-model", "stance"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
-            if arguments.command == "robot-model":
+            if arguments.command == "stance":
+                if arguments.output.resolve() == arguments.spec.resolve():
+                    raise ValueError("output must differ from the input stance spec")
+                payload = inspect_support_file(arguments.spec)
+            elif arguments.command == "robot-model":
                 payload = inspect_urdf(arguments.urdf, arguments.expected_sha256,
                                        camera_frame=arguments.camera_frame)
             elif arguments.command == "pilot":
