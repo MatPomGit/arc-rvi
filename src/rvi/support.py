@@ -82,9 +82,11 @@ def _validated_patch(value: object, index: int) -> tuple[list[tuple[float, float
     bends = [_cross(polygon[i], polygon[(i + 1) % len(polygon)],
                     polygon[(i + 2) % len(polygon)])
              for i in range(len(polygon))]
-    if any(not isfinite(v) for v in bends) or (
-            not (all(v >= 0 for v in bends) or all(v <= 0 for v in bends))):
-        raise ValueError("footprint must be a simple convex polygon")
+    # Independent nonadjacent-edge checks above exclude self-intersections.
+    # Strict turns also exclude collinear edges in either orientation.
+    if any(v == 0 for v in bends) or not (
+            all(v > 0 for v in bends) or all(v < 0 for v in bends)):
+        raise ValueError("footprint must be strictly convex")
     double_area = sum(
         polygon[i][0] * polygon[(i + 1) % len(polygon)][1]
         - polygon[(i + 1) % len(polygon)][0] * polygon[i][1]

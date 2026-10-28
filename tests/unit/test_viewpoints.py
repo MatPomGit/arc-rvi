@@ -3,7 +3,7 @@
 import unittest
 
 from rvi.models import Viewpoint
-from rvi.viewpoints import PlanningError, plan_viewpoints
+from rvi.viewpoints import PlanningError, plan_viewpoints, evaluate_viewpoints
 
 
 class ViewpointTests(unittest.TestCase):
@@ -19,6 +19,26 @@ class ViewpointTests(unittest.TestCase):
         self.assertEqual(plan.viewpoint_ids, ("first", "second"))
         self.assertEqual(plan.covered_regions, ("front", "left", "rear", "right"))
         self.assertGreater(plan.travel_distance_m, 0)
+
+    def test_budget_feasible_choice_with_legacy_baseline(self):
+        # A nominally best distant candidate cannot consume the full budget
+        # when a valid alternative can complete the request.
+        views = [Viewpoint("a_far", 10, 0, ("front",)),
+                 Viewpoint("z_near", 1, 0, ("front",))]
+        for method in ("greedy_coverage", "greedy_distance"):
+            result = evaluate_viewpoints(views, ["front"], method=method,
+                                         max_travel_distance_m=2)
+            self.assertIsNone(result.failure_reason)
+            self.assertEqual(result.plan.viewpoint_ids, ("z_near",))
+        legacy = evaluate_viewpoints(views, ["front"], method="greedy_coverage",
+                                     max_travel_distance_m=2,
+                                     budget_selection="legacy_stop")
+        self.assertEqual(legacy.failure_reason, "distance_budget_exceeded")
+        fixed = evaluate_viewpoints(views, ["front"], method="fixed_order",
+                                    max_travel_distance_m=2)
+        self.assertEqual(fixed.failure_reason, "distance_budget_exceeded")
+        with self.assertRaisesRegex(ValueError, "budget selection"):
+            evaluate_viewpoints(views, ["front"], budget_selection="bad")
 
     def test_missing_coverage_fails(self):
         with self.assertRaises(PlanningError):

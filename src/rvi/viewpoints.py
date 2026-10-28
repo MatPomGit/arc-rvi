@@ -31,8 +31,14 @@ def evaluate_viewpoints(
     *,
     method: str = "greedy_distance",
     max_travel_distance_m: float | None = None,
+    budget_selection: str = "feasible_first",
 ) -> PlanningOutcome:
-    """Execute a fixture route; retain coverage before failure or budget exhaustion."""
+    """Evaluate a greedy route while retaining evidence before budget exhaustion.
+
+    Historical fixture benchmarks explicitly request legacy_stop; the default
+    only ranks candidates currently feasible within the remaining budget.
+    Neither variant guarantees an optimal or globally feasible route.
+    """
     candidates = tuple(candidates)
     required = tuple(required_regions)
     if not required or any(not isinstance(x, str) or not x.strip() for x in required):
@@ -47,6 +53,8 @@ def evaluate_viewpoints(
         raise ValueError("duplicate viewpoint identifiers")
     if method not in METHODS:
         raise ValueError("unknown planning method")
+    if budget_selection not in ("feasible_first", "legacy_stop"):
+        raise ValueError("unknown budget selection policy")
     if max_travel_distance_m is not None and (
         type(max_travel_distance_m) not in (float, int)
         or not isfinite(max_travel_distance_m) or max_travel_distance_m < 0
@@ -77,6 +85,15 @@ def evaluate_viewpoints(
                 return (gain,)
             return (gain / (1.0 + distance(view)), gain, -distance(view))
 
+        if (max_travel_distance_m is not None and method != "fixed_order"
+                and budget_selection == "feasible_first"):
+            feasible = [view for view in eligible
+                        if isfinite(distance(view))
+                        and travel + distance(view) <= max_travel_distance_m]
+            if not feasible:
+                reason = "distance_budget_exceeded"
+                break
+            eligible = feasible
         best = eligible[0] if method == "fixed_order" else max(eligible, key=rank)
         step = distance(best)
         if not isfinite(step) or not isfinite(travel + step):

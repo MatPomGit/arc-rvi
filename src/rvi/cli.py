@@ -230,9 +230,12 @@ def main(argv: list[str] | None = None) -> int:
             if arguments.output.resolve() == arguments.scenario.resolve():
                 raise ValueError("output must differ from the input scenario")
             arguments.output.parent.mkdir(parents=True, exist_ok=True)
-            arguments.output.write_text(
-                json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2,
-                           allow_nan=False), encoding="utf-8")
+            serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                                    indent=2, allow_nan=False)
+            # Exclusive creation also closes a race between path validation
+            # and writing, without touching a pre-existing research output.
+            with arguments.output.open("x", encoding="utf-8") as stream:
+                stream.write(serialized)
             return 0
     except (OSError, ValueError, UnicodeError, OverflowError) as exc:
         parser.error(str(exc))

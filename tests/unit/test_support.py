@@ -124,6 +124,13 @@ class StaticSupportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "self-intersecting"):
             inspect_static_support(spec)
 
+    def test_reject_collinear_footprint_corner(self):
+        spec = fixture()
+        spec["contacts"][0]["footprint_xy_m"] = [
+            [0, 0], [1, 0], [2, 0], [2, 1], [0, 1]]
+        with self.assertRaisesRegex(ValueError, "strictly convex"):
+            inspect_static_support(spec)
+
     def test_schema_bounds_and_nonfinite_rejected(self):
         examples = [
             ("terrain_class", "stairs_unrecognized"),
@@ -208,6 +215,19 @@ def spatial_fixture() -> dict:
 
 
 class SpatialSupportTests(unittest.TestCase):
+    def test_3d_pentagram_and_collinear_footprint_rejected(self):
+        from math import cos, sin, pi
+        shapes = (
+            [[cos(2*pi*k/5), sin(2*pi*k/5)] for k in (0, 2, 4, 1, 3)],
+            [[0, 0], [1, 0], [2, 0], [2, 1], [0, 1]],
+        )
+        for shape in shapes:
+            spec = spatial_fixture()
+            spec["contacts"][0]["footprint_xyz_m"] = [[x, y, 0.2*x] for x, y in shape]
+            with self.subTest(shape=shape), self.assertRaises(ValueError):
+                inspect_static_support(spec)
+
+
     def test_sloped_plane_and_gravity_projection_analytic(self):
         from math import atan, degrees
 
