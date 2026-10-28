@@ -1,0 +1,194 @@
+"""Fixture-only sphere/AABB collision proxies for already-audited URDF FK poses.
+
+These checks never certify whole-body collision clearance or motion safety.
+"""
+
+from __future__ import annotations
+
+from hashlib import sha256
+import json
+from math import dist, hypot, isfinite
+from pathlib import Path
+
+MAX_FIXTURE_BYTES = 65_536
+MAX_PROXIES = 32
+MAX_BOXES = 32
+MAX_SELF_PAIRS = 64
+
+
+def _number(value: object, context: str, *, positive: bool = False) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{context} must be a finite number")
+    try:
+        x = float(value)
+    except (OverflowError, ValueError) as exc:
+        raise ValueError(f"{context} exceeds numeric range") from exc
+    if not isfinite(x) or (positive and x <= 0):
+        raise ValueError(f"{context} must be finite and valid")
+    return x
+
+
+def _point3(value: object, context: str) -> tuple[float, float, float]:
+    if not isinstance(value, list) or len(value) != 3:
+        raise ValueError(f"{context} must have three coordinates")
+    return tuple(_number(v, context) for v in value)
+
+
+def _text(value: object, context: str) -> str:
+    if not isinstance(value, str) or not value.strip() or len(value) > 128:
+        raise ValueError(f"{context} must be a nonempty bounded identifier")
+    return value
+
+
+def load_collision_fixture(path: Path) -> tuple[dict, str]:
+    """Read bounded local JSON; do not follow a symlink or contact hardware."""
+    source = Path(path)
+    if source.is_symlink() or not source.is_file():
+        raise ValueError("collision fixture must be a regular non-symlinked local file")
+    if source.stat().st_size > MAX_FIXTURE_BYTES:
+        raise ValueError("collision fixture exceeds size limit")
+    raw = source.read_bytes()
+    if len(raw) > MAX_FIXTURE_BYTES:
+        raise ValueError("collision fixture exceeds size limit")
+    try:
+        payload = json.loads(raw.decode("utf-8"), parse_constant=_reject_constant)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError("invalid collision fixture JSON") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("collision fixture must be a JSON object")
+    return payload, sha256(raw).hexdigest()
+
+
+def _reject_constant(value: str) -> None:
+    raise ValueError(f"non-finite collision fixture JSON constant: {value}")
+
+
+def inspect_collision_proxies(configured_pose: dict, fixture: dict) -> dict:
+    """Report only explicit spheres/boxes/pairs at one static FK configuration.
+
+    A clear *proxy* result never means a full robot, the unsampled link
+    volumes, the connecting motion trajectory, or the real site is clear.
+    """
+    if (not isinstance(configured_pose, dict)
+            or configured_pose.get("status") != "offline_articulated_fk_only"):
+        raise ValueError("collision proxies require configured offline URDF FK")
+    frames = configured_pose.get("frame_poses")
+    if not isinstance(frames, dict) or not frames:
+        raise ValueError("FK frames missing")
+    if not isinstance(fixture, dict) or set(fixture) != {
+            "schema_version", "spheres", "boxes", "self_pairs",
+            "clearance_margin_m"}:
+        raise ValueError("collision fixture has invalid schema fields")
+    if fixture["schema_version"] != "1.0.0":
+        raise ValueError("unsupported collision fixture version")
+    margin = _number(fixture["clearance_margin_m"], "clearance margin")
+    if margin < 0:
+        raise ValueError("clearance margin must not be negative")
+    spheres = fixture["spheres"]
+    boxes = fixture["boxes"]
+    pairs = fixture["self_pairs"]
+    if not isinstance(spheres, list) or not 1 <= len(spheres) <= MAX_PROXIES:
+        raise ValueError("collision spheres must contain 1–32 items")
+    if not isinstance(boxes, list) or len(boxes) > MAX_BOXES:
+        raise ValueError("collision boxes must contain at most 32 items")
+    if not isinstance(pairs, list) or len(pairs) > MAX_SELF_PAIRS:
+        raise ValueError("explicit self-pairs must contain at most 64 pairs")
+    if not boxes and not pairs:
+        raise ValueError("at least one obstacle box or explicit self-pair is required")
+
+    sphere_centres = {}
+    sphere_radii = {}
+    for entry in spheres:
+        if not isinstance(entry, dict) or set(entry) != {
+                "id", "link", "center_local_m", "radius_m"}:
+            raise ValueError("invalid sphere fields")
+        sid = _text(entry["id"], "sphere id")
+        link = _text(entry["link"], "URDF link")
+        if sid in sphere_centres:
+            raise ValueError("duplicate sphere id")
+        if link not in frames:
+            raise ValueError(f"undeclared collision link: {link}")
+        local = _point3(entry["center_local_m"], "local sphere centre")
+        radius = _number(entry["radius_m"], "sphere radius", positive=True)
+        frame = frames[link]
+        position = _point3(frame["translation_m"], "FK frame position")
+        rotation = frame["rotation_matrix"]
+        if (not isinstance(rotation, list) or len(rotation) != 3
+                or any(not isinstance(row, list) or len(row) != 3
+                       for row in rotation)):
+            raise ValueError("FK rotation matrix has invalid shape")
+        rot = tuple(tuple(_number(v, "FK rotation") for v in row)
+                    for row in rotation)
+        centre = tuple(position[i] + sum(rot[i][j] * local[j] for j in range(3))
+                       for i in range(3))
+        if not all(isfinite(v) for v in centre):
+            raise ValueError("transformed collision sphere centre exceeds numeric range")
+        sphere_centres[sid] = centre
+        sphere_radii[sid] = radius
+
+    obstacles = {}
+    for entry in boxes:
+        if not isinstance(entry, dict) or set(entry) != {
+                "id", "min_xyz_m", "max_xyz_m"}:
+            raise ValueError("invalid axis-aligned box fields")
+        bid = _text(entry["id"], "obstacle id")
+        if bid in obstacles:
+            raise ValueError("duplicate obstacle id")
+        lo = _point3(entry["min_xyz_m"], "AABB minimum")
+        hi = _point3(entry["max_xyz_m"], "AABB maximum")
+        if any(a >= b for a, b in zip(lo, hi)):
+            raise ValueError("axis-aligned box must have positive 3D extents")
+        obstacles[bid] = lo, hi
+
+    self_pairs = []
+    seen_pairs = set()
+    for pair in pairs:
+        if not isinstance(pair, list) or len(pair) != 2:
+            raise ValueError("self-pair must contain two sphere ids")
+        first = _text(pair[0], "self sphere id")
+        second = _text(pair[1], "self sphere id")
+        if first not in sphere_centres or second not in sphere_centres or first == second:
+            raise ValueError("self-pair references missing or identical spheres")
+        key = tuple(sorted((first, second)))
+        if key in seen_pairs:
+            raise ValueError("duplicate self-pair")
+        seen_pairs.add(key)
+        self_pairs.append(key)
+
+    checks = []
+    for sid, centre in sorted(sphere_centres.items()):
+        for bid, (lo, hi) in sorted(obstacles.items()):
+            outside = tuple(max(lo[i] - centre[i], 0.0,
+                                centre[i] - hi[i]) for i in range(3))
+            clearance = hypot(*outside) - sphere_radii[sid] - margin
+            if not isfinite(clearance):
+                raise ValueError("collision proxy clearance is not finite")
+            checks.append({
+                "kind": "sphere_aabb", "first_id": sid, "second_id": bid,
+                "signed_clearance_m": clearance, "touch_or_overlap": clearance <= 0,
+            })
+    for first, second in sorted(self_pairs):
+        clearance = (dist(sphere_centres[first], sphere_centres[second])
+                     - sphere_radii[first] - sphere_radii[second] - margin)
+        if not isfinite(clearance):
+            raise ValueError("self proxy clearance is not finite")
+        checks.append({
+            "kind": "explicit_self_pair", "first_id": first, "second_id": second,
+            "signed_clearance_m": clearance, "touch_or_overlap": clearance <= 0,
+        })
+    return {
+        "schema_version": "1.0.0",
+        "evidence_type": "synthetic_fixture",
+        "status": ("proxy_overlap_detected" if any(x["touch_or_overlap"] for x in checks)
+                   else "no_proxy_overlap_unverified"),
+        "checked_pairs": len(checks),
+        "proxy_spheres": len(spheres),
+        "obstacle_boxes": len(boxes),
+        "explicit_self_pairs": len(self_pairs),
+        "clearance_margin_m": margin,
+        "minimum_signed_clearance_m": min(x["signed_clearance_m"] for x in checks),
+        "checks": checks,
+        "full_body_collision_validation": "not_performed",
+        "trajectory_sweep_validation": "not_performed",
+        "robot_adapter": "not_configured",
+    }
