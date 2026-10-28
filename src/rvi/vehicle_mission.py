@@ -47,7 +47,7 @@ def _fraction(value, name):
 
 
 def _unique_ids(items, name):
-    values = [_text(x.get("id"), f"{name}.id") for x in items]
+    values = [_text(_mapping(x, name).get("id"), f"{name}.id") for x in items]
     if len(values) != len(set(values)):
         raise ValueError(f"{name} contains duplicate IDs")
 
@@ -153,6 +153,8 @@ def assess_mission(data: dict) -> dict:
 
     attempts = _array(d.get("photo_attempts"), "photo_attempts")
     _unique_ids(attempts, "photo_attempts")
+    if attempts and not target_ok:
+        violations.append("premature_photography_without_verified_target")
     selected = set()
     seen_hashes = set()
     rejected = []
@@ -182,6 +184,7 @@ def assess_mission(data: dict) -> dict:
             reasons.append("wrong_part_or_view")
         if photo.get("vehicle_instance_id") != chosen:
             reasons.append("wrong_vehicle_identity")
+            violations.append("photo_taken_of_wrong_vehicle")
         if not qc["reference_separate_from_policy"]:
             reasons.append("quality_not_independently_evaluated")
         if glare > max_glare:
