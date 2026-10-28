@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.5
+Protocol version: 1.1.6
 
 Status: prospective design, not preregistered or frozen
 
@@ -93,6 +93,24 @@ inspection viewpoints from a delivered G1 EDU model, obtain verified
 variant-specific URDF bytes, model-body dimensions, sensor extrinsics,
 independent FK cross-check and a scene/terrain collision reference.
 Do not substitute a toy analytic chain for the actual robot model.
+
+## Synthetic FK-linked collision proxies (2026-10-28, unfrozen)
+
+The optional `rvi robot-model --collision-fixture` audit now
+checks **explicit, static** spherical envelopes attached to
+configured URDF link frames against declared static 3D
+axis-aligned obstacles and enumerated self-sphere pairs. Signed
+clearance accounts for the declared test margin, and a touching
+proxy is a positive overlap detection.
+
+A clear result **must not** be treated as whole-body
+collision-free. The fixture can omit the torso, feet, swinging
+arms or any other link; only explicitly listed self-pairs are
+checked. No swept trajectory, environmental map uncertainty,
+terrain/contact dynamics, robot-specific collision mesh or real
+G1 EDU calibration is present. Keep full-body collision and
+locomotion feasibility as blocking P03 evidence gates until
+independently verified against the delivered articulated model.
 
 ## Reference model preparation (exploratory)
 

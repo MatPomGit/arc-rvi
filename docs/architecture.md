@@ -152,6 +152,58 @@ configured camera frame exists, its real extrinsics remain unverified
 until the actual Unitree G1 EDU variant and sensor mount are confirmed.
 The output must **not** be used as an executable or safe stance approval.
 
+### Offline collision-proxy preflight (fixture-only)
+
+The same offline FK command accepts an **optional**, bounded JSON
+collision fixture with spheres bound to named URDF links, static
+axis-aligned boxes in the same (assumed virtual) root frame, and
+**explicit** pairs of sphere IDs for local self-proxy checks:
+
+```json
+{
+  "schema_version": "1.0.0",
+  "clearance_margin_m": 0.01,
+  "spheres": [
+    {"id":"camera_envelope","link":"camera",
+     "center_local_m":[0,0,0],"radius_m":0.1}
+  ],
+  "boxes": [
+    {"id":"beam","min_xyz_m":[0.5,0.8,0],
+     "max_xyz_m":[1.0,1.0,1.8]}
+  ],
+  "self_pairs": []
+}
+```
+
+```bash
+rvi robot-model --urdf /path/to/pinned_model.urdf \
+  --expected-sha256 PINNED_64_CHARACTER_LOWERCASE_HEX \
+  --joint-state /path/to/joint_state.json \
+  --collision-fixture /path/to/collision_fixture.json \
+  --output results/collision_proxy_audit.json
+```
+
+The placeholder link name and dimensions above are **synthetic**,
+not Unitree G1 EDU body geometry. The command requires a complete
+configured joint state, transforms each explicitly supplied sphere
+by offline FK and reports signed sphere-to-AABB and specifically
+listed self-sphere clearances. Touching counts as overlap. It
+rejects missing URDF links, duplicate IDs/pairs, non-finite
+values, malformed boxes and unbounded inputs. The fixture SHA-256
+is included in the output.
+
+**`no_proxy_overlap_unverified` means only that the supplied
+static proxies do not overlap the supplied static boxes or
+explicit self-pairs** at one assumed joint configuration.
+Missing links, omitted volume, all unlisted self-pairs, moving
+obstacles, foot contact, body dynamics, motion swept volume and
+real robot geometry are **not** checked. Output always declares
+`full_body_collision_validation: not_performed` and
+`trajectory_sweep_validation: not_performed`. Never use this
+preflight to clear physical robot motion or certify whole-body
+collision safety. See [P03 protocol](../experiments/exp03_viewpoint_planning/protocol.md)
+and [safety](safety.md).
+
 Current implementation: deterministic planar greedy viewpoint baseline, mission
 state guards, threshold decisions on supplied measurements, file hashing, paired fixture
 benchmarking and a planar geometric simulator. The simulator has a separate observation

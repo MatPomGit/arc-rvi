@@ -9,6 +9,7 @@ from pathlib import Path
 from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
 from .conditions import generate_conditions
+from .collision import load_collision_fixture, inspect_collision_proxies
 from .experiment import run_experiment
 from .localization import run_localization_fixture, run_sensor_localization
 from .image_dataset import evaluate_image_manifest
@@ -83,6 +84,8 @@ def make_parser() -> argparse.ArgumentParser:
     robot_model.add_argument("--camera-frame")
     robot_model.add_argument("--joint-state", type=Path,
                              help="local JSON with all URDF movable joint positions")
+    robot_model.add_argument("--collision-fixture", type=Path,
+                             help="bounded fixture of local link spheres and obstacle AABBs")
     robot_model.add_argument("--output", required=True, type=Path)
     stance = sub.add_parser("stance", help="audit synthetic static foot support; no gait or safety clearance")
     stance.add_argument("--spec", required=True, type=Path)
@@ -143,6 +146,10 @@ def main(argv: list[str] | None = None) -> int:
                 inputs = [arguments.urdf]
                 if arguments.joint_state is not None:
                     inputs.append(arguments.joint_state)
+                if arguments.collision_fixture is not None:
+                    inputs.append(arguments.collision_fixture)
+                    if arguments.joint_state is None:
+                        raise ValueError("collision fixture requires joint-state FK")
                 if any(arguments.output.resolve() == item.resolve() for item in inputs):
                     raise ValueError("output must differ from URDF and joint-state inputs")
                 positions, state_sha = (
@@ -153,6 +160,12 @@ def main(argv: list[str] | None = None) -> int:
                                        joint_positions=positions)
                 if state_sha is not None:
                     payload["configured_joint_pose"]["state_source_sha256"] = state_sha
+                if arguments.collision_fixture is not None:
+                    fixture, fixture_sha = load_collision_fixture(arguments.collision_fixture)
+                    proxies = inspect_collision_proxies(
+                        payload["configured_joint_pose"], fixture)
+                    proxies["source_sha256"] = fixture_sha
+                    payload["configured_joint_pose"]["collision_proxies"] = proxies
             elif arguments.command == "pilot":
                 payload = analyze_pilot(arguments.manifest, arguments.reference,
                                         arguments.comparator, seed=arguments.seed)
