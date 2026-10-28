@@ -3,6 +3,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 import hashlib
+import json
+import subprocess
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -61,6 +64,21 @@ class ColourGroundingTest(unittest.TestCase):
                 },
             ],
         }
+
+    def test_checked_in_colour_scene_hashes_and_read_only_cli(self):
+        repo = Path(__file__).resolve().parents[1]
+        root = repo / "simulation/suites"
+        manifest = root / "vehicle_colour_two_cars_manifest.json"
+        spec = json.loads(manifest.read_text(encoding="utf-8"))
+        result = propose_colour_targets(spec, root)
+        self.assertEqual(result["candidate_instance_ids"], ["synthetic-left-car"])
+        self.assertFalse(result["identity_confirmed"])
+        p = subprocess.run([
+            sys.executable, str(repo / "scripts/propose_vehicle_colour_targets.py"),
+            "--manifest", str(manifest), "--data-root", str(root)
+        ], capture_output=True, text=True, check=False, cwd=repo)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(json.loads(p.stdout)["status"], "single_unverified_colour_candidate")
 
     def test_one_red_car_is_a_hint_not_authorized_binding(self):
         result = propose_colour_targets(self.spec, self.root)
