@@ -257,7 +257,7 @@ hardware inspection. Full methods review remains outstanding.
 
 ## Secondary comparator registration: humanoid NBV and motion control (2026-10-28, unfrozen)
 
-The [source-row-grounded review ledger](../../research/literature/secondary_comparator_decisions.json)
+The [source-row-grounded review ledger](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_comparator_decisions.json)
 registers [Monica et al. IROS 2019](https://doi.org/10.1109/IROS40897.2019.8968239)
 as directly overlapping **humanoid next-best-view planning with occlusions
 and body movement primitives**. The conference programme/DOI record confirms
