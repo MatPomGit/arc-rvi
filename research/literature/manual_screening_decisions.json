@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "source_archive_sha256": "603a6d1369466b160c29234bb4db8dd6d2247999f62835d0964ad95fb9a6e69f",
+  "scope": "Source-backed manual topical screening; neither title-score inference nor automated systematic eligibility review.",
+  "decisions": [
+    {
+      "candidate_id": "4472e58d35778dc9",
+      "doi": "10.7717/peerj.7086",
+      "status": "exclude_direct_evidence",
+      "review_date": "2026-10-28",
+      "rationale": "Eye-tracking measurement comparison, not direct evidence of autonomous visual inspection. Retain in methods literature only with cross-domain justification.",
+      "evidence_urls": [
+        "https://pubmed.ncbi.nlm.nih.gov/31328028/"
+      ]
+    },
+    {
+      "candidate_id": "4461d7bfd7123d62",
+      "doi": "10.1117/12.2502203",
+      "status": "exclude_direct_evidence",
+      "review_date": "2026-10-28",
+      "rationale": "SteamVR tracker accuracy against OptiTrack, not autonomous robotic inspection; P08 export truncated title is corrected in the derived review only.",
+      "evidence_urls": [
+        "https://orcid.org/0000-0002-4787-7868"
+      ]
+    },
+    {
+      "candidate_id": "423f7335a9f9d62e",
+      "doi": "10.1109/isas59543.2023.10164352",
+      "status": "contextual_only",
+      "review_date": "2026-10-28",
+      "rationale": "Digital twin and HIL environment inspection are relevant methodological context, not a G1 EDU or independent humanoid inspection outcome.",
+      "evidence_urls": [
+        "https://scholarsmine.mst.edu/civarc_enveng_facwork/2624/"
+      ]
+    },
+    {
+      "candidate_id": "1526f9632e5e53b0",
+      "doi": "10.1016/j.oceaneng.2019.106420",
+      "status": "contextual_only",
+      "review_date": "2026-10-28",
+      "rationale": "Review of vessel-inspection robot and vision technologies, not primary independent experimental evidence. Separate Zenodo DOI is not confirmed as a deposited version.",
+      "evidence_urls": [
+        "https://www.sciencedirect.com/science/article/abs/pii/S0029801819305682"
+      ]
+    },
+    {
+      "candidate_id": "6541872b2be5f2a8",
+      "doi": "10.48550/arxiv.2603.04284",
+      "status": "direct_prior_art",
+      "review_date": "2026-10-28",
+      "rationale": "Primary full-text v2 details inspection viewpoint planning and physical aerial/underwater deployments; no bipedal G1 whole-body validation. IEEE publisher DOI link remains unconfirmed.",
+      "evidence_urls": [
+        "https://arxiv.org/html/2603.04284v2"
+      ]
+    }
+  ]
+}
