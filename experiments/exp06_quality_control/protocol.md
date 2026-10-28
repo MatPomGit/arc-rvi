@@ -167,3 +167,32 @@ and must count each assigned scene's no-image, exhausted-retry,
 unsafe-reposition and intervention outcomes. Predefine separate
 conditional strata for reflective material and challenging bipedal
 motion; no broad physical transfer inference from current planar fixtures.
+
+## Reflective car paint as the principal quality failure (prospective, 2026-10-28)
+
+The [vehicle mission contract](../../docs/vehicle-inspection-missions.md)
+makes **specular saturation/highlights on the actual requested part**
+a first-class failure condition. A bumper photograph with high focus
+but a saturated defect-relevant ROI is **not** automatically acceptable.
+Define independently annotated part masks, saturation/glare fraction
+inside each mask, exposure/focus/motion blur, pose-dependent reflections
+and a blinded assessor's inspection-valid verdict. Fix cutoffs from
+development/calibration data, not by fitting confirmation images.
+
+Compare within identical mission budgets: no retry; same-view retry;
+exposure/gain/HDR control; safely changed camera incidence angle;
+and an optional calibrated polarizing/controlled-lighting arm *only
+if the verified sensor provides it*. Record action count, clock time,
+safety-limited moves, no-image, clipping, failed re-acquisition and
+whether the requested region becomes independently accepted. A
+glare-free background with an unusable shiny bumper remains a failure.
+
+[Staderini et al. 3DV 2024](https://doi.org/10.1109/3DV62453.2024.00108)
+already consider specular BRDF-aware photometric viewpoint optimisation;
+[van Ruitenbeek & Bhulai 2022](https://doi.org/10.1007/s00138-022-01295-w)
+study multi-view vehicle damage inspection under reflections, and
+[He et al. 2024](https://doi.org/10.1016/j.jmsy.2023.11.014)
+address specular car-body defect images. These limit broad novelty
+claims; the proposed distinct endpoint is *robotically executed,
+independent inspection-valid car/part acquisition at a matched budget*.
+No measured optical benefit is asserted.
