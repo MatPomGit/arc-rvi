@@ -1,6 +1,6 @@
 # Study 06: Closed-Loop Quality-Aware Image Acquisition for Autonomous Robotic Inspection
 
-Protocol version: 1.1.0
+Protocol version: 1.1.1
 
 Status: prospective design, not preregistered or frozen
 
@@ -61,6 +61,38 @@ same-view-retry question, with a shared deadline, matched disturbances and a
 reference evaluator independent from the policy score. This trial must not
 reuse P04's online incomplete-geometry endpoint as independent evidence.
 Suggested image-quality cutoffs and trial counts are not calibrated.
+
+## Full-method comparator appraisal (2026-10-28)
+
+The [publisher full-text Zhao et al. (2026)](https://www.mdpi.com/2076-3417/16/18/9389)
+shows a constrained, **quality-gated active re-observation** comparator,
+not just a passive quality filter: one 4-DoF Dobot eye-in-hand stereo
+system, six scenes, 60 sample cases and four feasible candidate views
+per case. It reports initial/online/manual-offline ROI evaluability of
+70.0% / 76.7% / 93.3%, respectively. Its **paired mean-Q** online-minus-
+initial 95% bootstrap CI is **[−0.008, 0.060]**; this interval includes
+zero and does **not** establish a definitive mean quality gain. The
+paper explicitly lacks independently measured reference depths.
+
+**Additional unfrozen comparator:** implement or faithfully approximate
+a bounded feasible-view, ROI-quality-gated **top-1 re-observation policy**
+and compare it with same-view retry, exposure/gain optimisation and
+P06's proposed quality-guided replanning. Record any unimplemented
+sensor-model elements and mark an approximation as such. Freeze a
+**separate external quality/inspection-coverage reference** before
+confirmatory tests; reusing the policy's ROI stereo score as the
+evaluator would introduce circularity.
+
+**Statistical guard:** scene/session identity, not the 60 correlated
+case-level images of a single six-scene study, controls independent
+inference. Report paired effects and intervals clustered by scene/
+object family; count failed/no-image/retry-exhausted cases and all
+their time costs at the common mission deadline. No threshold or
+sample count from the external paper is imported as a calibrated
+ARC-RVI parameter.
+
+Source grading and the 2026 Staderini thesis overlap are documented
+in the [evidence matrix](../../research/literature/evidence_to_experiments_2026-10-28.md).
 
 ## Publication overlap guard (2026-10-27)
 
