@@ -71,6 +71,7 @@ implemented:
   - "Offline audit of contributor-supplied eight CSV exports (1907 rows, 1695 provisional keys), with source hashes and prospective P01-P08 synthesis"
   - "HTML-aware source title normalization, seven row-traceable DOI/title identity groups and two narrowly scoped external relevance checks"
   - "Offline conservative reviewer-approved DOI version links: four supported same-work pairs, two unresolved pairs; no automatic eligibility screening"
+  - "Five source-linked manual topical screening decisions and full-text OmniPlanner P03/P04/P08 prior-art appraisal; 1690 candidate keys unreviewed"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -104,6 +105,7 @@ evidence_state:
   literature_and_novelty_review: doi_keyed_77_candidate_works_22_reviewed_metadata_49_unverified_doi_6_unresolved_no_doi_not_systematic_review
   supplemental_literature_exports: 1907_mention_1695_provisional_key_435_screening_flags_7_identity_conflict_groups_two_initial_external_checks_not_systematic_review
   reviewed_literature_versions: four_supported_same_work_pairs_two_pending_1691_provisional_group_keys_not_eligible_studies
+  manual_literature_screening: five_reviewed_1690_unreviewed_two_not_direct_two_contextual_one_direct_prior_art_not_prisma
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
   - corresponding_main_commit: "952e0344bd1eaab332570e373ba19eb2d5b42298"

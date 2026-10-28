@@ -11,6 +11,18 @@ A newly supplied ZIP contains 155 CSV exports. Eight explicitly selected complet
 
 The offline `python -m scripts.reconcile_literature_versions` step accepts **only four explicitly reviewed pairs**, preserves two uncertain relations unmerged, and emits a source-pinned reconciliation receipt. See the [version-link manifest](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/work_version_relations.json).
 
+**Manual relevance review, 2026-10-28:** five candidates have
+individually sourced decisions (one direct prior art, two contextual, two
+excluded from direct-inspection claims); **1690 remain unreviewed**.
+This is not the **435**-candidate data-quality queue, and neither
+count is a PRISMA screening stage. The
+[manual decision manifest](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/manual_screening_decisions.json)
+and `python -m scripts.screen_reviewed_literature` reproduce a
+source-pinned, non-destructive screening receipt. The
+[OmniPlanner full-text appraisal](prior-art-critical.md) documents
+existing cross-morphology inspection planning and field deployments,
+without verifying an IEEE publisher DOI or a humanoid experiment.
+
 **Editorial control:** original drafts and the 22-item reviewed DOI manifest remain unchanged; no imported CSV record is automatically labeled bibliographically verified.
 
 **Status:** editorial triage of four author-supplied research drafts, 2026-10-27.

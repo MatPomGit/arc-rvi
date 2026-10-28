@@ -57,3 +57,25 @@ python -m scripts.reconcile_literature_versions \
   --inventory-summary /tmp/rvi-literature-20261028/summary.json \
   --output-dir /tmp/rvi-literature-work-links
 ```
+
+## Manual topical screening (2026-10-28)
+
+The [manual screening manifest](manual_screening_decisions.json) records **five**
+source-linked candidate decisions: 1 direct inspection prior-art item,
+2 contextual items and 2 items excluded from direct inspection-evidence claims.
+**1690/1695 candidate keys remain unreviewed**; exclusion affects the
+*interpretation*, not retention, of original CSV rows. The earlier
+**435** automatic data-quality flags are a different dimension.
+
+```bash
+python scripts/audit_literature_exports.py /path/to/agent-artifacts-zip_robo.zip --output-dir /tmp/rvi-raw-audit
+python -m scripts.screen_reviewed_literature \
+  --candidates /tmp/rvi-raw-audit/work_candidates.csv \
+  --inventory-summary /tmp/rvi-raw-audit/summary.json \
+  --output-dir /tmp/rvi-manual-screen
+```
+
+The tool fails on a mismatched source hash, unexpected candidate count,
+unknown decision IDs or DOI mismatches, duplicate decisions and unsupported
+statuses. Outputs are non-destructive. [Full-text OmniPlanner appraisal](../../docs/prior-art-critical.md)
+narrows P03/P04/P08 novelty claims without asserting a G1 EDU finding.
