@@ -72,6 +72,7 @@ implemented:
   - "HTML-aware source title normalization, seven row-traceable DOI/title identity groups and two narrowly scoped external relevance checks"
   - "Offline conservative reviewer-approved DOI version links: four supported same-work pairs, two unresolved pairs; no automatic eligibility screening"
   - "Five source-linked manual topical screening decisions and full-text OmniPlanner P03/P04/P08 prior-art appraisal; 1690 candidate keys unreviewed"
+  - "Study P03/P04/P06 comparator-level evidence matrix: 2026 thesis abstract, 2024 IROS abstract, 2026 preprint abstract, Zhao 2026 publisher full-text method/results appraisal"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -106,6 +107,7 @@ evidence_state:
   supplemental_literature_exports: 1907_mention_1695_provisional_key_435_screening_flags_7_identity_conflict_groups_two_initial_external_checks_not_systematic_review
   reviewed_literature_versions: four_supported_same_work_pairs_two_pending_1691_provisional_group_keys_not_eligible_studies
   manual_literature_screening: five_reviewed_1690_unreviewed_two_not_direct_two_contextual_one_direct_prior_art_not_prisma
+  comparator_literature_gates: P03_P04_P06_unfrozen_strong_baselines_with_independent_evaluator_no_ARC_empirical_validation
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
   - corresponding_main_commit: "952e0344bd1eaab332570e373ba19eb2d5b42298"
