@@ -111,7 +111,7 @@ planning outcomes as independent P04 evidence.
 
 ## Secondary comparator registration: uncertain depth and reflective surfaces (2026-10-28, unfrozen)
 
-The [source-row-grounded review ledger](../../research/literature/secondary_comparator_decisions.json)
+The [source-row-grounded review ledger](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_comparator_decisions.json)
 adds two important contemporary method families:
 [FRA-NBV, Preziosa et al. 2026](https://doi.org/10.1109/LRA.2026.3728374)
 (replanning incidence to recover reflection-induced missing depth without
