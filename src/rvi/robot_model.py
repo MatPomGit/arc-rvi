@@ -109,7 +109,7 @@ def load_joint_state(path: Path) -> tuple[dict[str, float], str]:
         raise ValueError("joint-state input exceeds size limit")
     try:
         data = json.loads(raw.decode("utf-8"),
-                          parse_constant=lambda value: (_reject_constant(value)))
+                          parse_constant=_reject_constant)
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise ValueError("invalid UTF-8 joint-state JSON") from exc
     if not isinstance(data, dict) or set(data) != {"schema_version", "joint_positions"}:
@@ -142,11 +142,20 @@ def inspect_urdf(
     if joint_positions is not None:
         if not isinstance(joint_positions, dict) or len(joint_positions) > 128:
             raise ValueError("joint_positions must be a bounded mapping")
-        if any(not isinstance(name, str) or not name.strip()
-               or isinstance(value, bool)
-               or not isinstance(value, (float, int)) or not isfinite(value)
-               for name, value in joint_positions.items()):
-            raise ValueError("joint_positions must map names to finite numbers")
+        normalized_positions = {}
+        for name, value in joint_positions.items():
+            if (not isinstance(name, str) or not name.strip()
+                    or isinstance(value, bool)
+                    or not isinstance(value, (int, float))):
+                raise ValueError("joint_positions must map names to finite numbers")
+            try:
+                numeric = float(value)
+            except (ValueError, OverflowError) as exc:
+                raise ValueError("joint position exceeds numeric range") from exc
+            if not isfinite(numeric):
+                raise ValueError("joint position must be finite")
+            normalized_positions[name] = numeric
+        joint_positions = normalized_positions
     source = Path(path)
     if source.is_symlink() or not source.is_file():
         raise ValueError("URDF must be a regular, non-symlinked local file")
