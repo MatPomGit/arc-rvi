@@ -1,6 +1,6 @@
 # Study 06: Closed-Loop Quality-Aware Image Acquisition for Autonomous Robotic Inspection
 
-Protocol version: 1.1.1
+Protocol version: 1.1.2
 
 Status: prospective design, not preregistered or frozen
 
@@ -40,6 +40,26 @@ Estimate paired valid-coverage differences with object/session clustering approp
 to the sampling design. Do not treat retries or frames as independent trials.
 Before confirmation, verify perturbation strength, evaluator calibration, action timing
 and retry accounting. The existing threshold helper is not an implemented feedback loop.
+
+## Humanoid gait-induced acquisition failures (unfrozen)
+
+A humanoid's balance correction, foot impacts, torso pitch/roll,
+camera-head vibration and terrain occlusion can degrade exposure,
+motion blur and ROI coverage *while walking or after stopping*.
+Separate camera/sensor loss from instability-driven capture
+failure. Compare acquisition during safe approved motion,
+immediately after a stop, a fixed settling-delay policy and
+a motion-state-conditioned quality trigger **only when physical
+safety and independent motion references allow it**.
+
+Keep the same difficult-terrain route and validated contact
+limits across methods. A good static image is not sufficient if
+obtaining it required an unsafe stance, unapproved movement,
+omitted failure or exceeded deadline. Count all such trials as
+failures for the predeclared inspection-success endpoint; report
+image-quality conditional on successful safe acquisition only as
+a secondary outcome. No new numerical thresholds are adopted
+from locomotion literature.
 
 ## Provenance and confirmation gate
 
