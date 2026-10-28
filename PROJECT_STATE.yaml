@@ -74,6 +74,7 @@ implemented:
   - "Five source-linked manual topical screening decisions and full-text OmniPlanner P03/P04/P08 prior-art appraisal; 1690 candidate keys unreviewed"
   - "Study P03/P04/P06 comparator-level evidence matrix: 2026 thesis abstract, 2024 IROS abstract, 2026 preprint abstract, Zhao 2026 publisher full-text method/results appraisal"
   - "Humanoid difficult-terrain prior-art appraisal, prospective contact/sensing scenario registry and P03-P08 terrain-inspection safety/endpoint gates; no contact physics or physical robot trial"
+  - "Source-row-backed selective 7-record secondary comparator ledger (six export records, one external follow-up), with DOI/title/archive validation, independent-work caution and revised P03/P04/P06/P08 protocol comparator gates; no new experiment results"
   - "Offline one/two-foot horizontal static support projection preflight with analytic geometry tests; synthetic fixture only, no dynamic/contact-force model"
   - "Backward-compatible 3D coplanar slope support projection fixture, numeric coplanarity residual and fail-closed noncoplanar contacts; no locomotion safety claims"
   - "Offline configured URDF forward kinematics with finite complete joint states, bounded local SHA-pinned fixtures, analytic revolute/prismatic regression; not IK or collision verification"
