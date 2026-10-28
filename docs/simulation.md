@@ -62,6 +62,56 @@ and [physical safety](safety.md). No G1 EDU locomotion controller,
 risk-rated friction coefficient or safe terrain threshold is currently
 implemented or certified by ARC-RVI.
 
+## Synthetic foot-support projection preflight
+
+This is a **small, independently testable static geometry proxy**,
+not an articulated inverse-kinematics model, force/contact solver,
+or humanoid walking simulator.
+
+Run the standard offline CLI with the synthetic neutral sample:
+
+```bash
+rvi stance --spec simulation/scenarios/static_support_example.json --output results/static_support.json
+```
+
+The spec declares one or two **assumed** horizontal foot-contact
+polygons in metres, a common support height, a proposed horizontal
+centre-of-mass projection and a required geometric boundary margin
+in metres. The function forms the convex hull of contact vertices
+and computes a signed minimum distance to its edges using a
+deterministic analytic 2D geometry calculation. It rejects malformed,
+non-convex or degenerate contact footprints, duplicate IDs,
+non-finite numeric input and overwriting existing output files.
+The report includes the exact input SHA-256 and
+`evidence_type: synthetic_fixture`.
+
+The only positive status is **`geometric_candidate_only`**. It
+means *the supplied projected point is strictly inside the support
+hull with the requested geometric margin*. It does **not** show
+that gravity, joint torques, kinematics, terrain friction, joint
+contact loads, slip avoidance, dynamic gait balance or robot
+actuation are feasible.
+
+Failures are recorded as
+`outside_support_projection` or
+`insufficient_static_margin`. Any declared
+`steps`, `slope`, `loose`, or `unknown` terrain receives
+`terrain_model_unsupported`. Contact state `unknown`
+receives `contact_state_unknown`; different support heights
+receive `noncoplanar_contact_unsupported`. In these cases
+the report deliberately provides **no inferred support polygon
+or margin**. No gait strategy or G1 EDU safety limit follows
+from this fixture. The sample footprints are arbitrary test
+geometry and **not** manufacturer foot dimensions.
+
+The model does not couple to the planar route planner or a robot
+adapter. Before difficult-terrain planning can use this check,
+develop independently verified articulated kinematics and body
+geometry, actual terrain/contact observations, ground reaction
+constraints and time-indexed slip/retreat/abort dynamics.
+See [study P03](../experiments/exp03_viewpoint_planning/protocol.md)
+and [safety](safety.md).
+
 ## Visibility and coverage
 
 Each surface patch has a representative point, outward normal and positive area weight.
