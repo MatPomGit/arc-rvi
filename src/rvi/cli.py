@@ -20,6 +20,8 @@ from .planning import plan_family_sample
 from .power_mc import analyze_cluster_monte_carlo
 from .robot_model import inspect_urdf, load_joint_state
 from .support import inspect_support_file
+from .trajectory import (inspect_waypoint_collision, load_trajectory,
+                         validate_waypoints)
 from .population import generate_population
 from .scenarios import load_scenario
 from .viewpoints import plan_viewpoints
@@ -86,6 +88,8 @@ def make_parser() -> argparse.ArgumentParser:
                              help="local JSON with all URDF movable joint positions")
     robot_model.add_argument("--collision-fixture", type=Path,
                              help="bounded fixture of local link spheres and obstacle AABBs")
+    robot_model.add_argument("--trajectory", type=Path,
+                             help="offline time-ordered joint configurations; never motion commands")
     robot_model.add_argument("--output", required=True, type=Path)
     stance = sub.add_parser("stance", help="audit synthetic static foot support; no gait or safety clearance")
     stance.add_argument("--spec", required=True, type=Path)
@@ -148,24 +152,52 @@ def main(argv: list[str] | None = None) -> int:
                     inputs.append(arguments.joint_state)
                 if arguments.collision_fixture is not None:
                     inputs.append(arguments.collision_fixture)
-                    if arguments.joint_state is None:
-                        raise ValueError("collision fixture requires joint-state FK")
+                if arguments.trajectory is not None:
+                    inputs.append(arguments.trajectory)
+                    if arguments.joint_state is not None:
+                        raise ValueError("trajectory and joint-state are mutually exclusive")
+                    if arguments.collision_fixture is None:
+                        raise ValueError("trajectory requires collision-fixture")
+                elif (arguments.collision_fixture is not None
+                      and arguments.joint_state is None):
+                    raise ValueError("collision fixture requires joint-state FK")
                 if any(arguments.output.resolve() == item.resolve() for item in inputs):
-                    raise ValueError("output must differ from URDF and joint-state inputs")
-                positions, state_sha = (
-                    load_joint_state(arguments.joint_state)
-                    if arguments.joint_state is not None else (None, None))
-                payload = inspect_urdf(arguments.urdf, arguments.expected_sha256,
-                                       camera_frame=arguments.camera_frame,
-                                       joint_positions=positions)
-                if state_sha is not None:
-                    payload["configured_joint_pose"]["state_source_sha256"] = state_sha
-                if arguments.collision_fixture is not None:
-                    fixture, fixture_sha = load_collision_fixture(arguments.collision_fixture)
-                    proxies = inspect_collision_proxies(
-                        payload["configured_joint_pose"], fixture)
-                    proxies["source_sha256"] = fixture_sha
-                    payload["configured_joint_pose"]["collision_proxies"] = proxies
+                    raise ValueError("output must differ from all robot-model inputs")
+                if arguments.trajectory is not None:
+                    trajectory, trajectory_sha = load_trajectory(arguments.trajectory)
+                    waypoints = validate_waypoints(trajectory)
+                    collision, collision_sha = load_collision_fixture(
+                        arguments.collision_fixture)
+                    poses = [
+                        inspect_urdf(
+                            arguments.urdf, arguments.expected_sha256,
+                            joint_positions=waypoint["joint_positions"]
+                        )["configured_joint_pose"]
+                        for waypoint in waypoints
+                    ]
+                    report = inspect_waypoint_collision(
+                        poses, collision, [float(item["time_s"]) for item in waypoints])
+                    report["source_sha256"] = trajectory_sha
+                    report["collision_fixture_sha256"] = collision_sha
+                    payload = inspect_urdf(arguments.urdf, arguments.expected_sha256,
+                                           camera_frame=arguments.camera_frame)
+                    payload["trajectory_proxy"] = report
+                else:
+                    positions, state_sha = (
+                        load_joint_state(arguments.joint_state)
+                        if arguments.joint_state is not None else (None, None))
+                    payload = inspect_urdf(arguments.urdf, arguments.expected_sha256,
+                                           camera_frame=arguments.camera_frame,
+                                           joint_positions=positions)
+                    if state_sha is not None:
+                        payload["configured_joint_pose"]["state_source_sha256"] = state_sha
+                    if arguments.collision_fixture is not None:
+                        fixture, fixture_sha = load_collision_fixture(
+                            arguments.collision_fixture)
+                        proxies = inspect_collision_proxies(
+                            payload["configured_joint_pose"], fixture)
+                        proxies["source_sha256"] = fixture_sha
+                        payload["configured_joint_pose"]["collision_proxies"] = proxies
             elif arguments.command == "pilot":
                 payload = analyze_pilot(arguments.manifest, arguments.reference,
                                         arguments.comparator, seed=arguments.seed)
