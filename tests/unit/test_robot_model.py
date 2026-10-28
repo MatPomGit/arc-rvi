@@ -14,7 +14,7 @@ import unittest
 from rvi.adapters.robot import UnconfiguredRobotAdapter
 from rvi.cli import main
 from rvi.interfaces import AdapterUnavailable
-from rvi.robot_model import inspect_urdf
+from rvi.robot_model import inspect_urdf, load_joint_state
 
 TOY = """<robot name="neutral_test">
 <link name="pelvis"/><link name="mast"/><link name="camera"/><link name="arm"/>
@@ -187,6 +187,127 @@ class RobotModelAuditTests(unittest.TestCase):
             self.assertEqual(out.read_bytes(), first)
             with self.assertRaises(AdapterUnavailable):
                 UnconfiguredRobotAdapter().navigate_to(0.0, 0.0)
+
+
+
+    def test_joint_state_configured_fk_against_analytic_two_joint_chain(self):
+        """A 90-degree yaw rotates the prismatic rail and camera offset."""
+        model = """<robot name="analytic_articulated">
+<link name="base"/><link name="arm"/><link name="camera"/><link name="tip"/>
+<joint name="yaw" type="revolute">
+  <parent link="base"/><child link="arm"/>
+  <origin xyz="1 0 0"/><axis xyz="0 0 2"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966"/>
+</joint>
+<joint name="camera_mount" type="fixed">
+  <parent link="arm"/><child link="camera"/><origin xyz="2 0 0"/>
+</joint>
+<joint name="slider" type="prismatic">
+  <parent link="arm"/><child link="tip"/>
+  <origin xyz="1 0 0"/><axis xyz="2 0 0"/>
+  <limit lower="0" upper="2"/>
+</joint>
+</robot>"""
+        with tempfile.TemporaryDirectory() as tmp:
+            path, checksum = write_model(Path(tmp), model)
+            state = {"yaw": pi / 2, "slider": 0.5}
+            result = inspect_urdf(path, checksum, camera_frame="camera",
+                                  joint_positions=state)
+            self.assertEqual(result["camera_frame"]["zero_joint_pose"]
+                             ["translation_m"], [3.0, 0.0, 0.0])
+            poses = result["configured_joint_pose"]["frame_poses"]
+            for name, point in (
+                    ("base", (0, 0, 0)), ("arm", (1, 0, 0)),
+                    ("camera", (1, 2, 0)), ("tip", (1, 1.5, 0))):
+                with self.subTest(link=name):
+                    self.assertTrue(all(isclose(a, b, abs_tol=1e-12)
+                                        for a, b in zip(poses[name]["translation_m"],
+                                                        point)))
+            self.assertTrue(isclose(poses["camera"]["rotation_matrix"][0][1],
+                                    -1, abs_tol=1e-12))
+            self.assertEqual(result["configured_joint_pose"]["collision_or_ik_validation"],
+                             "not_performed")
+            self.assertEqual(result["configured_joint_pose"]["physical_robot_validation"],
+                             "not_performed")
+            self.assertEqual(result, inspect_urdf(path, checksum, camera_frame="camera",
+                                                  joint_positions=state))
+
+    def test_configured_fk_joint_limits_fail_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path, checksum = write_model(Path(tmp), TOY)
+            for invalid in ({"arm_joint": 1.01}, {"arm_joint": -1.01},
+                            {"arm_joint": float("nan")}, {"arm_joint": True},
+                            {"mast_joint": 0.0}, {}, {"arm_joint": 0, "extra": 0}):
+                with self.subTest(state=invalid), self.assertRaises(ValueError):
+                    inspect_urdf(path, checksum, joint_positions=invalid)
+            accepted = inspect_urdf(path, checksum, joint_positions={"arm_joint": 1})
+            self.assertEqual(accepted["configured_joint_pose"]["joints"], {"arm_joint": 1})
+
+    def test_continuous_joint_and_virtual_floating_base_state_is_assumed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            xml = TOY.replace('type="revolute"', 'type="continuous"')
+            xml = xml.replace('<link name="pelvis"/>',
+                              '<link name="world"/><link name="pelvis"/>'
+                              '<joint name="base_joint" type="floating">'
+                              '<parent link="world"/><child link="pelvis"/>'
+                              '</joint>')
+            path, checksum = write_model(Path(tmp), xml)
+            result = inspect_urdf(path, checksum, joint_positions={"arm_joint": pi})
+            self.assertTrue(result["configured_joint_pose"]["floating_base_identity_assumed"])
+            self.assertEqual(result["configured_joint_pose"]["frame_poses"]["world"]
+                             ["translation_m"], [0.0, 0.0, 0.0])
+            with self.assertRaisesRegex(ValueError, "unexpected"):
+                inspect_urdf(path, checksum,
+                             joint_positions={"arm_joint": 0, "base_joint": 0})
+
+    def test_joint_state_cli_source_hash_and_exclusive_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path, checksum = write_model(root, TOY)
+            state = root / "pose.json"
+            raw = b'{"schema_version":"1.0.0","joint_positions":{"arm_joint":0.25}}\n'
+            state.write_bytes(raw)
+            self.assertEqual(load_joint_state(state)[1], sha256(raw).hexdigest())
+            output = root / "poses.json"
+            cmd = ["robot-model", "--urdf", str(path), "--expected-sha256",
+                   checksum, "--camera-frame", "camera",
+                   "--joint-state", str(state), "--output", str(output)]
+            with redirect_stdout(StringIO()):
+                self.assertEqual(main(cmd), 0)
+            report = json.loads(output.read_text())
+            self.assertEqual(report["configured_joint_pose"]["joints"],
+                             {"arm_joint": 0.25})
+            self.assertEqual(report["configured_joint_pose"]["state_source_sha256"],
+                             sha256(raw).hexdigest())
+            original = output.read_bytes()
+            with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
+                main(cmd)
+            self.assertEqual(output.read_bytes(), original)
+            with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
+                main(cmd[:-1] + [str(state)])
+            self.assertEqual(state.read_bytes(), raw)
+            link = root / "link.json"
+            link.symlink_to(state)
+            with self.assertRaises(ValueError):
+                load_joint_state(link)
+
+    def test_joint_state_json_and_schema_hard_limits(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state = Path(tmp) / "joint.json"
+            for content in (
+                    '{"schema_version":"1.0.0","joint_positions":{"x":NaN}}',
+                    '{"schema_version":"1.0.0","joint_positions":[]}',
+                    '{"schema_version":"2.0.0","joint_positions":{}}',
+                    '{"schema_version":"1.0.0","joint_positions":{},"foo":1}',
+                    '[]',
+                    'malformed',
+                    ):
+                state.write_text(content)
+                with self.subTest(content=content), self.assertRaises(ValueError):
+                    load_joint_state(state)
+            state.write_bytes(b'X' * 65537)
+            with self.assertRaisesRegex(ValueError, "size limit"):
+                load_joint_state(state)
 
 
 if __name__ == "__main__":
