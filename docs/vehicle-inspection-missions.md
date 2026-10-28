@@ -113,6 +113,43 @@ Record **failed images, re-aim attempts, motion time, aborted safe
 repositions and total mission deadline**. Re-taking the same incorrect
 view repeatedly without a budget is not an acceptable strategy.
 
+## Exploratory glare-aware viewpoint selector (fixture-only)
+
+A deterministic [predicted-view selector](https://github.com/MatPomGit/arc-rvi/blob/main/src/rvi/photometric_view.py)
+now implements a **toy ranking baseline** for the prospective P03/P06
+comparison, independent of robot hardware and image acquisition.
+It consumes *supplied predictions* for each candidate camera pose:
+ROI-valid fraction, specular-glare fraction, visibility proxy, contact
+and collision **proxies**, outbound/capture/return time plus an extra
+return buffer. It first rejects predicted-infeasible poses and only then
+ranks feasible candidates:
+
+`score = predicted_valid_roi - lambda_glare * predicted_glare_fraction
+         - lambda_time * (outbound + capture + return + buffer) / remaining_time`.
+
+Every weight and limit is explicit in the input. Ties are resolved
+deterministically by candidate ID. If no candidate meets the limits or
+the return reserve, the selector **abstains** instead of recommending an
+unsafe or high-glare shot. Its score never substitutes for independent
+**observed image QC** after a real exposure.
+
+Try the [invented reflective bumper scenario](https://github.com/MatPomGit/arc-rvi/blob/main/simulation/suites/vehicle_glare_viewpoint_fixture.json):
+direct view with a large predicted reflection, oblique lower-glare view,
+low-glare but unsuitable support pose, and a distant position that
+violates the return deadline.
+
+```bash
+python scripts/select_vehicle_view.py simulation/suites/vehicle_glare_viewpoint_fixture.json
+```
+
+This example selects the synthetic oblique view, **not** a physical
+point for Unitree G1 EDU. The static feasibility flags are declared
+fixtures, not independent contact, dynamics or obstacle evidence.
+Real anti-glare control requires a calibrated paint/light/BRDF or
+on-image prediction model, approved hardware pose and return route,
+and actual independently assessed photographs. No such calibrated
+model or trial is supplied in this PR.
+
 ## Operator return, safety and data protection
 
 At the start, establish an operator-designated, bounded handoff anchor.
