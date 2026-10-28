@@ -37,6 +37,23 @@ source-level effect summaries remain external reports, **not**
 ARC-RVI results. The P03/P04/P06 protocols now name stronger
 conceptual comparators and independent test oracles.
 
+**Humanoid/difficult-terrain scope, 2026-10-28:** the robot in
+ARC-RVI is a **bipedal Unitree G1 EDU reference platform** intended
+for **challenging terrain and constrained inspection access**,
+not an ordinary level-floor mobile base. The
+[primary-source G1 prior-art appraisal](prior-art-critical.md)
+differentiates *published* rough-terrain locomotion, indoor humanoid
+inspection and **not-yet-tested terrain-conditioned inspection**;
+physical Unitree G1 claims must not be transferred to the actual G1
+EDU hardware without device/sensor/controller verification. The
+[prospective terrain registry](population.md),
+[simulator validity boundary](simulation.md) and
+[physical safety gate](safety.md) explicitly mark all contact/terrain
+factors unsupported in current planar software. The
+[study-specific evidence matrix](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md)
+defines disjoint P03–P08 endpoints and failure denominators, with
+no new ARC-RVI experiment or physical deployment reported.
+
 **Editorial control:** original drafts and the 22-item reviewed DOI manifest remain unchanged; no imported CSV record is automatically labeled bibliographically verified.
 
 **Status:** editorial triage of four author-supplied research drafts, 2026-10-27.

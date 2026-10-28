@@ -127,6 +127,44 @@ stereo-quality score is **not** independent inspection-valid area or
 absolute 3D measurement accuracy. See the prospective
 [P03/P04/P06 protocols](../experiments/README.md) for acceptance gates.
 
+## Humanoid locomotion in difficult terrain: direct evidence boundaries (2026-10-28)
+
+The reference hardware is **Unitree G1 EDU**, whereas published experiments
+below identify a **Unitree G1**. Their observed success must **not**
+be transferred to the unverified G1 EDU variant, its actuators, sensor
+payload, firmware or inspection task. "Full text" means that the
+publisher/author HTML method or result sections were inspected; it does
+not mean that ARC-RVI reproduced those experiments.
+
+| Prior art / inspected evidence | Reported platform, terrain and outcome | Consequence for ARC-RVI |
+| --- | --- | --- |
+| [Wang et al., *RoboInspect*, 2026, DOI 10.1016/j.cacaie.2026.100007](https://www.sciencedirect.com/science/article/pii/S1093968726018153); **publisher methods/results listing** | Physical humanoid with RL locomotion, LiDAR–IMU navigation and crack vision; two **controlled indoor** inspection case studies in open space, corridors and a landing. Not an experimentally demonstrated full rubble or stair-climbing inspection programme | Cannot claim first physical humanoid structural inspection. Required contrast is inspection validity *conditional on challenging terrain and independently verified contact safety*, not simple completion of a mapped indoor route |
+| [Zhang, Wu & Bräunl, *Autonomous Robots* 2026, DOI 10.1007/s10514-026-10263-6](https://link.springer.com/article/10.1007/s10514-026-10263-6); **publisher full HTML, methods and real-robot experiments** | FAWBC adapts whole-body controller weights using estimated ground normal/contact-force feasibility; physical **G1** tested on concrete, grass, wood chips and a 15° ramp; reported simulator baseline failure on a slope | Terrain-aware whole-body contact feasibility is **already established**; do not claim generic contact-aware locomotion as new, and do not import slope or friction thresholds to G1 EDU |
+| [Compton, Olkin & Ames, arXiv:2605.15517 (2026)](https://arxiv.org/abs/2605.15517); **author preprint abstract** | Physical **G1** long-horizon navigation reported for more than 70 m on rough outdoor surfaces and consecutive stairs; reference-guided policy plus MPC/CBF high-level navigation | Challenging-terrain *autonomous navigation* is established prior art. Exact independent sample structure, safety margin and camera inspection acceptance were **not** extracted from this abstract |
+| [Liu et al., arXiv:2609.02542 (2026)](https://arxiv.org/abs/2609.02542); **preprint HTML methods and experiments** | Physical **G1**, one depth stream and proprioception, traverses gaps, stairs and stepping stones; authors report mean hardware success 93.3% across three terrain categories. Target metric is locomotion, not inspection quality | Anticipatory foothold control on disconnected surfaces is prior art. Hardware experiments on one G1 and locomotion-success definition do not validate inspection viewpoints or G1 EDU safety |
+| [Zhang et al., arXiv:2604.17335 (2026)](https://arxiv.org/abs/2604.17335); **preprint HTML methods/introduction and hardware abstract** | Physical **G1** performs whole-body traversal of boxes, hurdles, stairs and mixed terrain, with diffusion-based motion generation and RL tracking | Coordinated whole-body terrain adaptation is prior art; actual inspection-camera quality, target coverage and constrained-mission failure accounting are distinct untested questions |
+
+**Research gap, stated as a testable proposition rather than a fact of
+novelty:** all five sources separately address humanoid navigation,
+terrain-adaptive contacts, or indoor inspection. None of the **inspected
+material** establishes a matched experiment jointly measuring
+*terrain-conditioned bipedal feasibility*, *accepted inspection-image
+coverage*, *common mission deadline*, *operator intervention* and
+*independently assessed failure modes*. This is a **bounded gap
+identified in these sources**, not a claim that no other publication
+exists. Complete source-method review, search update and competition
+audit are still required before novelty certification.
+
+**Required ablations:** (1) planar or geometric-only view routing;
+(2) contact/whole-body-aware routing without image acceptance;
+(3) quality-aware inspection planning with the **same** validated
+contact constraints; (4) fully coupled contact/visibility/inspection
+policy. Compare on the same supported terrain families, mission
+budgets, observations and independent evaluators; account for fall
+risk, slip, abort, unobservable region and unreached waypoint. Do
+not implement or enable physical motion by adding these planned
+ablation labels to a protocol.
+
 ## Revised research differentiation
 
 - **P02:** paired identity association in clutter with target-absent

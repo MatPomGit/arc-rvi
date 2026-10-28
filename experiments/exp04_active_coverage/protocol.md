@@ -1,6 +1,6 @@
 # Study 04: Uncertainty-Aware Active Visual Coverage of Partially Unknown Objects
 
-Protocol version: 1.1.1
+Protocol version: 1.1.2
 
 Status: prospective design, not preregistered or frozen
 
@@ -40,6 +40,29 @@ final coverage to interpret budget-capped failures.
 Before confirmation, check that hidden geometry cannot enter the planner, define
 physical reference-scan registration uncertainty, and validate stopping logic.
 Do not equate a heuristic score with epistemic uncertainty without a defined model.
+
+## Contact-limited unknown-terrain access (unfrozen)
+
+P04 studies inspection of **partially unknown target surfaces**,
+not locomotion policy optimization. Distinguish uncertainty in the
+target geometry from uncertainty in the **support terrain**:
+withheld reference terrain/target geometry may be used for scoring
+but never for selecting the next view. A foothold or retreat path
+unsupported by available onboard observations is not a valid
+executed viewpoint. Compare NBV policies only over shared,
+physically feasible stances or record rejected attempts and consumed
+time using the same contact-risk oracle. Premature stopping because
+only safe positions remain must count as a budget-capped failure
+when the true coverage threshold is unmet.
+
+Use scenario-family groups spanning occluded near-floor targets,
+slopes/steps, narrow clutter and camera-head motion, conditional on
+independent simulator validity. Report terrain-induced **unreachable
+area** and estimated uncertainty separately from image-quality
+failure; retain unknown or unsafe regions in the required-surface
+denominator unless the experimental task definition prospectively
+excludes them for *all* methods. No locomotion source alone
+establishes success for this inspection endpoint.
 
 ## Provenance and confirmation gate
 

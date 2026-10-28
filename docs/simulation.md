@@ -29,6 +29,39 @@ Translation, rotation and capture occur sequentially. The circular footprint doe
 not change during rotation. Movement is holonomic; there are no steering, gait,
 stability, acceleration or articulated-body constraints.
 
+## Difficult-terrain and humanoid validity boundary (2026-10-28)
+
+The present circular-footprint, planar, holonomic motion model **cannot**
+represent Unitree G1 EDU bipedal stability, foot contact, surface traction,
+stairs, gaps, loose rubble, falling, whole-body collision, torso/camera
+motion from gait, or recovery after a disturbed step. An obstacle-free
+planar path **is not** an executable humanoid trajectory. Static URDF
+topology checks are also **not** dynamic/contact feasibility checks.
+
+Before claiming safe or feasible inspection in difficult terrain, a
+separate, validated simulator/robot adapter must provide a consistent
+time-indexed state: base/torso pose, joint positions and limits, contact
+locations and states, contact friction uncertainty, swept body geometry,
+camera extrinsics/pose, observation quality and mission clock. It must
+also provide independently checked support/contact constraints and a
+reason for rejected or aborted motion. Planned footsteps, preflight
+checks and the **executed** motion trace must remain separate.
+
+A high-level planner may only use **declared observable** terrain and
+camera information. Hidden contact truth, complete geometry and
+accepted inspection coverage belong exclusively to the evaluator.
+Unknown ground traction, model-out-of-domain terrain or an unverified
+robot/camera setup is **not validated** (fail closed for any safety
+claim); it is not automatically traversable. Existing preflight
+rejections are not actual fall events or tested fail-safe hardware.
+
+For scenario factors, independent reference and scope, see
+[the terrain-factor registry](population.md), the
+[study-specific P03 protocol](../experiments/exp03_viewpoint_planning/protocol.md)
+and [physical safety](safety.md). No G1 EDU locomotion controller,
+risk-rated friction coefficient or safe terrain threshold is currently
+implemented or certified by ARC-RVI.
+
 ## Visibility and coverage
 
 Each surface patch has a representative point, outward normal and positive area weight.

@@ -33,6 +33,50 @@ to pilot/emergency stop and another to diagnostics; avoid competing
 SDK/ROS 2 controllers. Check optional dexterous-hand cabling and
 posture restrictions before any movement.
 
+## Difficult-terrain humanoid operating gate (prospective, 2026-10-28)
+
+A humanoid can lose balance even when its **planned camera viewpoint**
+and horizontal path are geometrically clear. In a cluttered or damaged
+environment, **fall exposure** covers more than the nominal foot
+footprint. The following are review gates, **not** authorization to
+drive or train on hazardous terrain.
+
+- **M0/M1/M2 first:** identify and verify the specific G1 EDU variant,
+  available safety-rated stop and recovery procedure, actuator/sensor
+  state, measured camera transforms, operator roles and the actual site.
+  No autonomous motion is permitted by this document.
+- **Site hazards:** survey slopes and steps, foot-support continuity,
+  uncertain/slippery/loose material, cables, falling objects, low beams,
+  narrowing passages, unobserved edges and human access. Record an
+  independently approved no-go region and physical fall/retreat zone;
+  assume an observed flat patch can have **unknown traction**.
+- **Staged evidence:** static offline modelling → independently checked
+  articulated/contact simulations → non-moving sensing/calibration
+  under supervision → independently approved, supported low-risk
+  experiments → only subsequently, if authorized, graded terrain.
+  **Do not** place this robot on rubble, gaps or inclined/slippery
+  obstacles as an informal verification step.
+- **Monitored stop/abort conditions:** uncertain support or foothold,
+  inability to verify full-body clearance or a safe retreat, slip or
+  unexpected contact, substantial pose/sensor disagreement, unstable
+  motion, people entering exclusion zone, supervisor command and
+  communications faults. An abort means no subsequent attempted
+  acquisition is credited; record the cause and partial data.
+- **Fallback and evidence:** stop/hold/retreat mechanisms must be
+  designed and physically validated separately, including loss of
+  communications and failure of localization. Never assume a
+  machine-learning locomotion policy, lab harness or preflight
+  collision check provides certified fall protection. Preserve
+  near-misses, operator takeovers, failed missions and missing images.
+
+**No numerical incline, friction, obstacle-size or fall-margin limit
+can be inferred for the actual delivered G1 EDU** from third-party
+G1 locomotion publications, vendor marketing or the current software.
+A qualified site risk assessment must set and verify bounds before
+each approved physical stage. Other papers' robot platforms, control
+policies and measured terrain successes do not establish G1 EDU
+inspection-system safety.
+
 ## Photographic laboratory walkthrough (2026-10-27)
 
 Three user-supplied still photographs show an upright, humanoid-shaped robot

@@ -1,6 +1,6 @@
 # Study 08: Experimental Evaluation of Autonomous Humanoid Robots for Standardized Visual Documentation
 
-Protocol version: 1.1.0
+Protocol version: 1.1.1
 
 Status: prospective design, not preregistered or frozen
 
@@ -46,6 +46,31 @@ Requires an integrated physical system, an approved operating procedure, data ri
 and an institutional determination of applicable human-participant requirements before
 operator recruitment. The main inference concerns end-to-end documentation, not the
 mechanistic effects assigned to earlier papers.
+
+## Difficult-terrain mission and safety denominator (unfrozen)
+
+The candidate claim concerns **end-to-end humanoid inspection
+documentation in challenging access**, not a demonstration
+that the robot can walk on a nominal indoor map. Stratify
+planned paired manual/autonomous tasks by independently
+assessed accessibility: level route, stairs/steps, constrained
+passage and complex footing **only within a separately
+approved physical risk envelope**. The tested G1 EDU
+variant, fall zone, traction/support uncertainty and
+emergency takeover must pass the site safety gate first.
+Do not recruit humans or deliberately induce falls/slips
+as an informal field test.
+
+Predeclare each method's reachable required regions. An
+unsafe/unreachable region cannot be removed **after**
+assignment to improve noninferiority, nor can a human
+operator silently rescue the autonomous arm without
+counting intervention. Keep aborted missions, assistive
+takeover, omitted images, contact instability and safety
+stops in the assigned-method denominator and report
+feasible-coverage stratum and whole-mission success
+separately. A comparison over flat, supervised corridors
+must not be generalized to stairs, rubble or unverified terrain.
 
 ## Provenance and confirmation gate
 

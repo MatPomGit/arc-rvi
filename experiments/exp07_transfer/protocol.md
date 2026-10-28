@@ -1,6 +1,6 @@
 # Study 07: Closing the Sim-to-Real Gap in Autonomous Humanoid Visual Inspection
 
-Protocol version: 1.1.0
+Protocol version: 1.1.1
 
 Status: prospective design, not preregistered or frozen
 
@@ -42,6 +42,28 @@ Compare paired absolute errors with intervals clustered by physical session and 
 as required by the design. Freeze parameter identifiability checks, bounds, budget
 and held-out partition before confirmation. Requires a validated simulator, authorized
 robot access and reference measurements; fixtures cannot test transfer.
+
+## Terrain/contact sim-to-real validity gate (unfrozen)
+
+The flat, holonomic planar model cannot predict terrain
+interaction of a humanoid: foot sole contact and friction,
+slip, slope, stair ascent/descent, whole-body swept collision,
+torso/head motion and camera optical blur during gait.
+Before any terrain-transfer claim, independently validate
+the exact robot URDF and contact/dynamic model, foot
+geometry, camera-to-body transforms and sensor timestamps
+on a **separate authorized calibration dataset**.
+
+Declare a supported terrain envelope and reject
+out-of-envelope, unknown-traction or unsupported contact
+states as **unverified**; never turn model failure into
+zero-error prediction. Primary error remains based on
+held-out *physical inspection-valid coverage*.
+Report separately locomotion failure, pose error,
+contact-estimation discrepancy, real-camera rejection,
+missing reference and site intervention, with sessions
+as units. No physical data exist yet and neither
+an external G1 paper nor planar smoke tests validate G1 EDU transfer.
 
 ## Provenance and confirmation gate
 
