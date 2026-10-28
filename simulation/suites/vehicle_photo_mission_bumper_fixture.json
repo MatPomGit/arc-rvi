@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "execution_mode": "fixture_only",
   "mission_id": "synthetic-rear-bumper-001",
   "handoff_anchor_id": "staging_operator_1",
@@ -72,7 +72,8 @@
         "occlusion_fraction": 0.02,
         "framing_ok": true,
         "focus_ok": true,
-        "exposure_ok": true
+        "exposure_ok": true,
+        "observation_id": "qc-attempt-glare"
       }
     },
     {
@@ -89,7 +90,8 @@
         "occlusion_fraction": 0.02,
         "framing_ok": true,
         "focus_ok": true,
-        "exposure_ok": true
+        "exposure_ok": true,
+        "observation_id": "qc-attempt-reoriented"
       }
     },
     {
@@ -106,7 +108,8 @@
         "occlusion_fraction": 0.02,
         "framing_ok": true,
         "focus_ok": true,
-        "exposure_ok": true
+        "exposure_ok": true,
+        "observation_id": "qc-attempt-side"
       }
     }
   ],
@@ -114,6 +117,75 @@
     "anchor_id": "staging_operator_1",
     "status": "arrived",
     "safe_route_verified": true,
-    "operator_handoff_confirmed": true
-  }
+    "operator_handoff_confirmed": true,
+    "observation_id": "handoff-synthetic-rear-bumper-001"
+  },
+  "session_id": "synthetic-rear-bumper-001-session",
+  "policy_id": "fixture-planning-policy",
+  "observations": [
+    {
+      "id": "vision-frame-100",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "vehicle_detection",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000001"
+    },
+    {
+      "id": "parts-mask-100",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "part_detection",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000002"
+    },
+    {
+      "id": "synthetic-image-observation-attempt-glare",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "capture",
+      "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "id": "qc-attempt-glare",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "independent_quality",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000004",
+      "capture_observation_id": "synthetic-image-observation-attempt-glare",
+      "image_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "evaluator_id": "independent-annotator"
+    },
+    {
+      "id": "synthetic-image-observation-attempt-reoriented",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "capture",
+      "source_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "id": "qc-attempt-reoriented",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "independent_quality",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000006",
+      "capture_observation_id": "synthetic-image-observation-attempt-reoriented",
+      "image_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "evaluator_id": "independent-annotator"
+    },
+    {
+      "id": "synthetic-image-observation-attempt-side",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "capture",
+      "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "id": "qc-attempt-side",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "independent_quality",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000008",
+      "capture_observation_id": "synthetic-image-observation-attempt-side",
+      "image_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "evaluator_id": "independent-annotator"
+    },
+    {
+      "id": "handoff-synthetic-rear-bumper-001",
+      "session_id": "synthetic-rear-bumper-001-session",
+      "kind": "handoff",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000009",
+      "anchor_id": "staging_operator_1"
+    }
+  ]
 }
