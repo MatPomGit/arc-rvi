@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 import json
-from math import isfinite
+from math import atan, degrees, hypot, isfinite
 from pathlib import Path
 
 from .geometry import segment_distance
@@ -93,12 +93,146 @@ def _convex_hull(points: list[tuple[float, float]]) -> list[tuple[float, float]]
     return polygon
 
 
+
+def _point3(value: object, name: str) -> tuple[float, float, float]:
+    if not isinstance(value, list) or len(value) != 3:
+        raise ValueError(f"{name} must contain three coordinates")
+    return tuple(_number(v, name) for v in value)
+
+
+def _spatial_support(spec: dict) -> dict:
+    """Evaluate a 3D coplanar fixture via gravitational XY projection.
+
+    The resulting geometric candidate is NOT a contact-force, friction,
+    dynamics, articulated kinematics or robot-stability certification.
+    """
+    if set(spec) != {"schema_version", "terrain_class", "contacts",
+                     "com_xyz_m", "required_margin_m"}:
+        raise ValueError("invalid 3D support specification fields")
+    terrain = spec["terrain_class"]
+    if not isinstance(terrain, str) or terrain not in TERRAIN_CLASSES:
+        raise ValueError("unknown terrain_class")
+    contacts = spec["contacts"]
+    if not isinstance(contacts, list) or not 1 <= len(contacts) <= 2:
+        raise ValueError("expected one or two foot contact polygons")
+    com = _point3(spec["com_xyz_m"], "com_xyz_m")
+    margin = _number(spec["required_margin_m"], "required_margin_m",
+                     nonnegative=True)
+
+    spatial = []
+    projected = []
+    identifiers = []
+    for index, contact in enumerate(contacts):
+        if not isinstance(contact, dict) or set(contact) != {
+                "id", "footprint_xyz_m", "contact_state"}:
+            raise ValueError(f"contact {index} has invalid 3D fields")
+        vertices = contact["footprint_xyz_m"]
+        if not isinstance(vertices, list) or not 3 <= len(vertices) <= 16:
+            raise ValueError("3D footprint must have 3–16 vertices")
+        points = [_point3(v, "footprint_xyz_m") for v in vertices]
+        xy = [[v[0], v[1]] for v in points]
+        legacy = {
+            "id": contact["id"], "contact_state": contact["contact_state"],
+            "height_m": 0.0, "footprint_xy_m": xy,
+        }
+        _validated_patch(legacy, index)
+        identifiers.append(contact["id"])
+        spatial.extend(points)
+        projected.append(legacy)
+    if len(set(identifiers)) != len(identifiers):
+        raise ValueError("foot contact ids must be distinct")
+
+    # Reuse the v1 XY hull and signed-margin evaluator without changing its
+    # input/output contract. A vertical gravity line keeps XY coordinates.
+    baseline = inspect_static_support({
+        "schema_version": "1.0.0", "terrain_class": "flat_horizontal",
+        "contacts": projected, "com_projection_xy_m": list(com[:2]),
+        "required_margin_m": margin,
+    })
+    baseline.update({
+        "schema_version": "1.1.0",
+        "model": "coplanar_3d_static_gravity_projection_v1",
+        "terrain_class": terrain,
+        "support_plane_z_at_com_m": None,
+        "com_height_above_plane_m": None,
+        "plane_slope_deg": None,
+        "plane_residual_max_m": None,
+        "plane_tolerance_m": 1e-8,
+        "margin_basis": "horizontal_xy_projection_m",
+    })
+    if terrain not in (SUPPORTED_TERRAIN, "slope"):
+        baseline.update(status="terrain_model_unsupported",
+                        signed_support_margin_m=None,
+                        support_polygon_xy_m=None)
+        return baseline
+    if any(contact["contact_state"] == "unknown" for contact in contacts):
+        baseline.update(status="contact_state_unknown",
+                        signed_support_margin_m=None,
+                        support_polygon_xy_m=None)
+        return baseline
+
+    # Find a nondegenerate XY triangle on the first convex contact footprint.
+    first = spatial[0]
+    basis = None
+    for i in range(1, len(contacts[0]["footprint_xyz_m"]) - 1):
+        second, third = spatial[i], spatial[i + 1]
+        det = _cross(first[:2], second[:2], third[:2])
+        if abs(det) > 1e-12:
+            basis = (second, third, det)
+            break
+    if basis is None:
+        raise ValueError("no nondegenerate 3D support basis")
+    second, third, det = basis
+    dx1, dy1, dz1 = (second[j] - first[j] for j in range(3))
+    dx2, dy2, dz2 = (third[j] - first[j] for j in range(3))
+    a = (dz1 * dy2 - dy1 * dz2) / det
+    b = (dx1 * dz2 - dz1 * dx2) / det
+    slope = degrees(atan(hypot(a, b)))
+    if not all(isfinite(v) for v in (a, b, slope)):
+        raise ValueError("support plane exceeds finite geometric domain")
+    normal_scale = hypot(a, b, 1.0)
+    residuals = [
+        abs(point[2] - (first[2] + a * (point[0] - first[0])
+                        + b * (point[1] - first[1]))) / normal_scale
+        for point in spatial
+    ]
+    residual = max(residuals)
+    if not isfinite(residual):
+        raise ValueError("support plane residual is not finite")
+    baseline["plane_residual_max_m"] = residual
+    baseline["plane_slope_deg"] = slope
+    if residual > baseline["plane_tolerance_m"]:
+        baseline.update(status="noncoplanar_contact_unsupported",
+                        signed_support_margin_m=None,
+                        support_polygon_xy_m=None)
+        return baseline
+    if terrain == "flat_horizontal" and slope > 1e-8:
+        baseline.update(status="terrain_geometry_mismatch",
+                        signed_support_margin_m=None,
+                        support_polygon_xy_m=None)
+        return baseline
+
+    plane_z = first[2] + a * (com[0] - first[0]) + b * (com[1] - first[1])
+    clearance = com[2] - plane_z
+    if not isfinite(plane_z) or not isfinite(clearance):
+        raise ValueError("COM-plane intersection is not finite")
+    baseline["support_plane_z_at_com_m"] = plane_z
+    baseline["com_height_above_plane_m"] = clearance
+    if clearance <= 1e-10:
+        baseline.update(status="com_not_above_support_plane",
+                        signed_support_margin_m=None,
+                        support_polygon_xy_m=None)
+    return baseline
+
+
 def inspect_static_support(spec: dict) -> dict:
     """Audit a static horizontal support *proxy*, never dynamic safety.
 
     Contact labels denote synthetic/assumed support, not physically measured
     ground reaction, friction, verified G1 contacts or load distribution.
     """
+    if isinstance(spec, dict) and spec.get("schema_version") == "1.1.0":
+        return _spatial_support(spec)
     if not isinstance(spec, dict) or set(spec) != {
             "schema_version", "terrain_class", "contacts",
             "com_projection_xy_m", "required_margin_m"}:

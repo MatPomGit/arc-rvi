@@ -104,6 +104,43 @@ or margin**. No gait strategy or G1 EDU safety limit follows
 from this fixture. The sample footprints are arbitrary test
 geometry and **not** manufacturer foot dimensions.
 
+### Coplanar 3D contact geometry (schema 1.1.0)
+
+The same `rvi stance` CLI now accepts an **opt-in**, backward-compatible
+`schema_version: 1.1.0` JSON file with 3D foot-sole vertex positions
+(`footprint_xyz_m`), an assumed 3D centre-of-mass position
+(`com_xyz_m`) and the existing required horizontal margin.
+
+```bash
+rvi stance --spec simulation/scenarios/sloped_support_example.json --output results/sloped_support.json
+```
+
+The synthetic example uses two foot polygons lying on **one shared tilted
+plane** `z = 0.2*x`; it is not measured foot geometry or validated
+robot mass distribution. The code fits a plane from three noncollinear
+footprint vertices and verifies every other point lies within a
+**synthetic numeric tolerance of 1e-8 m**. The vertical gravity line
+through the supplied CoM intersects that plane at the same XY location.
+The report includes plane slope (degrees), maximum normal residual (m),
+support-plane height at the CoM projection (m), and geometric clearance
+of the supplied CoM above that plane (m). Its signed support margin is
+**the horizontal XY-projection distance in metres**, not a 3D
+on-surface distance, a zero-moment-point margin or a friction cone test.
+
+The 3D calculation only returns `geometric_candidate_only` when the
+coplanar-contact assumption, declared terrain geometry, CoM-above-plane
+condition and existing 2D geometric margin all pass. It reports
+`noncoplanar_contact_unsupported` for differently elevated or
+independently tilted contacts (including step geometries), and
+`terrain_geometry_mismatch` for tilted coordinates declared as
+`flat_horizontal`. `steps`, `loose`, `unknown` and
+`unknown` contact state remain unsupported. The old 1.0.0 fixture
+continues to reject `slope`; only schema 1.1.0 can geometrically
+represent a **single assumed sloping plane**. Unknown friction,
+nonrigid footing, sliding, force distribution, articulated motion and
+time-varying balance remain **unmodelled** and therefore no physical
+safe-traversal inference follows from a positive result.
+
 The model does not couple to the planar route planner or a robot
 adapter. Before difficult-terrain planning can use this check,
 develop independently verified articulated kinematics and body

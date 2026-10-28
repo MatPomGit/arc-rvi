@@ -75,6 +75,7 @@ implemented:
   - "Study P03/P04/P06 comparator-level evidence matrix: 2026 thesis abstract, 2024 IROS abstract, 2026 preprint abstract, Zhao 2026 publisher full-text method/results appraisal"
   - "Humanoid difficult-terrain prior-art appraisal, prospective contact/sensing scenario registry and P03-P08 terrain-inspection safety/endpoint gates; no contact physics or physical robot trial"
   - "Offline one/two-foot horizontal static support projection preflight with analytic geometry tests; synthetic fixture only, no dynamic/contact-force model"
+  - "Backward-compatible 3D coplanar slope support projection fixture, numeric coplanarity residual and fail-closed noncoplanar contacts; no locomotion safety claims"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -110,7 +111,7 @@ evidence_state:
   reviewed_literature_versions: four_supported_same_work_pairs_two_pending_1691_provisional_group_keys_not_eligible_studies
   manual_literature_screening: five_reviewed_1690_unreviewed_two_not_direct_two_contextual_one_direct_prior_art_not_prisma
   humanoid_terrain_inspection: design_only_contact_terrain_factors_not_implemented_planar_unsafe_for_whole_body_inference_no_physical_trials
-  static_support_preflight: flat_horizontal_assumed_foot_polygon_fixture_only_no_dynamic_balance_or_G1_validation
+  static_support_preflight: flat_horizontal_v1_and_coplanar_slope_3D_v1_1_fixtures_only_no_friction_kinematics_or_G1_validation
   comparator_literature_gates: P03_P04_P06_unfrozen_strong_baselines_with_independent_evaluator_no_ARC_empirical_validation
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:

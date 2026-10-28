@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.3
+Protocol version: 1.1.4
 
 Status: prospective design, not preregistered or frozen
 
@@ -55,6 +55,24 @@ humanoid dynamic support, contact-force, gait, IK or collision
 constraint. Do **not** include this score in an executed
 inspection-coverage result or imply it makes Unitree G1 EDU safe
 to traverse difficult ground. Full #25 acceptance remains open.
+
+## Coplanar 3D contact fixture upgrade (2026-10-28)
+
+The offline `rvi stance` preflight adds schema `1.1.0` for two
+assumed 3D foot-contact polygons on **one coplanar sloping surface**
+and an independently provided CoM position. Analytic checks now
+return a vertical-gravity XY-projection margin, plane slope and
+noncoplanarity residual. Differently elevated footholds, steps,
+deformable terrain and unknown friction remain outside this limited
+model. The numeric plane tolerance is a fixture precision check,
+**not** an allowable rough-terrain contact error for actual hardware.
+
+This is an incremental geometric prerequisite for #25 only, not
+inverse kinematics, whole-body collision, force closure or dynamic
+walking stability. The G1 EDU variant/sensor mount are still
+unverified, and no new physical trials or inspectable viewpoints are
+declared feasible. The primary joint-versus-decoupled inspection
+estimand is unchanged.
 
 ## Reference model preparation (exploratory)
 
