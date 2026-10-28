@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.2
+Protocol version: 1.1.3
 
 Status: prospective design, not preregistered or frozen
 
@@ -41,6 +41,20 @@ Cost-coverage curves are secondary and must use predeclared budgets.
 Freeze the camera model, collision margin, stability criterion, timing model and
 budget before confirmation. Validate each with analytic test scenes.
 Whole-body claims require a verified articulated model; planar fixtures are insufficient.
+
+## Initial static support proxy (fixture-only, 2026-10-28)
+
+The offline `rvi stance` command checks whether a synthetic
+centre-of-mass projection lies strictly inside the convex hull of
+one or two assumed horizontal foot contacts with a declared margin.
+It preserves source SHA-256 and explicitly rejects unsupported
+slopes, steps, loose/unknown terrain, noncoplanar foot heights and
+unknown contact state. This adds a regression-tested geometric
+**screening proxy** for a flat, stationary stance, not a
+humanoid dynamic support, contact-force, gait, IK or collision
+constraint. Do **not** include this score in an executed
+inspection-coverage result or imply it makes Unitree G1 EDU safe
+to traverse difficult ground. Full #25 acceptance remains open.
 
 ## Reference model preparation (exploratory)
 
