@@ -77,6 +77,7 @@ implemented:
   - "Offline one/two-foot horizontal static support projection preflight with analytic geometry tests; synthetic fixture only, no dynamic/contact-force model"
   - "Backward-compatible 3D coplanar slope support projection fixture, numeric coplanarity residual and fail-closed noncoplanar contacts; no locomotion safety claims"
   - "Offline configured URDF forward kinematics with finite complete joint states, bounded local SHA-pinned fixtures, analytic revolute/prismatic regression; not IK or collision verification"
+  - "Static FK-attached collision sphere/AABB and explicit self-pair proxy preflight with SHA provenance; no full-body or swept-motion certification"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -114,6 +115,7 @@ evidence_state:
   humanoid_terrain_inspection: design_only_contact_terrain_factors_not_implemented_planar_unsafe_for_whole_body_inference_no_physical_trials
   static_support_preflight: flat_horizontal_v1_and_coplanar_slope_3D_v1_1_fixtures_only_no_friction_kinematics_or_G1_validation
   articulated_fk_preflight: configured_URDF_revolute_continuous_prismatic_fixture_only_no_ik_collision_or_G1_hardware_validation
+  fk_collision_proxy: static_sphere_AABB_and_explicit_self_pairs_only_no_full_body_or_swept_collision_validation
   comparator_literature_gates: P03_P04_P06_unfrozen_strong_baselines_with_independent_evaluator_no_ARC_empirical_validation
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
