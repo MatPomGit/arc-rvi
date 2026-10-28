@@ -108,3 +108,33 @@ therefore avoid a broad novelty claim for physical NBV coverage; it should
 compare a prespecified unknown-surface, observation-only policy on matched
 budgets and separated hidden evaluator geometry. Do not double-count P03
 planning outcomes as independent P04 evidence.
+
+## Secondary comparator registration: uncertain depth and reflective surfaces (2026-10-28, unfrozen)
+
+The [source-row-grounded review ledger](../../research/literature/secondary_comparator_decisions.json)
+adds two important contemporary method families:
+[FRA-NBV, Preziosa et al. 2026](https://doi.org/10.1109/LRA.2026.3728374)
+(replanning incidence to recover reflection-induced missing depth without
+an a priori object mesh), and
+[RASP, Liu et al. 2025](https://doi.org/10.1109/TASE.2025.3604455)
+(joint active viewpoint-sequence planning and geometric depth completion).
+Their **publisher abstracts** establish these methods, but not a reusable
+matched implementation or a verified P04 effect size.
+
+The intended conditional ablations must separate at least:
+(i) no recovery, (ii) geometry/frontier NBV, (iii) missing-depth-/reflectivity-
+aware reacquisition on applicable reflective scenes, and (iv) joint
+viewpoint-plus-depth-completion where a supported implementation exists.
+Each receives the same scene-family assignment, candidate observations,
+action/camera-time budget and hidden reference surface. Log policy-visible
+depth loss separately from evaluator-only true surface visibility.
+Non-reflective tasks must not be excluded after observing failures.
+
+A published method that cannot be implemented from inspected source methods
+must be labelled **unavailable comparator** or **explicit surrogate**;
+do not assign it fabricated performance. The
+[Shahid et al. measurement paper](https://doi.org/10.1016/j.rcim.2018.11.009)
+is a *contextual coverage-construct comparator*, not an NBV baseline:
+surface treatment measurement and independently inspected unknown-surface
+area are different estimands. Report P04 endpoint overlap with P06 and
+prohibit reusing their observations as independent confirmation.
