@@ -68,7 +68,7 @@ implemented:
   - "Offline 79-row source DOI/numbering inventory with deterministic provenance and four manual external spot checks"
   - "Cross-study stable DOI candidate catalogue and 22 externally checked bibliographic metadata records; preserves original draft citation mismatches"
   - "Critical prior-art appraisal of 12 P02-P08 candidate works with preprint/simulation/physical-evidence separation"
-  - "Offline audit of contributor-supplied eight CSV exports (1907 rows, 1695 provisional keys), with source hashes and prospective P01-P08 synthesis"
+  - "Offline audit of contributor-supplied eight CSV exports (1907 rows, 1695 provisional keys), with source hashes and prospective P01-P08 synthesis"\n  - "HTML-aware source title normalization, seven row-traceable DOI/title identity groups and two narrowly scoped external relevance checks"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -100,7 +100,7 @@ evidence_state:
   physical_measurements: absent
   manuscripts: templates_not_results
   literature_and_novelty_review: doi_keyed_77_candidate_works_22_reviewed_metadata_49_unverified_doi_6_unresolved_no_doi_not_systematic_review
-  supplemental_literature_exports: 1907_mention_1695_provisional_key_offline_audit_436_screening_flags_not_systematic_review
+  supplemental_literature_exports: 1907_mention_1695_provisional_key_435_screening_flags_7_identity_conflict_groups_two_initial_external_checks_not_systematic_review
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:
   - corresponding_main_commit: "952e0344bd1eaab332570e373ba19eb2d5b42298"

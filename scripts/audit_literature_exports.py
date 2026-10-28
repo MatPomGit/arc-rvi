@@ -5,6 +5,7 @@ import argparse
 from collections import Counter, defaultdict
 import csv
 import hashlib
+from html import unescape
 import io
 import json
 from pathlib import Path
@@ -32,7 +33,8 @@ def normalized_doi(value: str) -> str:
 
 
 def normalized_title(value: str) -> str:
-    plain = unicodedata.normalize("NFKD", value.replace("ł", "l").replace("Ł", "L")).encode("ascii", "ignore").decode().lower()
+    cleaned = re.sub(r"<[^>]*>", "", unescape(value))
+    plain = unicodedata.normalize("NFKD", cleaned.replace("ł", "l").replace("Ł", "L")).encode("ascii", "ignore").decode().lower()
     return re.sub(r"[^a-z0-9]+", "", plain)
 
 
@@ -43,6 +45,8 @@ def audit(archive: Path) -> tuple[dict, list[dict], list[dict]]:
     groups = defaultdict(list)
     doi_titles = defaultdict(set)
     title_dois = defaultdict(set)
+    doi_records = defaultdict(list)
+    title_records = defaultdict(list)
     with ZipFile(archive) as source:
         for study, filename in STUDIES.items():
             raw = source.read(filename)
@@ -81,8 +85,10 @@ def audit(archive: Path) -> tuple[dict, list[dict], list[dict]]:
                 groups[key].append(record)
                 if valid_doi:
                     doi_titles[doi].add(title_key)
+                    doi_records[doi].append(record)
                     if title_key:
                         title_dois[title_key].add(doi)
+                        title_records[title_key].append(record)
     candidates = []
     screening = []
     for key in sorted(groups):
@@ -113,6 +119,25 @@ def audit(archive: Path) -> tuple[dict, list[dict], list[dict]]:
         candidates.append(item)
         if flags:
             screening.append(item)
+    conflicts = []
+    for doi, records in sorted(doi_records.items()):
+        variants = {normalized_title(record["title"]) for record in records}
+        if len(variants) > 1:
+            conflicts.append({
+                "conflict_type": "one_doi_multiple_titles", "key": doi,
+                "dois": [doi], "titles": sorted({r["title"] for r in records}),
+                "source_records": sorted({f'{r["source_file"]}#{r["source_record"]}' for r in records}),
+                "review_status": "pending",
+            })
+    for title, dois in sorted(title_dois.items()):
+        if len(dois) > 1:
+            records = title_records[title]
+            conflicts.append({
+                "conflict_type": "one_normalized_title_multiple_dois", "key": title,
+                "dois": sorted(dois), "titles": sorted({r["title"] for r in records}),
+                "source_records": sorted({f'{r["source_file"]}#{r["source_record"]}' for r in records}),
+                "review_status": "pending",
+            })
     report = {
         "scope": "Eight selected CSV exports; no DOI resolution, full-text checking or eligibility screening",
         "source_archive_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
@@ -124,6 +149,7 @@ def audit(archive: Path) -> tuple[dict, list[dict], list[dict]]:
         "unique_valid_doi_strings": len(doi_titles),
         "doi_with_conflicting_titles": sum(len(titles) > 1 for titles in doi_titles.values()),
         "titles_with_multiple_dois": sum(len(dois) > 1 for dois in title_dois.values()),
+        "identifier_conflicts": conflicts,
         "missing_fields": dict(sorted(issues.items())),
         "screening_queue_candidates": len(screening),
         "limitation": "Candidate keys are not verified unique publications; preprint/journal pairs and false matches require review",
@@ -138,11 +164,15 @@ def main() -> None:
     args = parser.parse_args()
     report, candidates, screening = audit(args.archive)
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    names = ["summary.json", "work_candidates.csv", "screening_queue.csv"]
+    names = ["summary.json", "work_candidates.csv", "screening_queue.csv",
+             "identifier_conflicts.json"]
     if any((args.output_dir / name).exists() for name in names):
         parser.error("output exists; choose a new output directory")
     (args.output_dir / names[0]).write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (args.output_dir / names[3]).write_text(
+        json.dumps(report["identifier_conflicts"], ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8")
     columns = list(candidates[0])
     for name, records in [(names[1], candidates), (names[2], screening)]:
         with (args.output_dir / name).open("w", encoding="utf-8", newline="") as file:
