@@ -281,3 +281,25 @@ and unreached-view counts in the originally assigned denominator; and
 (e) independent scene-family and terrain-stratum partitions.
 A geometric-only or floating-base proxy is **not** demonstrated
 feasible bipedal gait. These are protocol requirements, not completed tests.
+
+## Car inspection and operator return reachability (prospective, 2026-10-28)
+
+The [primary vehicle mission contract](../../docs/vehicle-inspection-missions.md)
+introduces separate **outbound, photographic and return-to-human** route
+segments. Camera viewpoints around a parked car must be feasible for
+the *actual* G1 EDU body and camera payload, not only a circular base path.
+The task may be to photograph a bumper only, where whole-car
+circumnavigation is unnecessary. A feasible shot must satisfy component
+visibility, obstruction clearance, joint/camera limits, bipedal support
+and safe human/vehicle separation; the original required-shot denominator
+is retained even when no stance can reach a view.
+
+Proposed crossed conditions: car orientation and parking density,
+narrow passages, vehicle height and bumper curvature, camera mounting
+geometry, glare-rejected candidate pose, human handoff location and
+route budget. Compare decoupled geometric viewpoint then walking route
+against joint feasible photographic + safe-return planning, at identical
+candidate poses and mission deadlines. A plan with no viable return
+reserve must be rejected; do not optimise outbound coverage by silently
+discarding return safety. No actual collision, fall or G1 EDU locomotion
+envelope is presently validated.
