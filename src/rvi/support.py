@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 import json
-from math import hypot, isfinite
+from math import isfinite
 from pathlib import Path
 
 from .geometry import segment_distance
@@ -17,7 +17,10 @@ TERRAIN_CLASSES = {SUPPORTED_TERRAIN, "steps", "slope", "loose", "unknown"}
 def _number(value: object, name: str, *, nonnegative: bool = False) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ValueError(f"{name} must be a finite number")
-    result = float(value)
+    try:
+        result = float(value)
+    except (OverflowError, ValueError) as exc:
+        raise ValueError(f"{name} is outside finite numeric range") from exc
     if not isfinite(result) or (nonnegative and result < 0):
         raise ValueError(f"{name} must be finite and within domain")
     return result
@@ -171,8 +174,7 @@ def inspect_support_file(path: Path) -> dict:
     if len(raw) > MAX_SPEC_BYTES:
         raise ValueError("support input exceeds byte limit")
     try:
-        data = json.loads(raw.decode("utf-8"), parse_constant=lambda c: (
-            _reject_constant(c)))
+        data = json.loads(raw.decode("utf-8"), parse_constant=_reject_constant)
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise ValueError("invalid UTF-8 JSON support input") from exc
     result = inspect_static_support(data)
