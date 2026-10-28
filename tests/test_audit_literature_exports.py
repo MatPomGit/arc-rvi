@@ -17,6 +17,8 @@ class LiteratureExportAuditTests(unittest.TestCase):
     def test_identifier_normalization(self) -> None:
         self.assertEqual(literature.normalized_doi("https://doi.org/10.1007/ABC"), "10.1007/abc")
         self.assertEqual(literature.normalized_title("Zażółć Gęślą"), "zazolcgesla")
+        self.assertEqual(literature.normalized_title("Inspection<sup>*</sup>"),
+                         literature.normalized_title("Inspection*"))
 
     def test_exact_doi_dedup_and_missing_fields(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -43,6 +45,34 @@ class LiteratureExportAuditTests(unittest.TestCase):
             self.assertEqual(len(works), 8)
             self.assertEqual(len(queue), 1)
             self.assertEqual(sum(w["mentions"] for w in works), 9)
+
+    def test_identifier_collision_ledger_keeps_original_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            archive = Path(temp) / "collisions.zip"
+            with ZipFile(archive, "w") as sink:
+                for idx, filename in enumerate(literature.STUDIES.values(), 1):
+                    body = io.StringIO()
+                    writer = csv.DictWriter(body, fieldnames=sorted(literature.REQUIRED))
+                    writer.writeheader()
+                    record = {"Paper Title": f"Inspection Paper {idx}",
+                              "DOI": f"10.1234/p{idx}", "Publication Year": "2026",
+                              "Author Names": "Author", "Abstract": "Abstract",
+                              "Paper Link": "https://example.org"}
+                    if idx == 3:
+                        record["Paper Title"] = "Inspection Paper 1"
+                    writer.writerow(record)
+                    if idx == 1:
+                        writer.writerow({**record, "Paper Title": "Inspection Paper 1<sup>*</sup>"})
+                    if idx == 2:
+                        writer.writerow({**record, "Paper Title": "Another research"})
+                    sink.writestr(filename, body.getvalue())
+            report, _, _ = literature.audit(archive)
+            conflicts = report["identifier_conflicts"]
+            self.assertEqual(report["doi_with_conflicting_titles"], 1)
+            self.assertEqual(report["titles_with_multiple_dois"], 1)
+            self.assertEqual(len(conflicts), 2)
+            self.assertTrue(all(c["review_status"] == "pending" for c in conflicts))
+            self.assertTrue(all(c["source_records"] for c in conflicts))
 
     def test_reject_missing_columns(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
