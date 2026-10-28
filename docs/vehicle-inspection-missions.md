@@ -41,6 +41,8 @@ zone, local hazard stopping and emergency takeover are independent,
 hardware-verified safety gates. A parked car and a person's proximity
 create separate collision/damage risks.
 
+An initial [observed-pixel colour-cue baseline](vehicle-colour-cues.md) now processes **provided car-body masks** to identify plausible red/green/blue/yellow candidates. It is strictly advisory: a single matching colour does **not** establish the intended vehicle identity, while two matching candidates must trigger clarification. Automatic car/part detection, multimodal grounding and cross-frame re-identification remain pending.
+
 ## Instruction resolution and target binding
 
 The request must retain the original human utterance and an auditable

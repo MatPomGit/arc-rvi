@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "request": {
+    "utterance_id": "synthetic-utterance-red-car",
+    "observation_frame_id": "synthetic-camera-frame-001",
+    "requested_colour": "red"
+  },
+  "image": {
+    "path": "vehicle_colour_two_cars.ppm",
+    "sha256": "a913e5caf020962bcd4cf9be6d88e921e5c934beb5f5dfb67d21582049ab5124"
+  },
+  "policy": {
+    "minimum_chroma": 30,
+    "minimum_intensity": 40,
+    "maximum_intensity": 245,
+    "minimum_mask_pixels": 4,
+    "minimum_usable_fraction": 0.5,
+    "minimum_matching_fraction": 0.8
+  },
+  "candidates": [
+    {
+      "vehicle_instance_id": "synthetic-left-car",
+      "mask_annotation_id": "synthetic-annot-left",
+      "annotation_origin": "fixture_only",
+      "car_body_mask": {
+        "path": "vehicle_colour_left_mask.pgm",
+        "sha256": "e3b402a53c36b79ac4bbec9ca2ebda9562058e65ef2f766a31c589e66b82bd50"
+      }
+    },
+    {
+      "vehicle_instance_id": "synthetic-right-car",
+      "mask_annotation_id": "synthetic-annot-right",
+      "annotation_origin": "fixture_only",
+      "car_body_mask": {
+        "path": "vehicle_colour_right_mask.pgm",
+        "sha256": "2aee8ddd59b6b81314ac1fd5b3dde889c44b23259a4556d94e866c4219f99b83"
+      }
+    }
+  ]
+}
