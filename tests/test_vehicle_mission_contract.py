@@ -172,7 +172,10 @@ class VehicleMissionTests(unittest.TestCase):
         bad["photo_attempts"][1]["part"] = "front_bumper"
         r = assess_mission(bad)
         self.assertIn("wrong_part_or_view", r["rejected_attempts"][1]["reasons"])
-        self.assertEqual(r["verdict"], "partial_coverage")
+        self.assertIn("capture_not_bound_to_matching_source", r["rejected_attempts"][1]["reasons"])
+        # A capture that contradicts its source-linked part metadata is an
+        # invalid trace, not merely a missed shot.
+        self.assertEqual(r["verdict"], "invalid_trace")
 
     def test_duplicate_photo_not_allowed_to_satisfy_multiple_views(self):
         bad = deepcopy(self.whole)
