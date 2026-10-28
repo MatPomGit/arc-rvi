@@ -1,5 +1,7 @@
 # Architecture
 
+For the primary operational scenario, see [commanded car / bumper photography and return-to-human](vehicle-inspection-missions.md). It specifies a fail-closed target/part-resolution contract, reflective car-body image acceptance and an operator-verified return. The implemented evaluator is **offline fixture-only**; no physical robot motion or sensor is controlled.
+
 The shared core contains neutral algorithms and data contracts. A future
 orchestrator will connect target localization, navigation, viewpoint selection,
 acquisition, quality control and evidence generation via one adapter boundary.

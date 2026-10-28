@@ -9,6 +9,9 @@ See `config/robot.yaml` and
 [hardware safety requirements](../docs/safety.md).
 
 Eight prospective studies share infrastructure but answer different questions.
+
+**Shared application scenario:** commanded vehicle / component photography and verified return to the human. [The end-to-end mission contract](../docs/vehicle-inspection-missions.md) now unifies experiment inputs, part-scoped and full-vehicle shot-list requirements, reflective-paint quality gates, return-to-person safety and objective completeness. This cross-paper use case does not change the independently scoped P01–P08 estimands or supply new empirical results.
+
 Protocols are design drafts. Numerical thresholds, sample sizes, implemented methods
 and confirmation partitions must be frozen before confirmatory collection.
 

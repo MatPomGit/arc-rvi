@@ -2,6 +2,9 @@
 
 Independent research software for autonomous perception, mobile inspection, viewpoint planning and reproducible image acquisition. The initial platform of interest is a humanoid robot, but algorithms and experiments should remain hardware- and object-agnostic.
 
+**Primary concrete use case (2026-10-28):** a human instructs Unitree G1 EDU to photograph a specifically identified **car**, or a single named part such as the **rear bumper**; the robot must localise the correct car and part, satisfy an authorised required-shot checklist despite specular reflections, and return for an operator-confirmed handoff. See the [mission specification and offline fail-closed evaluator](docs/vehicle-inspection-missions.md). This does not imply speech/vision/robot integration has been implemented; its example logs are synthetic.
+
+
 ## Scope
 
 - Target identification and localization in multi-object scenes.

@@ -150,3 +150,31 @@ Report the approved-terrain envelope and deviations; no claim of
 noninferiority, safe G1 EDU autonomous operation or novelty of humanoid
 inspection is warranted until physical approvals, preregistered margin,
 frozen analysis and independent session data exist.
+
+## Primary end-to-end car-photo / bumper-photo task (prospective, 2026-10-28)
+
+The [commanded mission specification](../../docs/vehicle-inspection-missions.md)
+defines the intended human-to-humanoid workflow: spoken vehicle
+description -> correct car instance -> requested front/rear bumper
+when applicable -> approved multi-view capture with glare rejection
+and bounded reacquisition -> independently checked required images
+-> safe return to the originating human with positive handoff.
+
+In addition to the existing paired valid-required-region *documentation*
+estimand, **report a separate conjunctive whole-mission endpoint**:
+correct target and part, all preassigned required shots accepted, no
+unapproved intervention, and verified safe return/handoff. Preserve the
+original randomised-method denominator. An aborted mission, photograph
+of another car, unacceptable specular ROI, missing view or arrival
+at an empty starting waypoint makes *whole-mission success = false*.
+Do not confuse counts of camera frames with required region coverage,
+nor odometric return with human recontact.
+
+Include held-out vehicle/paint families, one/two plausible target
+cars, target absence and component-only orders; disclose whether a
+human clarification was required. Keep human operator presence,
+bystander/vehicle privacy, fall separation, parked-car clearance
+and all manual takeovers inside the preregistered physical operating
+envelope. Existing P08 noninferiority margin is **not altered** by this
+unfrozen secondary whole-mission endpoint; it must be frozen separately
+before physical trials.

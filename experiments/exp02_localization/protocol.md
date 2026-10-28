@@ -120,3 +120,31 @@ re-identification are already researched. P02 must validate the
 held-out object/session identity truth and calibrated poses. The current
 8×8 simulated textures and uncalibrated PGM input do not meet that gate.
 See [prior-art appraisal](../../docs/prior-art-critical.md).
+
+## Primary vehicle-instruction grounding task (prospective, 2026-10-28)
+
+The project reference scenario is a person commanding the bipedal robot
+to photograph **a particular car**, or only its **front/rear bumper**,
+before returning. See the [mission contract](../../docs/vehicle-inspection-missions.md).
+P02 now explicitly includes a two-stage decision: (i) referential grounding
+of the intended *vehicle instance* among several parked or visually similar
+cars and (ii) part-to-parent matching for an instructed component.
+"Front" and "rear" refer to the vehicle's intrinsic coordinate frame,
+not to the robot's current heading.
+
+Prospective matched strata: one unambiguous vehicle, two near-identical
+vehicles, target absent, occluded/partially visible target, part absent,
+left/right spatial language, human pointing or spoken clarification.
+Keep independent car-family, parking-layout and recording-session splits.
+A model's confidence alone does **not** authorize selecting an ambiguous
+vehicle; compare confidence calibration, explicit abstention and
+clarification. Score wrong-car selection as a failure even if later images
+have adequate sharpness. Wrong-part, wrong-parent and misunderstood
+front/rear requests are separate errors. The two-stage system must be
+compared against visual-only, spatial-only and human-clarification variants.
+
+[LEGS-POMDP (HRI 2026)](https://arxiv.org/abs/2603.04705) and
+[LINGO-Space (AAAI 2024)](https://doi.org/10.1609/aaai.v38i9.28898)
+establish ambiguity-aware language grounding prior art. A new P02 claim
+requires independent *vehicle/part* evidence, not "first language-guided
+robot search". The current grayscale 8x8 proxy cannot evaluate this task.

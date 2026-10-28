@@ -74,3 +74,22 @@ protocol release. No confirmation data may be used to tune these choices.
 
 Manuscript: [paper 05](../../papers/paper05/manuscript.tex).
 Publication boundaries: [research program](../README.md).
+
+## Vehicle-part return-visit repeatability (prospective, 2026-10-28)
+
+An instruction to photograph a bumper permits repeated viewpoint
+acquisition after glare or motion-blur rejection. This creates a
+specific P05 question: does a gait-aware settling/capture policy
+reproduce the **camera-to-same-car-part transform** across visits
+better than fixed-delay capture at matched time? See the
+[vehicle mission contract](../../docs/vehicle-inspection-missions.md).
+
+Predeclare the car and part instance ID and vehicle frame. Use a
+calibrated external reference for camera pose at the exposure time;
+robot-base odometry alone is insufficient. Sample independent vehicle
+instances, bumper surface types, approach paths, parking slopes,
+stance/settling profiles and sessions. Record approach failures and
+loss of parent-vehicle identity. Photometric defect visibility
+remains P06's endpoint; P05 concerns pose error, not proof that an image
+with the same apparent crop is inspection-valid. No physical G1 EDU
+repeat-visit data presently exist.

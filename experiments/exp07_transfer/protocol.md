@@ -86,3 +86,21 @@ physical reference measurements on frozen held-out object/session units.
 This is an extension of the existing predictive-transfer endpoint, not
 a claim that “full calibration” works or that measured physical sessions
 have already been collected.
+
+## Vehicle-paint and lighting domain shift (prospective, 2026-10-28)
+
+The [vehicle-mission protocol](../../docs/vehicle-inspection-missions.md)
+requires an explicit transfer question: does synthetic predicted
+glare/visibility at planned car/bumper poses correspond to independently
+measured photographs of reflective automotive paint under varying
+sunlight, overcast conditions, garage lighting, wetness, trim/glass
+materials and paint colours? Freeze material and illumination families,
+lens/exposure/polarization state and actual robot camera configuration.
+
+Report independent ROI saturation/defect-visibility prediction error
+and calibration on held-out physical vehicles, **separately** from
+P03 feasibility, P04 coverage and P06 bounded recovery treatment
+effects. A BRDF simulator and synthetic data cannot establish a
+physical transfer result or a valid G1 EDU terrain/actuator model.
+Hardware calibration, ground-truth region annotation and sensor
+synchronisation are mandatory physical gates.
