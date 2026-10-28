@@ -104,6 +104,18 @@ This is not inverse kinematics, stability, collision, gait, hardware
 calibration or physical authorization. The original vendor URDF/meshes and
 their license remain with the upstream source, outside this repository.
 
+A separate offline **synthetic static foot-support preflight** is
+available through `rvi stance --spec simulation/scenarios/static_support_example.json
+--output results/static_support.json`. It uses assumed horizontal contact
+polygons and centre-of-mass projection only, not actual robot mass modelling
+or whole-body kinematics. Its sole positive status
+`geometric_candidate_only` means a polygon projection passes a
+caller-declared boundary margin. Steps, slopes, loose/unknown terrain,
+unknown contacts and different foot heights are unsupported or unverified.
+This is a bounded first contribution to issue #25, **not** a dynamic
+bipedal stability or G1 EDU inspection-validity oracle; see
+[simulation](simulation.md).
+
 Current implementation: deterministic planar greedy viewpoint baseline, mission
 state guards, threshold decisions on supplied measurements, file hashing, paired fixture
 benchmarking and a planar geometric simulator. The simulator has a separate observation
