@@ -23,8 +23,8 @@ The other 147 CSV exports in the same archive may be intermediate searches or ov
 - **1907** exported row mentions; **1695** provisional candidate keys under a deterministic DOI-first, normalized-title-fallback grouping; **212** duplicate row mentions by that rule.
 - **1300** different syntactically plausible DOI strings. DOI format checks **do not resolve the DOI or verify the article**.
 - Missing/invalid fields among 1907 row mentions: **414** DOI; **207** year; **274** abstract; **130** author field; **2** title.
-- **2** DOI keys map to differing normalized titles; **6** normalized titles map to more than one DOI. Preprint/publisher versions and erroneous metadata must be resolved manually. Do not automatically merge those six title cases.
-- **436** candidate keys carry at least one of the generator's screening flags (missing DOI, year, title disagreement or potential preprint/publisher version). This is a **triage queue**, not a confirmed number of erroneous articles.
+- **1** DOI key maps to differing normalized title strings after HTML markup removal; **6** normalized titles map to more than one DOI. A previous count of two DOI/title collisions included one spurious HTML superscript artifact. Preprint/publisher versions and erroneous metadata must be resolved manually. Do not automatically merge those six title cases.
+- **435** candidate keys carry at least one of the generator's screening flags (missing DOI, year, title disagreement or potential preprint/publisher version). This is a **triage queue**, not a confirmed number of erroneous articles.
 
 The **1695 is not a count of unique publications**: (i) different DOIs can refer to versions of one study; (ii) the same title can refer to different studies; (iii) DOI-free entries can overlap DOI-bearing entries; (iv) eligibility and publication status were not verified. The older narrative's **1908** and **240** are source claims and cannot be taken as reconciled PRISMA stages. The separate matrix audit covers **79** detailed table mentions (77 candidate work keys) and previously recorded **64** local bracket-reference DOI mismatches. These datasets and counting rules are distinct.
 
@@ -47,6 +47,6 @@ With the user-provided ZIP available locally, run:
 
     python scripts/audit_literature_exports.py /path/to/agent-artifacts-zip_robo.zip --output-dir /tmp/rvi-literature-20261028
 
-Outputs are a machine-readable summary JSON, a candidate CSV with source-record locations, and a flagged screening queue. The script does not connect to publishers, assert that abstracts were actually read, or upgrade the 79-row curated metadata catalogue. Keep paper-to-claim links and research results outside this inventory until separately assessed.
+Outputs are a machine-readable summary JSON, a candidate CSV with source-record locations, and a flagged screening queue, and a row-level `identifier_conflicts.json` containing seven unresolved DOI/title identity groups. The script does not connect to publishers, assert that abstracts were actually read, or upgrade the 79-row curated metadata catalogue. Keep paper-to-claim links and research results outside this inventory until separately assessed.
 
-Follow the [critical synthesis](critical_synthesis_2026-10-28.md), [experiment-specific evidence map](evidence_to_experiments_2026-10-28.md), existing [DOI metadata manifest](verified_doi_metadata.json), and [canonical editorial gate](../../docs/literature.md).
+The [source-row collision and initial relevance review](identifier_review_2026-10-28.md) records the first external checks. All six title-to-multiple-DOI cases are still potential work-version matches, not automatically merged publications.\n\nFollow the [critical synthesis](critical_synthesis_2026-10-28.md), [experiment-specific evidence map](evidence_to_experiments_2026-10-28.md), existing [DOI metadata manifest](verified_doi_metadata.json), and [canonical editorial gate](../../docs/literature.md).
