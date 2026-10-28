@@ -1,6 +1,6 @@
 # Study 05: Influence of Humanoid Locomotion and Camera Pose on Visual Acquisition Repeatability
 
-Protocol version: 1.1.0
+Protocol version: 1.1.1
 
 Status: prospective design, not preregistered or frozen
 
@@ -43,6 +43,26 @@ a mixed-effects sensitivity model may include object and session effects.
 Freeze reference resolution, trigger thresholds, settling delay, repeats and session
 count after a separate pilot. Simulation can test noise models but cannot replace
 physical repeatability measurements.
+
+## Terrain-induced gait and camera vibration (unfrozen)
+
+Repeat acquisition after **separate traversals** through different
+terrain-support conditions, not just repeatable stationary arm
+poses. Cross approach direction and stance (level, incline,
+narrow support) with time since foot placement and observed
+torso/head motion. Record contact changes, slip/stance warnings,
+foot-placement variability, base/body pose, camera motion and
+image timestamps when available from **independently calibrated**
+references. Camera pose must be measured at the **exposure
+instant**, not inferred from a static nominal URDF transform.
+
+Do not treat steps, video frames or strides as independent
+sessions. Interventions, unreachable stances, unstable approaches
+and failed captures remain denominators alongside the conditional
+pose-RMS endpoint; an abort cannot be used to make a method appear
+more precise. Hardware tests require signed site/robot safety
+approval and appropriate controlled support, never ad hoc
+slippery/rubble tests.
 
 ## Provenance and confirmation gate
 
