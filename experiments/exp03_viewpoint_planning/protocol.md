@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.6
+Protocol version: 1.1.7
 
 Status: prospective design, not preregistered or frozen
 
@@ -111,6 +111,25 @@ terrain/contact dynamics, robot-specific collision mesh or real
 G1 EDU calibration is present. Keep full-body collision and
 locomotion feasibility as blocking P03 evidence gates until
 independently verified against the delivered articulated model.
+
+## FK waypoint and inter-sample collision preflight (2026-10-28)
+
+The fixture-only `rvi robot-model --trajectory` extension
+evaluates the explicit proxy collisions at 2–32 **provided**
+joint configurations. An additional conservative test checks
+straight centre chords of each link-attached sphere against
+inflated static AABB obstacles. It can expose a missed obstacle
+between two individually clear endpoints and retains every
+waypoint/segment as a diagnostic.
+
+**A clear chord result does not establish safety along real
+joint motion**. For instance, a revolute joint can sweep its
+camera along an arc through an obstacle even when the segment
+joining the two endpoint camera positions misses the obstacle.
+Continuous articulated swept-volume checks, verified complete
+collision geometry and contact/balance dynamics remain missing.
+Do not remove failures or score planned candidate viewpoints
+as inspection-valid acquisitions based on these diagnostics.
 
 ## Reference model preparation (exploratory)
 
