@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.1
+Protocol version: 1.1.2
 
 Status: prospective design, not preregistered or frozen
 
@@ -57,6 +57,38 @@ The source examples do **not** prove functioning G1 ROS 2 controllers.
 It does **not** implement articulated
 collision/reachability, full forward/inverse kinematics, stability or
 actual G1 physical verification. Issue #25 remains open.
+
+## Difficult-terrain humanoid feasibility stratum (unfrozen)
+
+The mobile platform is a **bipedal humanoid**, not a holonomic circle.
+A view candidate is provisionally executable only if a continuous
+**whole-body** trajectory can reach and maintain an appropriate stance:
+valid foot support, contact/friction feasibility, full-body/self-collision
+clearance, reachable camera pose, stable turning and a feasible escape
+route, within the time budget. `unknown_contact`, unavailable contact
+reference and out-of-model geometry mean **unverified feasibility**, not
+safe traversal. A pose reached by teleoperation, when no equivalent
+autonomous control exists, is not autonomous evidence.
+
+Cross terrain layout (level, stairs/raised edges, inclined or loose
+support, cluttered narrow passage, sparse support) with target-view
+height, lighting and traversability sensing error **only within the
+independently validated model envelope**. Pair all methods on identical
+initial stance and observations. Compare geometric routing, contact-aware
+routing, imaging-quality-aware routing and the coupled version, retaining
+the primary joint-versus-decoupled estimand already defined above.
+Record unsuccessful foot contacts, slip warnings, planner failure,
+safety abort, camera obstruction and omitted/blurred frames separately;
+a planned image counts zero until actually captured and accepted.
+
+The selected Unitree G1 EDU needs verified joint/foot dimensions,
+contact model, actual camera mounting, controller interface, and
+external pose/terrain reference before such claims. Other published
+G1 rough-terrain policies **do not** establish those parameters.
+The current planar simulator does not implement these constraints;
+do not execute a confirmatory comparison with synthetic terrain
+labels. See [terrain registry](../../docs/population.md) and
+[hardware safety](../../docs/safety.md).
 
 ## Provenance and confirmation gate
 
