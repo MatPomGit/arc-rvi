@@ -56,6 +56,50 @@ inspectable, not blinded or preregistered; **do not treat them as
 confirmatory evidence**. A separate frozen holdout release and cluster-level
 factor analysis are still required.
 
+## Prospective difficult-terrain factor registry (P03/P04/P05/P07/P08)
+
+**Design only, 2026-10-28.** None of these factors is implemented
+by `sampled_factorial_v1`, the existing planar simulator, or a
+verified Unitree G1 EDU locomotion/vision adapter. A factor is
+`unsupported` until its geometry, sensor observations and evaluator
+are implemented and independently tested; do not add pseudo-terrain
+labels to existing flat-world runs.
+
+| Independent scenario factor | Definition to record before simulation | Robot/inspection mechanism | Measurement / required check |
+| --- | --- | --- | --- |
+| Support geometry | Foot-contact patches in metres, elevation/step height and tread width in metres, slope in degrees | Two-foot stance, reachable step sequence, pelvis clearance | Contact-polygon and kinematics validation; clearance against full body, not circular base |
+| Contact uncertainty | Foot/ground friction bound or `unknown`, surface deformability and possible slip | Force-cone feasibility, slip, recovery and safe stop | Independent contact-force or slip oracle; if `unknown` do not assert traction safety |
+| Traversal obstruction | Gap width, scattered-object geometry, passage width, overhead clearance and obstacle mobility | Whole-body self/environment collision, lateral step and escape corridor | Swept **full-body** volume; collision envelope includes arms, head and carried equipment |
+| Locomotion disturbance | Start/stop, body pitch/roll, turns on slopes, push perturbation only in **simulation** | Dynamic balance and image smear during stance transitions | Independent body/foot kinematics and time-stamped movement-state estimates |
+| Sensing degradation | Depth dropout, occluded terrain patches, glare/low illumination, camera vibration and timestamp drift | Wrong foothold/scene geometry, corrupted inspection frame | Separate terrain-observation uncertainty from **inspection-image** validity; withheld reference truth |
+| Mission access | Inspection targets above/below the camera, occluded from stable stances, blocked retreat routes | Requires stance choice or torso/head reorientation without contact loss | Target view and recovery path feasible at same checkpoint; unknown treated as not verified |
+| Human/site exposure | Human exclusion zone, fall footprint and movable trip hazards | A slip/fall threatens nearby personnel, robot, inspected site | Formal site approval and supervisor-controlled abort; no synthetic threshold grants permission |
+
+**Strata, not physical promises:** flat/easy, narrow or inclined,
+disconnected footholds/stairs, and cluttered/occluded access are
+prospective **scenario families**. Their dimensions, contact laws and
+risk ceilings require model calibration, a robot-specific approved
+operating envelope, and independent validation. Do not assume every
+factorial combination is possible or safe; classify
+`supported`, `infeasible`, `outside_validated_model` or
+`not_implemented` **before** evaluating policies.
+
+Within a matched scenario, compare the same initial stance and terrain
+map, sensor stream, inspection targets, deadline and valid-camera
+criterion across methods. Keep the terrain truth and contact feasibility
+oracle *outside* planner inputs, except declared sensor observations.
+Log attempted footholds, rejected stances, instability warning,
+relocalization, safe retreat, interventions, timeout, fall-equivalent
+simulated abort and frames never acquired; no method may discard
+dangerous scenarios after seeing its failures.
+
+**Scientific unit:** terrain-layout/target family across independent
+sessions, not individual footsteps, captured images or RL control
+ticks. Freeze development versus held-out terrain families and
+illumination/sensor conditions separately. Locomotion-only success,
+stable stance, usable image and successful inspection documentation
+are **four different outcomes**.
+
 ## Sampling model
 
 The checked-in example fixes seed `20261027`, 2 computational replicates per family and 2 paired conditions. It draws **32 latent families** from a fixed, explicitly limited planar distribution: 8 development, 12 pilot and 12 holdout. Every family is drawn using a separate SHA-256-derived stream. It fixes a family-level latent patch layout, then applies small, paired coordinate perturbations to the two replicate scenes. The nominal and occluded condition of each replicate have identical target geometry, camera poses and model parameters; only a single line-of-sight occluder differs.
