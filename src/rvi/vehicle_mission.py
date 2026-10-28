@@ -13,6 +13,10 @@ from pathlib import Path
 from .vehicle_image_quality import _file_and_hash
 
 _HEX256 = re.compile(r"[0-9a-f]{64}\Z")
+_QC_FIELDS = (
+    "reference_separate_from_policy", "glare_fraction", "occlusion_fraction",
+    "framing_ok", "focus_ok", "exposure_ok",
+)
 _PARTS = {"front_bumper", "rear_bumper", "hood", "roof", "trunk",
           "front_left_door", "front_right_door", "rear_left_door",
           "rear_right_door", "left_fender", "right_fender",
@@ -55,6 +59,21 @@ def _time(value, name):
     return float(value)
 
 
+def _quality_values(record, label):
+    """Normalize only the declared QC measurements for exact trace comparisons."""
+    if not isinstance(record, dict) or set(record) != set(_QC_FIELDS):
+        raise ValueError(f"{label}: incomplete or unexpected quality fields")
+    return {
+        "reference_separate_from_policy": _flag(
+            record["reference_separate_from_policy"], f"{label}.reference_separate_from_policy"),
+        "glare_fraction": _fraction(record["glare_fraction"], f"{label}.glare_fraction"),
+        "occlusion_fraction": _fraction(record["occlusion_fraction"], f"{label}.occlusion_fraction"),
+        "framing_ok": _flag(record["framing_ok"], f"{label}.framing_ok"),
+        "focus_ok": _flag(record["focus_ok"], f"{label}.focus_ok"),
+        "exposure_ok": _flag(record["exposure_ok"], f"{label}.exposure_ok"),
+    }
+
+
 def _unique_ids(items, name):
     values = [_text(_mapping(x, name).get("id"), f"{name}.id") for x in items]
     if len(values) != len(set(values)):
@@ -69,7 +88,7 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
     unverified identity or physical return can never pass by high image quality.
     """
     d = _mapping(data, "mission")
-    if d.get("schema_version") != 2 or d.get("execution_mode") != "fixture_only":
+    if d.get("schema_version") != 3 or d.get("execution_mode") != "fixture_only":
         raise ValueError("unsupported schema or non-fixture execution mode")
     mission_id = _text(d.get("mission_id"), "mission_id")
     session_id = _text(d.get("session_id"), "session_id")
@@ -78,8 +97,8 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
     observations = _array(d.get("observations"), "observations")
     _unique_ids(observations, "observations")
     registry = {}
-    kinds = {"vehicle_detection", "part_detection", "capture",
-             "independent_quality", "handoff"}
+    kinds = {"vehicle_detection", "part_detection", "operator_confirmation",
+             "capture", "independent_quality", "handoff"}
     for observation in observations:
         if observation.get("session_id") != session_id:
             raise ValueError("observation belongs to another mission session")
@@ -167,8 +186,22 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
             violations.append("target_not_grounded_in_matching_observation")
         elif not linked(obs, "vehicle_detection", chosen):
             violations.append("target_without_bound_observation_provenance")
-        elif len(matches) > 1 and not clarified:
-            violations.append("unresolved_multi_car_ambiguity")
+        elif len(matches) > 1:
+            if not clarified:
+                violations.append("unresolved_multi_car_ambiguity")
+            else:
+                confirmation_id = decision.get("confirmation_observation_id")
+                record = registry.get(confirmation_id) if isinstance(confirmation_id, str) else None
+                if (record is None or record.get("kind") != "operator_confirmation"
+                        or record.get("vehicle_instance_id") != chosen
+                        or record.get("confirmed") is not True
+                        or not isinstance(record.get("actor_id"), str)
+                        or not record["actor_id"].strip()
+                        or record["actor_id"] == policy_id
+                        or record["timestamp_s"] <= max(registry[item]["timestamp_s"] for item in obs)):
+                    violations.append("operator_clarification_not_bound_to_observation")
+                else:
+                    target_ok = True
         else:
             target_ok = True
     elif chosen is not None:
@@ -221,6 +254,7 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
         occlusion = _fraction(qc.get("occlusion_fraction"), "occlusion_fraction")
         for k in ("framing_ok", "focus_ok", "exposure_ok"):
             _flag(qc.get(k), f"independent_qc.{k}")
+        inline_quality = {key: qc[key] for key in _QC_FIELDS}
         reasons = []
         if (capture_record is None or capture_record.get("kind") != "capture"
                 or capture_record.get("source_sha256") != image_hash
@@ -237,10 +271,21 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
                 or qc_record["evaluator_id"] == policy_id):
             reasons.append("independent_qc_source_unverified")
             violations.append("independent_qc_source_binding_invalid")
+        if qc_record is not None and qc_record.get("kind") == "independent_quality":
+            try:
+                reference_quality = _quality_values(qc_record.get("quality"),
+                                                    "observation.quality")
+            except ValueError:
+                reference_quality = None
+            if reference_quality != inline_quality:
+                reasons.append("quality_not_bound_to_reference_observation")
+                violations.append("independent_quality_values_mismatch")
         if capture_record is not None and capture_record.get("kind") == "capture":
             ground_ids = list(obs)
             if scope == "component" and isinstance(d.get("part_grounding"), dict):
                 ground_ids.extend(d["part_grounding"].get("observation_ids", []))
+            if len(matches) > 1 and target_ok:
+                ground_ids.append(decision["confirmation_observation_id"])
             if (not ground_ids or any(ref not in registry for ref in ground_ids)
                     or capture_record["timestamp_s"] <= max(
                         (registry[ref]["timestamp_s"] for ref in ground_ids if ref in registry),
@@ -299,6 +344,14 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
         raise ValueError("unsupported return status")
     safe_route = _flag(returned.get("safe_route_verified"), "safe_route_verified")
     handoff = _flag(returned.get("operator_handoff_confirmed"), "operator_handoff_confirmed")
+    # The handoff report cannot make independent-looking declarations that
+    # contradict the referenced operator acknowledgement observation.
+    if handoff_bound and (handoff_record.get("anchor_id") != returned["anchor_id"]
+                          or handoff_record.get("status") != returned["status"]
+                          or handoff_record.get("safe_route_verified") is not safe_route
+                          or handoff_record.get("operator_handoff_confirmed") is not handoff):
+        handoff_bound = False
+        violations.append("handoff_claim_not_bound_to_observation")
     return_ok = (returned["anchor_id"] == origin and returned["status"] == "arrived"
                  and safe_route and handoff and handoff_bound)
 
@@ -328,7 +381,7 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
         "part_grounded": part_ok,
         "return_verified": return_ok,
         "evidence_class": "software_fixture_only",
-        "trace_schema_version": 2,
+        "trace_schema_version": 3,
         "capture_bytes_verified": artifact_root is not None,
         "observation_chronology": "validated_fixture_timestamps_not_clock_synchronized",
         "non_capture_evidence": "declared_fixture_sources_not_independently_verified",

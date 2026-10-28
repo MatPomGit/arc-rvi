@@ -1,3 +1,3 @@
 """Vendor-neutral research primitives for robotic visual inspection."""
 
-__version__ = "1.22.1"
+__version__ = "1.22.2"

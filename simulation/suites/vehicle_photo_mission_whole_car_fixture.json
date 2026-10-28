@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "execution_mode": "fixture_only",
   "mission_id": "synthetic-full-car-001",
   "handoff_anchor_id": "staging_operator_1",
@@ -77,7 +77,8 @@
       "observation_ids": [
         "observation-1",
         "operator-disambiguation-2"
-      ]
+      ],
+      "confirmation_observation_id": "operator-confirmation-synthetic-full-car-001"
     }
   },
   "part_grounding": null,
@@ -254,6 +255,16 @@
       "vehicle_instance_id": "car-B"
     },
     {
+      "id": "operator-confirmation-synthetic-full-car-001",
+      "kind": "operator_confirmation",
+      "session_id": "synthetic-full-car-001-session",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000014",
+      "timestamp_s": 2.5,
+      "vehicle_instance_id": "car-B",
+      "confirmed": true,
+      "actor_id": "synthetic-human-operator"
+    },
+    {
       "id": "fixture-observation-front",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
@@ -271,7 +282,15 @@
       "capture_observation_id": "fixture-observation-front",
       "image_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 4
+      "timestamp_s": 4,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "fixture-observation-front_left",
@@ -291,7 +310,15 @@
       "capture_observation_id": "fixture-observation-front_left",
       "image_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 6
+      "timestamp_s": 6,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "fixture-observation-left",
@@ -311,7 +338,15 @@
       "capture_observation_id": "fixture-observation-left",
       "image_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 8
+      "timestamp_s": 8,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "fixture-observation-rear_left",
@@ -331,7 +366,15 @@
       "capture_observation_id": "fixture-observation-rear_left",
       "image_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 10
+      "timestamp_s": 10,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "fixture-observation-rear",
@@ -351,7 +394,15 @@
       "capture_observation_id": "fixture-observation-rear",
       "image_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 12
+      "timestamp_s": 12,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "fixture-observation-rear_right",
@@ -371,7 +422,15 @@
       "capture_observation_id": "fixture-observation-rear_right",
       "image_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 14
+      "timestamp_s": 14,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "fixture-observation-right",
@@ -391,7 +450,15 @@
       "capture_observation_id": "fixture-observation-right",
       "image_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 16
+      "timestamp_s": 16,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "fixture-observation-front_right",
@@ -411,7 +478,15 @@
       "capture_observation_id": "fixture-observation-front_right",
       "image_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 18
+      "timestamp_s": 18,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.05,
+        "occlusion_fraction": 0.03,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "handoff-synthetic-full-car-001",
@@ -419,7 +494,10 @@
       "kind": "handoff",
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000013",
       "anchor_id": "staging_operator_1",
-      "timestamp_s": 19
+      "timestamp_s": 19,
+      "status": "arrived",
+      "safe_route_verified": true,
+      "operator_handoff_confirmed": true
     }
   ]
 }

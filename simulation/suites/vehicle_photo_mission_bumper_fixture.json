@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "execution_mode": "fixture_only",
   "mission_id": "synthetic-rear-bumper-001",
   "handoff_anchor_id": "staging_operator_1",
@@ -158,7 +158,15 @@
       "capture_observation_id": "synthetic-image-observation-attempt-glare",
       "image_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 4
+      "timestamp_s": 4,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.28,
+        "occlusion_fraction": 0.02,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "synthetic-image-observation-attempt-reoriented",
@@ -178,7 +186,15 @@
       "capture_observation_id": "synthetic-image-observation-attempt-reoriented",
       "image_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 6
+      "timestamp_s": 6,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.04,
+        "occlusion_fraction": 0.02,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "synthetic-image-observation-attempt-side",
@@ -198,7 +214,15 @@
       "capture_observation_id": "synthetic-image-observation-attempt-side",
       "image_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
       "evaluator_id": "independent-annotator",
-      "timestamp_s": 8
+      "timestamp_s": 8,
+      "quality": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.03,
+        "occlusion_fraction": 0.02,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
     },
     {
       "id": "handoff-synthetic-rear-bumper-001",
@@ -206,7 +230,10 @@
       "kind": "handoff",
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000009",
       "anchor_id": "staging_operator_1",
-      "timestamp_s": 9
+      "timestamp_s": 9,
+      "status": "arrived",
+      "safe_route_verified": true,
+      "operator_handoff_confirmed": true
     }
   ]
 }

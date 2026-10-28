@@ -76,6 +76,57 @@ class VehicleMissionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "timestamp"):
             assess_mission(bad)
 
+    def test_quality_registry_cannot_be_bypassed_by_editing_inline_pass(self):
+        bad = deepcopy(self.bumper)
+        bad["photo_attempts"][0]["independent_qc"]["glare_fraction"] = 0.01
+        # Previously this edited, rejected glare attempt could appear accepted.
+        result = assess_mission(bad)
+        self.assertEqual(result["verdict"], "invalid_trace")
+        self.assertIn("quality_not_bound_to_reference_observation",
+                      result["rejected_attempts"][0]["reasons"])
+        bad = deepcopy(self.bumper)
+        reference = next(o for o in bad["observations"] if o["kind"] == "independent_quality")
+        reference["quality"]["framing_ok"] = False
+        self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
+        bad = deepcopy(self.bumper)
+        reference = next(o for o in bad["observations"] if o["kind"] == "independent_quality")
+        del reference["quality"]["focus_ok"]
+        self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
+
+    def test_handoff_registry_cannot_be_bypassed_by_editing_inline_ack(self):
+        bad = deepcopy(self.whole)
+        record = next(o for o in bad["observations"] if o["kind"] == "handoff")
+        record["operator_handoff_confirmed"] = False
+        report = assess_mission(bad)
+        self.assertEqual(report["verdict"], "invalid_trace")
+        self.assertIn("handoff_claim_not_bound_to_observation", report["trace_violations"])
+        # Consistent, explicit negative evidence means return unverified, not a fake success.
+        bad["return_evidence"]["operator_handoff_confirmed"] = False
+        self.assertEqual(assess_mission(bad)["verdict"], "return_unverified")
+
+    def test_multiple_cars_require_bound_confirmation_and_chronology(self):
+        bad = deepcopy(self.whole)
+        bad["target_grounding"]["decision"]["confirmation_observation_id"] = "fake-confirmation"
+        self.assertEqual(assess_mission(bad)["verdict"], "blocked_target")
+        bad = deepcopy(self.whole)
+        confirmation = next(o for o in bad["observations"] if o["kind"] == "operator_confirmation")
+        confirmation["vehicle_instance_id"] = "car-A"
+        self.assertEqual(assess_mission(bad)["verdict"], "blocked_target")
+        bad = deepcopy(self.whole)
+        confirmation = next(o for o in bad["observations"] if o["kind"] == "operator_confirmation")
+        confirmation["actor_id"] = bad["policy_id"]
+        self.assertEqual(assess_mission(bad)["verdict"], "blocked_target")
+        bad = deepcopy(self.whole)
+        confirmation = next(o for o in bad["observations"] if o["kind"] == "operator_confirmation")
+        confirmation["timestamp_s"] = 0
+        self.assertEqual(assess_mission(bad)["verdict"], "blocked_target")
+        bad = deepcopy(self.whole)
+        confirmation = next(o for o in bad["observations"] if o["kind"] == "operator_confirmation")
+        confirmation["timestamp_s"] = 3.5
+        report = assess_mission(bad)
+        self.assertEqual(report["verdict"], "invalid_trace")
+        self.assertIn("capture_not_after_grounding", report["rejected_attempts"][0]["reasons"])
+
     def test_optional_capture_file_hash_verification(self):
         from tempfile import TemporaryDirectory
         from hashlib import sha256
@@ -159,12 +210,17 @@ class VehicleMissionTests(unittest.TestCase):
     def test_return_requires_handoff_not_just_odometry(self):
         bad = deepcopy(self.whole)
         bad["return_evidence"]["operator_handoff_confirmed"] = False
+        self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
+        record = next(o for o in bad["observations"] if o["kind"] == "handoff")
+        record["operator_handoff_confirmed"] = False
         self.assertEqual(assess_mission(bad)["verdict"], "return_unverified")
         bad["return_evidence"]["operator_handoff_confirmed"] = True
+        record["operator_handoff_confirmed"] = True
         bad["return_evidence"]["anchor_id"] = "wrong_place"
-        self.assertEqual(assess_mission(bad)["verdict"], "return_unverified")
+        self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
         bad["return_evidence"]["anchor_id"] = "staging_operator_1"
         bad["return_evidence"]["safe_route_verified"] = False
+        record["safe_route_verified"] = False
         self.assertEqual(assess_mission(bad)["verdict"], "return_unverified")
 
     def test_unrelated_part_is_not_an_inspection_photo(self):
@@ -196,6 +252,13 @@ class VehicleMissionTests(unittest.TestCase):
         bad["shot_plan"]["required"] = []
         with self.assertRaisesRegex(ValueError, "cannot be empty"):
             assess_mission(bad)
+
+    def test_schema_three_requires_updated_source_records(self):
+        legacy = deepcopy(self.whole)
+        legacy["schema_version"] = 2
+        with self.assertRaisesRegex(ValueError, "unsupported schema"):
+            assess_mission(legacy)
+        self.assertEqual(assess_mission(self.whole)["trace_schema_version"], 3)
 
     def test_nonfixture_and_invalid_image_hash_rejected(self):
         bad = deepcopy(self.whole)
