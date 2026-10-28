@@ -27,6 +27,10 @@ The `10.1109/ISAS59543.2023.10164352` source titles differ only because one CSV 
 
 The above are **two manually assessed DOI identities**, not a count of distinct screened studies or completed systematic review. Review date: 2026-10-28. No automated exclusion is applied to the remaining 1693 candidate keys.
 
+## Verified work-version links (2026-10-28)
+
+Four of the six potential multi-DOI work identities have supporting primary bibliographic evidence; two remain pending. Their exact DOI decisions, sources and limitations are recorded in [work-version review](work_version_review_2026-10-28.md) and the [curated version manifest](work_version_relations.json). The separate work-level grouping may produce **1691 provisional keys**, not independently screened or eligible articles. Source citations and original DOI strings are retained.
+
 ## Next gates
 
 - Resolve all six potential work-version relations against original publisher/preprint version metadata and record accepted work-level merges *separately* from immutable export-row identities.
