@@ -78,6 +78,7 @@ implemented:
   - "Primary user-specified car/bumper photography-and-return mission: fixture-only identity/part/shot/glare/handoff validator, two explicitly synthetic traces, software tests and P02-P08 protocol extensions; no perception, robot adapter or physical measurements"
   - "Fixture-only predicted viewpoint ranking: reject unsupported/reflective/return-over-budget car-photo poses, rank safe-proxy candidates and abstain when none remain; no calibrated glare model or physical safety validation"
   - "Offline read-only source-hashed car/bumper pixel ROI photometric quality proxies (PGM/PPM and optional Pillow images), separately supplied part masks, paired descriptive results, synthetic calibration fixtures; no automatic detection, defect visibility or physical G1 trials"
+  - "Offline P02 RGB colour-cue triage from externally supplied car-body image masks with automatic ambiguity abstention, hash-pinned fixtures and no identity confirmation, vehicle detector or robot commands"
   - "Offline one/two-foot horizontal static support projection preflight with analytic geometry tests; synthetic fixture only, no dynamic/contact-force model"
   - "Backward-compatible 3D coplanar slope support projection fixture, numeric coplanarity residual and fail-closed noncoplanar contacts; no locomotion safety claims"
   - "Offline configured URDF forward kinematics with finite complete joint states, bounded local SHA-pinned fixtures, analytic revolute/prismatic regression; not IK or collision verification"
