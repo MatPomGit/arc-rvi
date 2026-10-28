@@ -6,6 +6,7 @@ A newly supplied ZIP contains 155 CSV exports. Eight explicitly selected complet
 
 - [Reproducible source-hash and count audit](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/export_audit_2026-10-28.md)
 - [Whole-archive coverage audit: 147 secondary CSVs and unscreened identifiers](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_export_coverage_2026-10-28.md)
+- [Selective secondary comparator appraisal: humanoid NBV, VertInspect, CAIS, FRA-NBV, RASP](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_direct_comparators_2026-10-28.md)
 - [New critical eight-study synthesis](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/critical_synthesis_2026-10-28.md)
 - [Evidence-to-experiment and publication gates](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md)
 - Offline command: python scripts/audit_literature_exports.py /path/to/agent-artifacts-zip_robo.zip --output-dir /tmp/arc-rvi-export-audit
