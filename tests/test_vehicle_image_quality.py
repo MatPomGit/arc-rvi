@@ -3,6 +3,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 import hashlib
+import json
+import subprocess
+import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -172,6 +175,23 @@ class VehicleImageQualityTest(unittest.TestCase):
             _netpbm(b"P2\n1 1\n10\n11\n", mask=True)
         with self.assertRaisesRegex(ValueError, "trailing ASCII"):
             _netpbm(b"P2\n1 1\n255\n20 100\n", mask=True)
+
+    def test_committed_pair_fixture_provenance_and_offline_cli(self):
+        repo = Path(__file__).resolve().parents[1]
+        data_root = repo / "simulation" / "suites"
+        manifest = data_root / "vehicle_roi_synthetic_pair.json"
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+        result = compare_pair(data["before"], data["after"], data_root)
+        self.assertEqual(result["before"]["metrics"]["white_clipped_fraction"], .75)
+        self.assertEqual(result["after"]["metrics"]["white_clipped_fraction"], 0.0)
+        proc = subprocess.run(
+            [sys.executable, str(repo / "scripts" / "audit_vehicle_image_roi.py"),
+             "--manifest", str(manifest), "--data-root", str(data_root)],
+            cwd=repo, capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        cli_data = json.loads(proc.stdout)
+        self.assertEqual(cli_data["after_minus_before"]["white_clipped_fraction"], -.75)
 
     def test_invalid_thresholds_and_nan_fail(self):
         bad = deepcopy(self.b)
