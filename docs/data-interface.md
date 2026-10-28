@@ -1,5 +1,7 @@
 # Neutral data interface (draft)
 
+For per-photo car/bumper ROI analysis on local images with separately supplied masks, SHA-256 and bounded observed photometric proxies, see [vehicle image QA](vehicle-image-qa.md). It is not vehicle-instance recognition or independent defect-visibility validation.
+
 Proposed export package:
 - `manifest.json`: schema version, evidence level, session ID, capture setup,
   relative paths, SHA-256 hashes, validity status, and calibration reference.
