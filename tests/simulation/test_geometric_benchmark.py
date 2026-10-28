@@ -121,6 +121,16 @@ class GeometricBenchmarkTests(unittest.TestCase):
                     self.assertNotIn("oracle", serialized)
         self.assertEqual({r["trial_count"] for r in report["summary"]}, {2})
 
+    def test_sensor_summary_distinguishes_execution_from_coverage(self):
+        report = run_benchmark(SUITE, ROOT / "simulation/conditions/sensor_exploratory.json")
+        for summary in report["summary"]:
+            method_rows = [row for row in report["trials"] if row["method"] == summary["method"]]
+            self.assertEqual(summary["execution_complete_count"], summary["success_count"])
+            self.assertEqual(summary["coverage_complete_count"],
+                             sum(row["coverage_complete"] for row in method_rows))
+            self.assertAlmostEqual(summary["coverage_complete_fraction"],
+                                   summary["coverage_complete_count"] / len(method_rows))
+
     def test_sensor_stream_is_paired_per_candidate_not_action_order(self):
         sensor, _ = load_sensor_config(
             ROOT / "simulation/conditions/sensor_exploratory.json")
