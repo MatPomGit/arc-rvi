@@ -139,3 +139,31 @@ study noise-aware exposure for robot vision. These are useful controls
 for exposure and image-quality estimation, but cannot be presented as
 equivalent to independent inspection-valid surface coverage or autonomous
 recovery. Add their comparable scores only where units and data are compatible.
+
+## Secondary comparator registration: closed-loop sensing recovery (2026-10-28, unfrozen)
+
+The [source-row-grounded review ledger](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_comparator_decisions.json)
+makes [FRA-NBV](https://doi.org/10.1109/LRA.2026.3728374)
+an explicit **reflectivity and missing-depth reacquisition** comparator and
+[RASP](https://doi.org/10.1109/TASE.2025.3604455)
+a **joint view-planning/depth-completion** contextual method comparator.
+Both are prior art for quality-aware active sensing. They cannot be cited
+as evidence that any ARC-RVI physical inspection quality improvement exists.
+Primary full-method and outcome extraction remain pending.
+
+The matched-budget pilot matrix shall cross image degradation mechanisms
+(specular missing depth, blur, exposure, occlusion, pose/motion disturbance)
+with (a) no-retry; (b) fixed same-view retry; (c) bounded photometric
+exposure control; (d) feasible-view quality-gated reobservation, including
+an incidence-aware surrogate when reflective sensing is relevant.
+A source-faithful RASP baseline may be added **only** after its depth
+completion component, training inputs and datasets are independently
+inspected and reproducible; otherwise record it as contextual prior art.
+
+Freeze one shared **mission time**, image budget and view-feasibility/safety
+oracle across comparable arms. The independent evaluator must score
+inspection-valid regions **without using the policy's own quality score**
+and must count each assigned scene's no-image, exhausted-retry,
+unsafe-reposition and intervention outcomes. Predefine separate
+conditional strata for reflective material and challenging bipedal
+motion; no broad physical transfer inference from current planar fixtures.

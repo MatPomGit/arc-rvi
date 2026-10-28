@@ -7,6 +7,17 @@ A newly supplied ZIP contains 155 CSV exports. Eight explicitly selected complet
 - [Reproducible source-hash and count audit](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/export_audit_2026-10-28.md)
 - [Whole-archive coverage audit: 147 secondary CSVs and unscreened identifiers](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_export_coverage_2026-10-28.md)
 - [Selective secondary comparator appraisal: humanoid NBV, VertInspect, CAIS, FRA-NBV, RASP](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_direct_comparators_2026-10-28.md)
+- [Source-pinned, machine-readable decisions (7 curated records)](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_comparator_decisions.json)
+- [P03/P04/P06/P08 evidence-to-baseline map](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md)
+
+The additional seven DOI records are **selectively reviewed comparators, not seven
+independently demonstrated studies**. Six are traceable to their
+source-export rows; VertInspect is an external journal follow-up. Chai
+2025/2026 study independence is unresolved. An offline validator
+(`python -m scripts.validate_secondary_comparators`) checks DOI, evidence-tier,
+source-record and study-label schema; with the original ZIP supplied, it
+also verifies archive SHA and source-row DOI/title provenance. These
+checks are **not primary-article full-text appraisal or empirical replication**.
 - [New critical eight-study synthesis](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/critical_synthesis_2026-10-28.md)
 - [Evidence-to-experiment and publication gates](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md)
 - Offline command: python scripts/audit_literature_exports.py /path/to/agent-artifacts-zip_robo.zip --output-dir /tmp/arc-rvi-export-audit

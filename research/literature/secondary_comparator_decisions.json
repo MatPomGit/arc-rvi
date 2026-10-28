@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-28",
+  "review_scope": "Selective, manually selected prior-art triage of six secondary-CSV works plus one independently located follow-up; not systematic screening, not seven independent studies.",
+  "archive_sha256": "603a6d1369466b160c29234bb4db8dd6d2247999f62835d0964ad95fb9a6e69f",
+  "status": "source_supported_editorial_prior_art_gates_not_experimental_evidence",
+  "decisions": [
+    {
+      "doi": "10.1109/iros40897.2019.8968239",
+      "title": "Humanoid Robot Next Best View Planning Under Occlusions Using Body Movement Primitives",
+      "source_file": "scispace_viewpoint_motion_planning_2.csv",
+      "source_record": 99,
+      "source_kind": "secondary_csv",
+      "evidence_level": "conference_program_and_bibliographic_record",
+      "primary_url": "https://www.iros2019.org/sites/g/files/asqsls1961/files/2019-10/IROS%202019%20Conference%20Digest.pdf",
+      "studies": [
+        "P03"
+      ],
+      "relevance": "direct_conceptual_prior_art",
+      "comparator_requirement": "Humanoid body-motion-primitives NBV under occlusion; determine reproducibility and source methods before algorithmic reimplementation.",
+      "claims_not_supported": "No source-verified matched mission deadline, rough-terrain bipedal contact safety, or inspection-valid accepted coverage.",
+      "work_family": "monica2019",
+      "work_relation": "single_record"
+    },
+    {
+      "doi": "10.1109/aihcir67580.2025.11404946",
+      "title": "Humanoid Whole-Body Control for Glass Curtain Wall Inspection Scenarios",
+      "source_file": "scispace_viewpoint_motion_planning_2.csv",
+      "source_record": 69,
+      "source_kind": "secondary_csv",
+      "evidence_level": "bibliographic_abstract",
+      "primary_url": "https://doi.org/10.1109/AIHCIR67580.2025.11404946",
+      "studies": [
+        "P03",
+        "P08"
+      ],
+      "relevance": "direct_humanoid_inspection_context",
+      "comparator_requirement": "Physical whole-body inspection motion control is established; compare task, sensor, terrain and independently validated acquisition endpoint, not generic motion retargeting.",
+      "claims_not_supported": "No confirmed rough-terrain walking, blind assessment, or G1 EDU configuration; relation to 2026 journal paper unverified.",
+      "work_family": "chai_humanoid_glass_wall",
+      "work_relation": "potential_related_work_unverified"
+    },
+    {
+      "doi": "10.1016/j.aei.2026.104590",
+      "title": "VertInspect: Learning-based humanoid whole-body control for glass curtain wall inspection",
+      "source_file": null,
+      "source_record": null,
+      "source_kind": "external_followup_not_in_secondary_only_queue",
+      "evidence_level": "publisher_abstract_and_visible_sections",
+      "primary_url": "https://www.sciencedirect.com/science/article/pii/S147403462600282X",
+      "studies": [
+        "P03",
+        "P08"
+      ],
+      "relevance": "direct_humanoid_inspection_context",
+      "comparator_requirement": "Contrast motion tracking/trials with independent valid-region documentation, randomised manual comparison and unsupported terrain strata.",
+      "claims_not_supported": "Publisher reports three real-world experiments with 15 trials each, not bipedal rough-terrain autonomous inspection or ARC-RVI outcomes; not a verified independent replication of 2025 conference contribution.",
+      "work_family": "chai_humanoid_glass_wall",
+      "work_relation": "potential_related_work_unverified"
+    },
+    {
+      "doi": "10.1109/lra.2026.3728374",
+      "title": "FRA-NBV: A Fast and Reflectivity-Aware Next-Best-View Strategy",
+      "source_file": "scispace_active_visual_coverage_nbv_2.csv",
+      "source_record": 81,
+      "source_kind": "secondary_csv",
+      "evidence_level": "publisher_abstract",
+      "primary_url": "https://ieeexplore.ieee.org/abstract/document/11669009",
+      "studies": [
+        "P04",
+        "P06"
+      ],
+      "relevance": "direct_active_sensing_and_recovery",
+      "comparator_requirement": "Represent reflectivity-driven missing-depth recovery by reorienting camera incidence; compare under equal acquisition and motion budget where reflective material is in task scope.",
+      "claims_not_supported": "Depth reconstruction coverage is not automatically inspection-valid evidence; published gains are not independent ARC-RVI results.",
+      "work_family": "preziosa_fra_nbv_2026",
+      "work_relation": "single_record"
+    },
+    {
+      "doi": "10.1109/tase.2025.3604455",
+      "title": "RASP: Robot Active Scene Perception With Joint Viewpoint Planning and Depth Completion in Cluttered Environments",
+      "source_file": "scispace_active_vision_reobservation.csv",
+      "source_record": 41,
+      "source_kind": "secondary_csv",
+      "evidence_level": "publisher_abstract",
+      "primary_url": "https://ieeexplore.ieee.org/abstract/document/11145809",
+      "studies": [
+        "P04",
+        "P06"
+      ],
+      "relevance": "direct_active_perception_method",
+      "comparator_requirement": "Account for joint active viewpoint-sequence planning and depth completion, with independent score and common sensing budget. A conceptually matched surrogate is not a claim of source-method replication.",
+      "claims_not_supported": "Grasping/point-cloud metrics cannot serve as accepted inspection area without external reference; full model implementation and comparable datasets not reviewed.",
+      "work_family": "liu_rasp_2025",
+      "work_relation": "single_record"
+    },
+    {
+      "doi": "10.1109/iros58592.2024.10802162",
+      "title": "CAIS: Culvert Autonomous Inspection Robotic System",
+      "source_file": "scispace_autonomous_robotic_inspection.csv",
+      "source_record": 31,
+      "source_kind": "secondary_csv",
+      "evidence_level": "author_manuscript_abstract_and_bibliography",
+      "primary_url": "https://par.nsf.gov/servlets/purl/10595830",
+      "studies": [
+        "P08"
+      ],
+      "relevance": "direct_confined_access_inspection_system",
+      "comparator_requirement": "Record RGB-D, auxiliary illumination and non-destructive inspection instrumentation as prior end-to-end capabilities; independently score assigned-method coverage, missed required regions, interventions and aborted missions.",
+      "claims_not_supported": "No evidence for bipedal G1 EDU rough-terrain autonomy or assessor-blinded manual noninferiority; numerical outcome extraction pending.",
+      "work_family": "le_cais_2024",
+      "work_relation": "single_record"
+    },
+    {
+      "doi": "10.1016/j.rcim.2018.11.009",
+      "title": "A hybrid vision-based surface coverage measurement method for robotic inspection",
+      "source_file": "scispace_autonomous_robotic_inspection.csv",
+      "source_record": 51,
+      "source_kind": "secondary_csv",
+      "evidence_level": "publisher_abstract",
+      "primary_url": "https://www.sciencedirect.com/science/article/abs/pii/S0736584517302417",
+      "studies": [
+        "P04"
+      ],
+      "relevance": "contextual_coverage_measurement_not_direct_nbv",
+      "comparator_requirement": "Define distinct coverage constructs: treated/imaged region vs hidden geometric surface observed vs independently accepted inspection image. Do not use as direct NBV planner baseline.",
+      "claims_not_supported": "Shot-peening surface coverage does not prove active unknown-object reconstruction or G1 EDU evidence.",
+      "work_family": "shahid_coverage_2019",
+      "work_relation": "single_record"
+    }
+  ]
+}
