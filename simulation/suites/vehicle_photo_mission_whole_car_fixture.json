@@ -255,6 +255,16 @@
       "vehicle_instance_id": "car-B"
     },
     {
+      "id": "operator-confirmation-synthetic-full-car-001",
+      "kind": "operator_confirmation",
+      "session_id": "synthetic-full-car-001-session",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000014",
+      "timestamp_s": 2.5,
+      "vehicle_instance_id": "car-B",
+      "confirmed": true,
+      "actor_id": "synthetic-human-operator"
+    },
+    {
       "id": "fixture-observation-front",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
@@ -488,15 +498,6 @@
       "status": "arrived",
       "safe_route_verified": true,
       "operator_handoff_confirmed": true
-    },
-    {
-      "id": "operator-confirmation-synthetic-full-car-001",
-      "kind": "operator_confirmation",
-      "session_id": "synthetic-full-car-001-session",
-      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000014",
-      "timestamp_s": 2.5,
-      "vehicle_instance_id": "car-B",
-      "confirmed": true
     }
   ]
 }

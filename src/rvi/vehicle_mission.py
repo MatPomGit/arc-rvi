@@ -195,6 +195,9 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
                 if (record is None or record.get("kind") != "operator_confirmation"
                         or record.get("vehicle_instance_id") != chosen
                         or record.get("confirmed") is not True
+                        or not isinstance(record.get("actor_id"), str)
+                        or not record["actor_id"].strip()
+                        or record["actor_id"] == policy_id
                         or record["timestamp_s"] <= max(registry[item]["timestamp_s"] for item in obs)):
                     violations.append("operator_clarification_not_bound_to_observation")
                 else:

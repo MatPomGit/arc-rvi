@@ -76,7 +76,8 @@ exposure or reviewer independence. Handoff observations separately assert
 arrival status, safe-route assessment and operator acknowledgement; a
 mismatched report invalidates the trace. Where two or more cars match the
 command, a positive clarification also requires a separate, time-ordered
-`operator_confirmation` observation for the selected car. It is not enough to
+`operator_confirmation` observation for the selected car, with an explicitly
+identified actor different from the planning policy. It is not enough to
 flip `clarification_confirmed` in the decision. All fields remain supplied
 synthetic declarations, **not** externally authenticated observations.
 Neither capture hashes nor synthetic QC prove identity,

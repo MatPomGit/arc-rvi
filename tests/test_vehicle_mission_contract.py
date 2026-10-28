@@ -114,11 +114,15 @@ class VehicleMissionTests(unittest.TestCase):
         self.assertEqual(assess_mission(bad)["verdict"], "blocked_target")
         bad = deepcopy(self.whole)
         confirmation = next(o for o in bad["observations"] if o["kind"] == "operator_confirmation")
+        confirmation["actor_id"] = bad["policy_id"]
+        self.assertEqual(assess_mission(bad)["verdict"], "blocked_target")
+        bad = deepcopy(self.whole)
+        confirmation = next(o for o in bad["observations"] if o["kind"] == "operator_confirmation")
         confirmation["timestamp_s"] = 0
         self.assertEqual(assess_mission(bad)["verdict"], "blocked_target")
         bad = deepcopy(self.whole)
         confirmation = next(o for o in bad["observations"] if o["kind"] == "operator_confirmation")
-        confirmation["timestamp_s"] = bad["photo_attempts"][0] and 3.5
+        confirmation["timestamp_s"] = 3.5
         report = assess_mission(bad)
         self.assertEqual(report["verdict"], "invalid_trace")
         self.assertIn("capture_not_after_grounding", report["rejected_attempts"][0]["reasons"])
@@ -248,6 +252,13 @@ class VehicleMissionTests(unittest.TestCase):
         bad["shot_plan"]["required"] = []
         with self.assertRaisesRegex(ValueError, "cannot be empty"):
             assess_mission(bad)
+
+    def test_schema_three_requires_updated_source_records(self):
+        legacy = deepcopy(self.whole)
+        legacy["schema_version"] = 2
+        with self.assertRaisesRegex(ValueError, "unsupported schema"):
+            assess_mission(legacy)
+        self.assertEqual(assess_mission(self.whole)["trace_schema_version"], 3)
 
     def test_nonfixture_and_invalid_image_hash_rejected(self):
         bad = deepcopy(self.whole)
