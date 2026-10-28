@@ -115,6 +115,15 @@ class StaticSupportTests(unittest.TestCase):
             with self.subTest(polygon=polygon), self.assertRaises(ValueError):
                 inspect_static_support(spec)
 
+    def test_reject_pentagram_despite_consistent_turn_sign(self):
+        from math import cos, sin, pi
+        ring = [(cos(2*pi*k/5), sin(2*pi*k/5)) for k in range(5)]
+        star = [list(ring[k]) for k in (0, 2, 4, 1, 3)]
+        spec = fixture()
+        spec["contacts"][0]["footprint_xy_m"] = star
+        with self.assertRaisesRegex(ValueError, "self-intersecting"):
+            inspect_static_support(spec)
+
     def test_schema_bounds_and_nonfinite_rejected(self):
         examples = [
             ("terrain_class", "stairs_unrecognized"),

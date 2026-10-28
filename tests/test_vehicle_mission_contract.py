@@ -132,6 +132,20 @@ class VehicleMissionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unexpected part_grounding"):
             assess_mission(bad)
 
+    def test_cli_rejects_duplicate_json_fields_and_nonfinite(self):
+        from tempfile import TemporaryDirectory
+        from contextlib import redirect_stderr
+        from io import StringIO
+        from unittest.mock import patch
+        from scripts.assess_vehicle_mission import main
+        with TemporaryDirectory() as temp:
+            path = Path(temp) / "trace.json"
+            for raw in ('{"schema_version":1,"schema_version":2}',
+                        '{"schema_version": NaN}'):
+                path.write_text(raw, encoding="utf-8")
+                with patch("sys.argv", ["assess_vehicle_mission.py", str(path)]), redirect_stderr(StringIO()):
+                    self.assertEqual(main(), 2)
+
     def test_nan_quality_rejected(self):
         bad = deepcopy(self.whole)
         bad["photo_attempts"][0]["independent_qc"]["glare_fraction"] = float("nan")
