@@ -31,9 +31,13 @@ The above are **two manually assessed DOI identities**, not a count of distinct 
 
 Four of the six potential multi-DOI work identities have supporting primary bibliographic evidence; two remain pending. Their exact DOI decisions, sources and limitations are recorded in [work-version review](work_version_review_2026-10-28.md) and the [curated version manifest](work_version_relations.json). The separate work-level grouping may produce **1691 provisional keys**, not independently screened or eligible articles. Source citations and original DOI strings are retained.
 
+## New manual-screening receipt (2026-10-28)
+
+A five-item DOI-keyed, source-backed [screening decision manifest](manual_screening_decisions.json) now records two works excluded from **direct robotic inspection evidence**, two method/context works, and one direct inspection prior-art work. The 1695 original candidate keys remain unchanged; **1690** have no manual screening decision. This is a limited topical triage, not full eligibility screening or a complete literature review. The generated receipt and table are produced by `scripts/screen_reviewed_literature.py` from the original user-supplied ZIP. The raw SteamVR title mismatch is preserved, while the complete title is independently confirmed by [the ORCID/Scopus-indexed record](https://orcid.org/0000-0002-4787-7868).
+
 ## Next gates
 
 - Resolve all six potential work-version relations against original publisher/preprint version metadata and record accepted work-level merges *separately* from immutable export-row identities.
-- Independently resolve the truncated SteamVR record before using its citation; link exact DOI/title and original P08 row without inventing missing text.
-- Review the unassessed **435** provisional candidate keys with explicit inclusion/exclusion criteria; no bulk machine-generated eligibility or false full-text review claims.
+- The SteamVR DOI's canonical full title is confirmed via a scholarly ORCID/Scopus-indexed record; original P08 title remains truncated and unchanged. Keep the raw collision visible but classify it as a corrected source-field error, not two studies.
+- Review the **1690** candidate keys without manual topical decisions (including much of the **435**-entry *automated data-quality flag queue*) with explicit inclusion/exclusion criteria; no bulk machine-generated eligibility or false full-text review claims.
 - Only after work-level reconciliation estimate unique eligible studies and rebuild a dated search/screening flow. The source claims 1908→240→79 remain unsupported as a single flow.
