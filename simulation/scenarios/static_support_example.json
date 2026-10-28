@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "terrain_class": "flat_horizontal",
+  "contacts": [
+    {
+      "id": "foot_a",
+      "height_m": 0,
+      "contact_state": "assumed",
+      "footprint_xy_m": [
+        [
+          -0.1,
+          -0.2
+        ],
+        [
+          0.1,
+          -0.2
+        ],
+        [
+          0.1,
+          -0.1
+        ],
+        [
+          -0.1,
+          -0.1
+        ]
+      ]
+    },
+    {
+      "id": "foot_b",
+      "height_m": 0,
+      "contact_state": "assumed",
+      "footprint_xy_m": [
+        [
+          -0.1,
+          0.1
+        ],
+        [
+          0.1,
+          0.1
+        ],
+        [
+          0.1,
+          0.2
+        ],
+        [
+          -0.1,
+          0.2
+        ]
+      ]
+    }
+  ],
+  "com_projection_xy_m": [
+    0,
+    0
+  ],
+  "required_margin_m": 0.05
+}
