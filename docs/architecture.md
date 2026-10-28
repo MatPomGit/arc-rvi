@@ -204,6 +204,64 @@ preflight to clear physical robot motion or certify whole-body
 collision safety. See [P03 protocol](../experiments/exp03_viewpoint_planning/protocol.md)
 and [safety](safety.md).
 
+### Offline waypoint collision diagnostics (fixture-only)
+
+The canonical `rvi robot-model` command can review **2–32**
+time-ordered joint configurations using a local UTF-8 JSON trajectory:
+
+```json
+{
+  "schema_version": "1.0.0",
+  "waypoints": [
+    {"time_s": 0, "joint_positions": {"slider": -1.0}},
+    {"time_s": 1, "joint_positions": {"slider": 1.0}}
+  ]
+}
+```
+
+The joint name is illustrative. Every waypoint must contain the
+**complete** set of joints declared movable by its own pinned URDF,
+with radians for rotary and metres for prismatic joints; timestamps
+must be strictly increasing. Use:
+
+```bash
+rvi robot-model --urdf /path/to/pinned_model.urdf \
+  --expected-sha256 PINNED_64_CHARACTER_LOWERCASE_HEX \
+  --trajectory /path/to/trajectory.json \
+  --collision-fixture /path/to/collision_fixture.json \
+  --output results/waypoint_collision_audit.json
+```
+
+`--trajectory` and `--joint-state` are mutually exclusive; the
+collision fixture is mandatory for a trajectory. Inputs are local,
+size-bounded, source-hashed, and output is never overwritten.
+At each waypoint, static FK-attached sphere proxies are checked
+against explicit static AABBs and listed self-pairs. For each pair
+of adjacent waypoints, a straight segment connecting the sphere
+centres is screened against an **axis-wise sphere-inflated box**.
+This chord screen conservatively flags possible contact for **that
+straight chord** (and may over-flag corners), but the actual centre
+path of an articulated joint is generally **curved**. The chord
+check can therefore **miss a collision on the true swept path**.
+
+The diagnostic statuses are:
+
+- `proxy_overlap_at_waypoint`: collision proxy touches or overlaps
+  a declared obstacle or self-pair at a supplied configuration.
+- `possible_chord_obstacle_overlap`: no sampled overlap, but the
+  straight centre chord intersects an expanded obstacle box.
+- `sampled_proxy_clear_between_samples_unverified`: no overlap
+  among the **supplied** sampled proxies and chords; the actual
+  intermediate FK trajectories and full robot remain **unverified**.
+
+The tool does **not** interpolate joint angles, reconstruct
+continuous trajectories, check between-waypoint self-collision,
+solve inverse kinematics, validate contacts on stairs or certify
+any physical G1 EDU motion. Results always record
+`continuous_articulated_collision_validation: not_performed`.
+This is a screening aid for P03 candidate rejection, **not**
+a motion-clearance authorization.
+
 Current implementation: deterministic planar greedy viewpoint baseline, mission
 state guards, threshold decisions on supplied measurements, file hashing, paired fixture
 benchmarking and a planar geometric simulator. The simulator has a separate observation
