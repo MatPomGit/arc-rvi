@@ -123,7 +123,7 @@ under a frozen noninferiority margin and independent judges.
 
 ## Secondary comparator registration: physical inspection versus assessment (2026-10-28, unfrozen)
 
-The [source-row-grounded review ledger](../../research/literature/secondary_comparator_decisions.json)
+The [source-row-grounded review ledger](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_comparator_decisions.json)
 adds [CAIS (Le et al., IROS 2024)](https://doi.org/10.1109/IROS58592.2024.10802162)
 as confined-access autonomous visual/instrumented inspection prior art
 and [VertInspect (Chai et al., 2026)](https://doi.org/10.1016/j.aei.2026.104590)
