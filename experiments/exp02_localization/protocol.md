@@ -121,6 +121,10 @@ held-out object/session identity truth and calibrated poses. The current
 8×8 simulated textures and uncalibrated PGM input do not meet that gate.
 See [prior-art appraisal](../../docs/prior-art-critical.md).
 
+## Image-derived colour-cue pilot (2026-10-28, not identity validation)
+
+The [offline masked-image colour baseline](../../docs/vehicle-colour-cues.md) derives a small number of RGB colour cues from source-hashed images and *externally supplied* car-body masks. It excludes weak chroma or blown-out pixels, but it is **not** an automatic car detector, model-trained part segmenter or natural-language grounding system. Two plausible matching cars force abstention; a single supported colour candidate still needs independent target identity verification/clarification. Development-only thresholds and vehicle/session-disjoint real photographs are required before comparative P02 evidence. The module provides neither actual wrong-instance rate nor physical confirmation.
+
 ## Primary vehicle-instruction grounding task (prospective, 2026-10-28)
 
 The project reference scenario is a person commanding the bipedal robot
