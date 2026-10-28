@@ -47,6 +47,30 @@ class BenchmarkCliTests(unittest.TestCase):
             self.assertEqual(exit.exception.code, 2)
             self.assertFalse(output.exists())
 
+    def test_plan_never_overwrites_existing_output_or_scenario(self):
+        scenario = ROOT / "simulation/scenarios/inspection_small.json"
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            old_report = root / "prior.json"
+            old_report.write_bytes(b"immutable-previous-result")
+            with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as err:
+                main(["plan", "--scenario", str(scenario), "--output", str(old_report)])
+            self.assertEqual(err.exception.code, 2)
+            self.assertEqual(old_report.read_bytes(), b"immutable-previous-result")
+            original = root / "input.json"
+            original.write_bytes(scenario.read_bytes())
+            with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                main(["plan", "--scenario", str(original), "--output", str(original)])
+            self.assertEqual(original.read_bytes(), scenario.read_bytes())
+            alias = root / "alias.json"
+            alias.symlink_to(original)
+            with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                main(["plan", "--scenario", str(original), "--output", str(alias)])
+            self.assertEqual(original.read_bytes(), scenario.read_bytes())
+            target = root / "new" / "plan.json"
+            self.assertEqual(main(["plan", "--scenario", str(original), "--output", str(target)]), 0)
+            self.assertEqual(json.loads(target.read_text())["evidence_type"], "synthetic_fixture")
+
     def test_module_entrypoint_reports_error_without_traceback(self):
         with tempfile.TemporaryDirectory() as temp:
             completed = subprocess.run(

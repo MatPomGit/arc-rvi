@@ -241,19 +241,27 @@
       "id": "observation-1",
       "session_id": "synthetic-full-car-001-session",
       "kind": "vehicle_detection",
-      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000001"
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "timestamp_s": 1,
+      "vehicle_instance_id": "car-B"
     },
     {
       "id": "operator-disambiguation-2",
       "session_id": "synthetic-full-car-001-session",
       "kind": "vehicle_detection",
-      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000002"
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000002",
+      "timestamp_s": 2,
+      "vehicle_instance_id": "car-B"
     },
     {
       "id": "fixture-observation-front",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
-      "source_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+      "source_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "timestamp_s": 3,
+      "vehicle_instance_id": "car-B",
+      "part_label": "whole_vehicle",
+      "slot_id": "vehicle-front"
     },
     {
       "id": "qc-shot-front",
@@ -262,13 +270,18 @@
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000004",
       "capture_observation_id": "fixture-observation-front",
       "image_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 4
     },
     {
       "id": "fixture-observation-front_left",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
-      "source_sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+      "source_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "timestamp_s": 5,
+      "vehicle_instance_id": "car-B",
+      "part_label": "whole_vehicle",
+      "slot_id": "vehicle-front_left"
     },
     {
       "id": "qc-shot-front_left",
@@ -277,13 +290,18 @@
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000006",
       "capture_observation_id": "fixture-observation-front_left",
       "image_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 6
     },
     {
       "id": "fixture-observation-left",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
-      "source_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+      "source_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "timestamp_s": 7,
+      "vehicle_instance_id": "car-B",
+      "part_label": "whole_vehicle",
+      "slot_id": "vehicle-left"
     },
     {
       "id": "qc-shot-left",
@@ -292,13 +310,18 @@
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000008",
       "capture_observation_id": "fixture-observation-left",
       "image_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 8
     },
     {
       "id": "fixture-observation-rear_left",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
-      "source_sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+      "source_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "timestamp_s": 9,
+      "vehicle_instance_id": "car-B",
+      "part_label": "whole_vehicle",
+      "slot_id": "vehicle-rear_left"
     },
     {
       "id": "qc-shot-rear_left",
@@ -307,13 +330,18 @@
       "source_sha256": "000000000000000000000000000000000000000000000000000000000000000a",
       "capture_observation_id": "fixture-observation-rear_left",
       "image_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 10
     },
     {
       "id": "fixture-observation-rear",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
-      "source_sha256": "5555555555555555555555555555555555555555555555555555555555555555"
+      "source_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "timestamp_s": 11,
+      "vehicle_instance_id": "car-B",
+      "part_label": "whole_vehicle",
+      "slot_id": "vehicle-rear"
     },
     {
       "id": "qc-shot-rear",
@@ -322,13 +350,18 @@
       "source_sha256": "000000000000000000000000000000000000000000000000000000000000000c",
       "capture_observation_id": "fixture-observation-rear",
       "image_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 12
     },
     {
       "id": "fixture-observation-rear_right",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
-      "source_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+      "source_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "timestamp_s": 13,
+      "vehicle_instance_id": "car-B",
+      "part_label": "whole_vehicle",
+      "slot_id": "vehicle-rear_right"
     },
     {
       "id": "qc-shot-rear_right",
@@ -337,13 +370,18 @@
       "source_sha256": "000000000000000000000000000000000000000000000000000000000000000e",
       "capture_observation_id": "fixture-observation-rear_right",
       "image_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 14
     },
     {
       "id": "fixture-observation-right",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
-      "source_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+      "source_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+      "timestamp_s": 15,
+      "vehicle_instance_id": "car-B",
+      "part_label": "whole_vehicle",
+      "slot_id": "vehicle-right"
     },
     {
       "id": "qc-shot-right",
@@ -352,13 +390,18 @@
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000010",
       "capture_observation_id": "fixture-observation-right",
       "image_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 16
     },
     {
       "id": "fixture-observation-front_right",
       "session_id": "synthetic-full-car-001-session",
       "kind": "capture",
-      "source_sha256": "8888888888888888888888888888888888888888888888888888888888888888"
+      "source_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
+      "timestamp_s": 17,
+      "vehicle_instance_id": "car-B",
+      "part_label": "whole_vehicle",
+      "slot_id": "vehicle-front_right"
     },
     {
       "id": "qc-shot-front_right",
@@ -367,14 +410,16 @@
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000012",
       "capture_observation_id": "fixture-observation-front_right",
       "image_sha256": "8888888888888888888888888888888888888888888888888888888888888888",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 18
     },
     {
       "id": "handoff-synthetic-full-car-001",
       "session_id": "synthetic-full-car-001-session",
       "kind": "handoff",
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000013",
-      "anchor_id": "staging_operator_1"
+      "anchor_id": "staging_operator_1",
+      "timestamp_s": 19
     }
   ]
 }

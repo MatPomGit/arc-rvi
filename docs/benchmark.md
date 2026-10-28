@@ -1,6 +1,6 @@
 # Paired fixture benchmark
 
-Application version: 1.5.0
+Application version: 1.22.1
 
 ## Run
 
@@ -29,9 +29,15 @@ travel budget. Each declared scenario is evaluated once per method.
 The additive constant in the distance score represents a fixed one-metre reference
 scale inherited from the original baseline. Changing coordinate units changes this score.
 Greedy methods skip views with no coverage gain. They do not solve a global route problem.
-All methods stop if their chosen next move exceeds the remaining budget; they do not
-substitute another view at that point. The original `rvi plan` API retains its complete-plan
-behaviour and raises an error when full coverage is impossible.
+The historical **fixture benchmark** deliberately retains the frozen
+`legacy_stop` behavior for reproducibility: all original policies stop when
+**their chosen** next move exceeds the remaining budget. The library
+`evaluate_viewpoints` defaults to `budget_selection="feasible_first"` for
+greedy policies under a finite travel budget, filtering currently feasible
+candidates *before* ranking. Specify `budget_selection="legacy_stop"` to
+replay the benchmark policy. The `fixed_order` method retains its prescribed
+sequence, the unbudgeted `rvi plan` API remains unchanged, and neither greedy
+selection rule promises globally optimal route completion.
 
 Coverage is the fraction of distinct required region labels visited. Regions have equal
 weight and supplied visibility is treated as exact. This is not measured image quality

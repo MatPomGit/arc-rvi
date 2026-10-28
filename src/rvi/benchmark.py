@@ -67,7 +67,8 @@ def run_benchmark(suite_path: Path, sensor_path: Path | None = None) -> dict:
         for method in METHODS:
             outcome = evaluate_viewpoints(scenario.viewpoints, scenario.required_regions,
                                           scenario.start_xy, method=method,
-                                          max_travel_distance_m=budget)
+                                          max_travel_distance_m=budget,
+                                           budget_selection="legacy_stop")
             plan = outcome.plan
             trials.append({
                 "trial_id": f"{len(trials) + 1:06d}", "run_id": run_id,
