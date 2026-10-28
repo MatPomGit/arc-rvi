@@ -73,7 +73,7 @@ With the source ZIP present locally, run:
 ```bash
 python scripts/audit_full_literature_archive.py /path/to/agent-artifacts-rvi.zip \
   --output-dir /tmp/rvi-full-archive-audit
-python -m pytest -q tests/test_full_literature_archive_audit.py
+python scripts/validate.py
 ```
 
 Outputs: `archive_coverage.json` (including per-export SHA-256 and row
