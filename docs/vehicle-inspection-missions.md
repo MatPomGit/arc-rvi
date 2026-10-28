@@ -80,6 +80,8 @@ views. P04 geometric coverage is *a separate estimand* requiring withheld
 surface truth; P08 valid-region completion is not interchangeable with
 P03 viewpoint reachability or P06 image-quality classification.
 
+For reproducible **observed-pixel** ROI clipping/brightness checks on locally annotated photographs, see [the image-quality audit](vehicle-image-qa.md). This is a separate, read-only image analysis stage: its photometric pass **cannot** by itself satisfy independent photo validity or verify car identity.
+
 ## Strongly reflective paint: active photometric viewpoint planning
 
 Metallic paint, varnish, glazing and chrome introduce directional
