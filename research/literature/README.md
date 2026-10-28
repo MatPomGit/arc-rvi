@@ -39,3 +39,7 @@ The [critical prior-art appraisal](../../docs/prior-art-critical.md) distinguish
 reported physical manipulator/field trials, simulated Gazebo evidence,
 metrology-only methods and arXiv publication status. None of these
 records by itself validates the eight ARC-RVI research contributions.
+
+## Additional exported bibliographic search corpus (2026-10-28)
+
+The contributor's later archive has a different SHA-256 and different MD-draft hashes from the four archival source files above. It has **not** replaced those files. See the [pinned eight-export audit](export_audit_2026-10-28.md), [critical synthesis](critical_synthesis_2026-10-28.md), and [prospective evidence-to-experiment map](evidence_to_experiments_2026-10-28.md). The reproducible import command is documented in the audit; the private/local ZIP itself is not committed. Neither 1907 export rows nor 1695 candidate keys should be cited as a systematic screening denominator.

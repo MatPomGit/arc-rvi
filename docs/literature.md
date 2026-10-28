@@ -1,5 +1,16 @@
 # Literature evidence and publication gates
 
+## Eight-export bibliographic inventory, 2026-10-28
+
+A newly supplied ZIP contains 155 CSV exports. Eight explicitly selected complete/final datasets contain **1907 row mentions** and produce **1695 provisional DOI-first/title-fallback keys**; these are **not confirmed unique eligible studies**. There are **414 missing DOI fields**, **207 missing/invalid years**, **274 missing abstracts**, **130 missing author fields**, and **2 empty titles**. The screening queue flags **436 candidate keys**. Preprint/publisher duplicates and conflicting identifiers remain unresolved. This collection is **distinct** from the earlier 79-row curated evidence-matrix inventory, and it does not establish the drafts' 1908→240 screening flow.
+
+- [Reproducible source-hash and count audit](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/export_audit_2026-10-28.md)
+- [New critical eight-study synthesis](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/critical_synthesis_2026-10-28.md)
+- [Evidence-to-experiment and publication gates](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md)
+- Offline command: python scripts/audit_literature_exports.py /path/to/agent-artifacts-zip_robo.zip --output-dir /tmp/arc-rvi-export-audit
+
+**Editorial control:** original drafts and the 22-item reviewed DOI manifest remain unchanged; no imported CSV record is automatically labeled bibliographically verified.
+
 **Status:** editorial triage of four author-supplied research drafts, 2026-10-27.
 **Not** a completed systematic review, DOI audit, preregistration, or publication clearance.
 Canonical publication decisions remain governed by the [research programme](../experiments/README.md),
