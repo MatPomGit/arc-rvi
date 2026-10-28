@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.4
+Protocol version: 1.1.5
 
 Status: prospective design, not preregistered or frozen
 
@@ -73,6 +73,26 @@ walking stability. The G1 EDU variant/sensor mount are still
 unverified, and no new physical trials or inspectable viewpoints are
 declared feasible. The primary joint-versus-decoupled inspection
 estimand is unchanged.
+
+## Joint-configured URDF FK audit (2026-10-28, unfrozen)
+
+The `rvi robot-model --joint-state` option now computes *forward*
+transforms from a hash-pinned local URDF and a complete, finite,
+in-range joint-state fixture. Unlike the earlier zero-only preflight,
+it can calculate a **candidate virtual camera pose** under a chosen
+joint configuration, and rejects missing or out-of-limit joint states.
+The virtual floating base is still fixed at an assumed identity pose.
+A correct FK result is **not** proof that a humanoid can attain that
+configuration: it does not validate inverse kinematics, the stance
+contact distribution, whole-body collision, fall margins or motion
+along a trajectory.
+
+P03 must retain unsupported/unvalidated collision, support and
+dynamics as separate blocking gates. Before generating feasible
+inspection viewpoints from a delivered G1 EDU model, obtain verified
+variant-specific URDF bytes, model-body dimensions, sensor extrinsics,
+independent FK cross-check and a scene/terrain collision reference.
+Do not substitute a toy analytic chain for the actual robot model.
 
 ## Reference model preparation (exploratory)
 

@@ -17,7 +17,7 @@ from .localization_population import (generate_localization_population,
 from .pilot import analyze_pilot
 from .planning import plan_family_sample
 from .power_mc import analyze_cluster_monte_carlo
-from .robot_model import inspect_urdf
+from .robot_model import inspect_urdf, load_joint_state
 from .support import inspect_support_file
 from .population import generate_population
 from .scenarios import load_scenario
@@ -81,6 +81,8 @@ def make_parser() -> argparse.ArgumentParser:
     robot_model.add_argument("--urdf", required=True, type=Path)
     robot_model.add_argument("--expected-sha256", required=True)
     robot_model.add_argument("--camera-frame")
+    robot_model.add_argument("--joint-state", type=Path,
+                             help="local JSON with all URDF movable joint positions")
     robot_model.add_argument("--output", required=True, type=Path)
     stance = sub.add_parser("stance", help="audit synthetic static foot support; no gait or safety clearance")
     stance.add_argument("--spec", required=True, type=Path)
@@ -138,8 +140,19 @@ def main(argv: list[str] | None = None) -> int:
                     raise ValueError("output must differ from the input stance spec")
                 payload = inspect_support_file(arguments.spec)
             elif arguments.command == "robot-model":
+                inputs = [arguments.urdf]
+                if arguments.joint_state is not None:
+                    inputs.append(arguments.joint_state)
+                if any(arguments.output.resolve() == item.resolve() for item in inputs):
+                    raise ValueError("output must differ from URDF and joint-state inputs")
+                positions, state_sha = (
+                    load_joint_state(arguments.joint_state)
+                    if arguments.joint_state is not None else (None, None))
                 payload = inspect_urdf(arguments.urdf, arguments.expected_sha256,
-                                       camera_frame=arguments.camera_frame)
+                                       camera_frame=arguments.camera_frame,
+                                       joint_positions=positions)
+                if state_sha is not None:
+                    payload["configured_joint_pose"]["state_source_sha256"] = state_sha
             elif arguments.command == "pilot":
                 payload = analyze_pilot(arguments.manifest, arguments.reference,
                                         arguments.comparator, seed=arguments.seed)
