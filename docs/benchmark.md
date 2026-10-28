@@ -1,6 +1,6 @@
 # Paired fixture benchmark
 
-Application version: 1.5.0
+Application version: 1.22.1
 
 ## Run
 

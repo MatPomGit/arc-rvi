@@ -40,6 +40,11 @@ class VehicleMissionTests(unittest.TestCase):
         bad["return_evidence"]["observation_id"] = "wrong-handoff"
         self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
 
+    def test_assessment_does_not_modify_supplied_trace(self):
+        original = deepcopy(self.bumper)
+        assess_mission(self.bumper)
+        self.assertEqual(self.bumper, original)
+
     def test_chronology_identity_and_part_binding(self):
         bad = deepcopy(self.bumper)
         # Capture is associated with a different vehicle than its photo record.

@@ -85,8 +85,7 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
             raise ValueError("observation belongs to another mission session")
         if observation.get("kind") not in kinds:
             raise ValueError("observation has unsupported kind")
-        observation["timestamp_s"] = _time(observation.get("timestamp_s"),
-                                           "observation.timestamp_s")
+        _time(observation.get("timestamp_s"), "observation.timestamp_s")
         source_hash = observation.get("source_sha256")
         if not isinstance(source_hash, str) or not _HEX256.fullmatch(source_hash):
             raise ValueError("observation source SHA-256 must be lowercase hex")
