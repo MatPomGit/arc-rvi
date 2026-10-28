@@ -18,6 +18,7 @@ nav:
       - Study 02 - Localization: docs/localization.md
       - Commanded vehicle inspection mission: docs/vehicle-inspection-missions.md
       - Reflective bodywork image ROI audit: docs/vehicle-image-qa.md
+      - Annotated vehicle colour-cue triage: docs/vehicle-colour-cues.md
       - Study 02 - Protocol: experiments/exp02_localization/protocol.md
       - Study 03 - Viewpoint planning: experiments/exp03_viewpoint_planning/protocol.md
       - Study 04 - Active coverage: experiments/exp04_active_coverage/protocol.md
