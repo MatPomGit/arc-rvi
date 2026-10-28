@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "execution_mode": "fixture_only",
+  "mission_id": "synthetic-rear-bumper-001",
+  "handoff_anchor_id": "staging_operator_1",
+  "command": {
+    "text": "Zrób zdjęcia tylnego zderzaka tego czerwonego samochodu i wróć do mnie.",
+    "vehicle_description": "czerwony samochód wskazany przez operatora",
+    "scope": "component",
+    "component": "rear_bumper"
+  },
+  "shot_plan": {
+    "approval_kind": "operator_approved",
+    "approval_ref": "synthetic-plan-example/bumper-v1",
+    "required": [
+      {
+        "slot_id": "bumper-centre",
+        "part": "rear_bumper",
+        "view": "rear_straight"
+      },
+      {
+        "slot_id": "bumper-oblique",
+        "part": "rear_bumper",
+        "view": "rear_left_oblique"
+      }
+    ]
+  },
+  "quality_limits": {
+    "max_glare_fraction": 0.12,
+    "max_occlusion_fraction": 0.1
+  },
+  "target_grounding": {
+    "candidates": [
+      {
+        "id": "car-01",
+        "matches_description": true
+      },
+      {
+        "id": "car-02",
+        "matches_description": false
+      }
+    ],
+    "decision": {
+      "status": "resolved",
+      "selected_instance_id": "car-01",
+      "clarification_confirmed": false,
+      "observation_ids": [
+        "vision-frame-100"
+      ]
+    }
+  },
+  "part_grounding": {
+    "status": "resolved",
+    "parent_instance_id": "car-01",
+    "part_label": "rear_bumper",
+    "observation_ids": [
+      "parts-mask-100"
+    ]
+  },
+  "photo_attempts": [
+    {
+      "id": "attempt-glare",
+      "slot_id": "bumper-centre",
+      "vehicle_instance_id": "car-01",
+      "part": "rear_bumper",
+      "view": "rear_straight",
+      "observation_id": "synthetic-image-observation-attempt-glare",
+      "image_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.28,
+        "occlusion_fraction": 0.02,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "attempt-reoriented",
+      "slot_id": "bumper-centre",
+      "vehicle_instance_id": "car-01",
+      "part": "rear_bumper",
+      "view": "rear_straight",
+      "observation_id": "synthetic-image-observation-attempt-reoriented",
+      "image_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.04,
+        "occlusion_fraction": 0.02,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    },
+    {
+      "id": "attempt-side",
+      "slot_id": "bumper-oblique",
+      "vehicle_instance_id": "car-01",
+      "part": "rear_bumper",
+      "view": "rear_left_oblique",
+      "observation_id": "synthetic-image-observation-attempt-side",
+      "image_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "independent_qc": {
+        "reference_separate_from_policy": true,
+        "glare_fraction": 0.03,
+        "occlusion_fraction": 0.02,
+        "framing_ok": true,
+        "focus_ok": true,
+        "exposure_ok": true
+      }
+    }
+  ],
+  "return_evidence": {
+    "anchor_id": "staging_operator_1",
+    "status": "arrived",
+    "safe_route_verified": true,
+    "operator_handoff_confirmed": true
+  }
+}
