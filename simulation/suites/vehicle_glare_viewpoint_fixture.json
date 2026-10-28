@@ -1,0 +1,60 @@
+{
+  "execution_mode": "fixture_only",
+  "slot_id": "bumper-centre",
+  "remaining_time_s": 90,
+  "return_buffer_s": 10,
+  "quality_policy": {
+    "max_predicted_glare_fraction": 0.18,
+    "min_predicted_valid_roi_fraction": 0.65
+  },
+  "weights": {
+    "glare_penalty": 0.4,
+    "time_penalty": 0.2
+  },
+  "candidates": [
+    {
+      "pose_id": "front_direct_reflection",
+      "visibility_proxy_ok": true,
+      "support_proxy_ok": true,
+      "collision_proxy_ok": true,
+      "predicted_glare_fraction": 0.48,
+      "predicted_valid_roi_fraction": 0.7,
+      "outbound_s": 8,
+      "capture_s": 5,
+      "return_s": 10
+    },
+    {
+      "pose_id": "offset_lower_glare",
+      "visibility_proxy_ok": true,
+      "support_proxy_ok": true,
+      "collision_proxy_ok": true,
+      "predicted_glare_fraction": 0.07,
+      "predicted_valid_roi_fraction": 0.9,
+      "outbound_s": 18,
+      "capture_s": 5,
+      "return_s": 20
+    },
+    {
+      "pose_id": "dangerous_kerb_edge",
+      "visibility_proxy_ok": true,
+      "support_proxy_ok": false,
+      "collision_proxy_ok": true,
+      "predicted_glare_fraction": 0.01,
+      "predicted_valid_roi_fraction": 0.96,
+      "outbound_s": 10,
+      "capture_s": 5,
+      "return_s": 15
+    },
+    {
+      "pose_id": "too_far_to_return",
+      "visibility_proxy_ok": true,
+      "support_proxy_ok": true,
+      "collision_proxy_ok": true,
+      "predicted_glare_fraction": 0.02,
+      "predicted_valid_roi_fraction": 0.94,
+      "outbound_s": 60,
+      "capture_s": 8,
+      "return_s": 32
+    }
+  ]
+}
