@@ -32,7 +32,7 @@ def normalized_doi(value: str) -> str:
 
 
 def normalized_title(value: str) -> str:
-    plain = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode().lower()
+    plain = unicodedata.normalize("NFKD", value.replace("ł", "l").replace("Ł", "L")).encode("ascii", "ignore").decode().lower()
     return re.sub(r"[^a-z0-9]+", "", plain)
 
 
