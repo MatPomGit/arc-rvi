@@ -138,3 +138,25 @@ is a *contextual coverage-construct comparator*, not an NBV baseline:
 surface treatment measurement and independently inspected unknown-surface
 area are different estimands. Report P04 endpoint overlap with P06 and
 prohibit reusing their observations as independent confirmation.
+
+## Vehicle and component shot-list coverage (prospective, 2026-10-28)
+
+The [commanded vehicle-mission contract](../../docs/vehicle-inspection-missions.md)
+defines two distinct scopes: **complete required photographic shot list**
+for a car or **a specified part only**, e.g. rear bumper. For the
+whole-car task, a protocol-defined set of views/regions must be frozen
+*before* acquisition, and a single accepted bumper photograph cannot
+satisfy unrelated views. A nominal eight-direction checklist is merely
+a synthetic fixture, not evidence that roof, glass, wheels or hidden
+surfaces have been adequately inspected.
+
+P04 should separately report (a) accepted required-shot proportion and
+(b) independently evaluated target-surface fraction with evaluator-only
+mesh/region reference. Cross reflective paint, partial occlusion,
+parking-lot access geometry and unknown-surface uncertainty; hold out
+car models, materials, scene families and lighting sessions. Glare-
+saturated ROI segments do not count as *accepted* surface observations
+even when geometrically visible. Compare geometric NBV, reflectivity-
+aware NBV (including [FRA-NBV](https://doi.org/10.1109/LRA.2026.3728374))
+and matched finite-budget active policies; overlap with P06 quality
+must be declared rather than counted as independent results.
