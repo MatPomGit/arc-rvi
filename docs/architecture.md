@@ -116,6 +116,42 @@ This is a bounded first contribution to issue #25, **not** a dynamic
 bipedal stability or G1 EDU inspection-validity oracle; see
 [simulation](simulation.md).
 
+### Configured offline forward kinematics (fixture-only)
+
+The existing `rvi robot-model` command also accepts a caller-supplied,
+bounded, local JSON configuration of **all** movable URDF joints:
+
+```json
+{"schema_version":"1.0.0","joint_positions":{"arm_joint":0.25}}
+```
+
+```bash
+rvi robot-model --urdf /path/to/pinned_model.urdf \
+  --expected-sha256 PINNED_64_CHARACTER_LOWERCASE_HEX \
+  --camera-frame VERIFIED_URDF_LINK \
+  --joint-state /path/to/joint_state.json \
+  --output results/configured_fk.json
+```
+
+The example key `arm_joint` is **illustrative**, not a G1 joint. A real
+input must name **every** movable joint declared by the selected URDF
+(revolute in radians, continuous in radians and prismatic in metres).
+Unknown, omitted, extra, non-finite or out-of-limit joint values are
+rejected, without assuming unspecified joints are at zero. A one-root
+floating joint retains the explicit **virtual identity-base assumption**,
+not a physical base pose. The command preserves the prior zero-pose
+audit and adds source-hashed `configured_joint_pose` for every link.
+
+The FK uses URDF joint origins and normalized axes; analytic fixtures
+cover a revolute joint followed by a prismatic joint, camera offsets,
+boundary values and a floating root. This is **only offline articulated
+forward kinematics**. It does **not** solve inverse kinematics, check
+joint torque/velocity, self/environment collisions, foot contacts,
+dynamic balance, sensor calibration or physical safety. Even when a
+configured camera frame exists, its real extrinsics remain unverified
+until the actual Unitree G1 EDU variant and sensor mount are confirmed.
+The output must **not** be used as an executable or safe stance approval.
+
 Current implementation: deterministic planar greedy viewpoint baseline, mission
 state guards, threshold decisions on supplied measurements, file hashing, paired fixture
 benchmarking and a planar geometric simulator. The simulator has a separate observation
