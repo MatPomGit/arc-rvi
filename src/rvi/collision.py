@@ -183,6 +183,10 @@ def inspect_collision_proxies(configured_pose: dict, fixture: dict) -> dict:
                    else "no_proxy_overlap_unverified"),
         "checked_pairs": len(checks),
         "proxy_spheres": len(spheres),
+        "sphere_centres_world_m": {
+            identifier: list(point)
+            for identifier, point in sorted(sphere_centres.items())
+        },
         "obstacle_boxes": len(boxes),
         "explicit_self_pairs": len(self_pairs),
         "clearance_margin_m": margin,
