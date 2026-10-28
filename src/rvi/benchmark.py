@@ -321,12 +321,17 @@ def _simulation_suite(path: Path, suite: dict, raw: bytes,
             if row["failure_reason"] is not None:
                 reason = row["failure_reason"]
                 reasons[reason] = reasons.get(reason, 0) + 1
-        summary.append({"method": method, "trial_count": count,
-                        "success_count": sum(row["status"] == "completed" for row in rows),
-                        "mean_sampled_surface_coverage": fsum(row["sampled_surface_coverage"] / count for row in rows),
-                        "mean_elapsed_time_s": fsum(row["elapsed_time_s"] / count for row in rows),
-                        "mean_travel_distance_m": fsum(row["travel_distance_m"] / count for row in rows),
-                        "failures": reasons})
+        record = {"method": method, "trial_count": count,
+                  "success_count": sum(row["status"] == "completed" for row in rows),
+                  "mean_sampled_surface_coverage": fsum(row["sampled_surface_coverage"] / count for row in rows),
+                  "mean_elapsed_time_s": fsum(row["elapsed_time_s"] / count for row in rows),
+                  "mean_travel_distance_m": fsum(row["travel_distance_m"] / count for row in rows),
+                  "failures": reasons}
+        if sensor is not None:
+            record["execution_complete_count"] = record["success_count"]
+            record["coverage_complete_count"] = sum(row["coverage_complete"] for row in rows)
+            record["coverage_complete_fraction"] = record["coverage_complete_count"] / count
+        summary.append(record)
     result = {
         "schema_version": "1.0.0", "suite_id": suite_id, "study_id": "01",
         "evidence_type": "simulation",

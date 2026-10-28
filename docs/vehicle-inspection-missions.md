@@ -1,6 +1,6 @@
 # Commanded vehicle and component photography: mission contract
 
-**Version:** 1.0.0, 2026-10-28. **State:** prospective use case and
+**Version:** 1.1.0, 2026-10-28. **State:** prospective use case and
 software-fixture evidence contract. There is no deployed G1 EDU command,
 speech, camera, locomotion or human-return implementation in this change.
 Every result from the included examples is `software_fixture_only`.
@@ -42,6 +42,23 @@ hardware-verified safety gates. A parked car and a person's proximity
 create separate collision/damage risks.
 
 An initial [observed-pixel colour-cue baseline](vehicle-colour-cues.md) now processes **provided car-body masks** to identify plausible red/green/blue/yellow candidates. It is strictly advisory: a single matching colour does **not** establish the intended vehicle identity, while two matching candidates must trigger clarification. Automatic car/part detection, multimodal grounding and cross-frame re-identification remain pending.
+
+## Version 2 mission trace and integrity checks
+
+The fixture evaluator requires a single `session_id`, a `policy_id`, and a
+unique typed `observations` registry. Vehicle and part grounding IDs must
+refer to observations of the correct type within that session. Capture records
+must match the declared image SHA-256; independent QC records must bind to the
+same capture, image and a separately identified evaluator. Return evidence must
+be linked to the original handoff anchor. Invalid cross-session or missing
+bindings invalidate the trace. Legacy schema 1 is not accepted.
+
+These synthetic source hashes are *declarations*, not verified raw camera
+artifacts. The optional `artifact_root` argument in the Python API verifies
+the SHA-256 bytes of bounded local capture files (no symlink or traversal).
+`capture_bytes_verified` distinguishes this validation from the default
+fixture-only mode. Neither capture hashes nor synthetic QC prove identity,
+photographic usefulness, physical safety or actual operator acknowledgement.
 
 ## Instruction resolution and target binding
 

@@ -126,6 +126,13 @@ Track that work in [Issues #17](https://github.com/MatPomGit/arc-rvi/issues/17),
 [#21](https://github.com/MatPomGit/arc-rvi/issues/21) and
 [#22](https://github.com/MatPomGit/arc-rvi/issues/22).
 
+In sensor-observation summaries, `success_count` retains its historical
+route-execution meaning. For research interpretation, the additional
+`execution_complete_count`, `coverage_complete_count` and
+`coverage_complete_fraction` explicitly separate finished movement from
+independently detected surface coverage. Do not use route completion as an
+inspection-success endpoint.
+
 ## Paired geometric simulation
 
 ```bash

@@ -10,12 +10,27 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from rvi.vehicle_mission import assess_mission
 
 
+def _unique_keys(items):
+    output = {}
+    for key, value in items:
+        if key in output:
+            raise ValueError(f"duplicate JSON key: {key}")
+        output[key] = value
+    return output
+
+
+def _reject_nonfinite(value):
+    raise ValueError(f"non-finite JSON constant: {value}")
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("mission", type=Path, help="A fixture-only JSON mission log; never drives the robot")
     args = p.parse_args()
     try:
-        payload = json.loads(args.mission.read_text(encoding="utf-8"))
+        payload = json.loads(args.mission.read_text(encoding="utf-8"),
+                             object_pairs_hook=_unique_keys,
+                             parse_constant=_reject_nonfinite)
         report = assess_mission(payload)
     except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
         print(f"mission validation error: {exc}", file=sys.stderr)

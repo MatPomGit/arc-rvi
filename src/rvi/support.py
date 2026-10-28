@@ -40,6 +40,20 @@ def _cross(a: tuple[float, float], b: tuple[float, float],
     return result
 
 
+def _nonadjacent_edges_intersect(a, b, c, d) -> bool:
+    """Detect crossings and nonadjacent collinear touch/overlap."""
+    o1, o2 = _cross(a, b, c), _cross(a, b, d)
+    o3, o4 = _cross(c, d, a), _cross(c, d, b)
+    def on_edge(p, q, r):
+        return (min(p[0], q[0]) <= r[0] <= max(p[0], q[0])
+                and min(p[1], q[1]) <= r[1] <= max(p[1], q[1]))
+    if (o1 == 0 and on_edge(a, b, c)) or (o2 == 0 and on_edge(a, b, d)):
+        return True
+    if (o3 == 0 and on_edge(c, d, a)) or (o4 == 0 and on_edge(c, d, b)):
+        return True
+    return (o1 > 0) != (o2 > 0) and (o3 > 0) != (o4 > 0)
+
+
 def _validated_patch(value: object, index: int) -> tuple[list[tuple[float, float]], float, str]:
     if not isinstance(value, dict) or set(value) != {
             "id", "footprint_xy_m", "height_m", "contact_state"}:
@@ -57,6 +71,14 @@ def _validated_patch(value: object, index: int) -> tuple[list[tuple[float, float
     polygon = [_point(v, "footprint_xy_m") for v in vertices]
     if len(set(polygon)) != len(polygon):
         raise ValueError("footprint has duplicate vertices")
+    for i in range(len(polygon)):
+        for j in range(i + 1, len(polygon)):
+            if j == i + 1 or (i == 0 and j == len(polygon) - 1):
+                continue
+            if _nonadjacent_edges_intersect(
+                    polygon[i], polygon[(i + 1) % len(polygon)],
+                    polygon[j], polygon[(j + 1) % len(polygon)]):
+                raise ValueError("footprint is self-intersecting")
     bends = [_cross(polygon[i], polygon[(i + 1) % len(polygon)],
                     polygon[(i + 2) % len(polygon)])
              for i in range(len(polygon))]

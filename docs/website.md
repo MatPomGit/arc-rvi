@@ -5,10 +5,14 @@ The canonical files remain in the repository root, `docs/`, and
 
 ## Local verification
 
-Python 3.11+ is required.
+Python 3.11+ is required for the core package. Documentation builds use
+Python 3.12 and exact package versions taken from a successful CI environment
+(run 40726274868). Refresh the pinned dependency set deliberately when
+updating MkDocs, then validate the strict site build.
 
 ```bash
-python -m pip install mkdocs==1.6.1
+python -m pip install --no-deps -r docs/requirements-docs.txt
+python -m pip check
 python scripts/build_docs.py
 python -m mkdocs build --strict
 python -m mkdocs serve

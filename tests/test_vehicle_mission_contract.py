@@ -20,6 +20,52 @@ class VehicleMissionTests(unittest.TestCase):
         self.bumper = fixture("vehicle_photo_mission_bumper_fixture.json")
         self.whole = fixture("vehicle_photo_mission_whole_car_fixture.json")
 
+    def test_mission_sources_are_session_and_capture_bound(self):
+        bad = deepcopy(self.bumper)
+        bad["target_grounding"]["decision"]["observation_ids"] = ["unknown-frame"]
+        self.assertEqual(assess_mission(bad)["verdict"], "blocked_target")
+        bad = deepcopy(self.bumper)
+        bad["photo_attempts"][1]["observation_id"] = "nonexistent-frame"
+        result = assess_mission(bad)
+        self.assertEqual(result["verdict"], "invalid_trace")
+        self.assertIn("capture_not_bound_to_matching_source", result["rejected_attempts"][1]["reasons"])
+        bad = deepcopy(self.bumper)
+        bad["photo_attempts"][1]["independent_qc"]["observation_id"] = "missing-qc"
+        self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
+        bad = deepcopy(self.bumper)
+        bad["observations"][0]["session_id"] = "another-session"
+        with self.assertRaisesRegex(ValueError, "another mission session"):
+            assess_mission(bad)
+        bad = deepcopy(self.bumper)
+        bad["return_evidence"]["observation_id"] = "wrong-handoff"
+        self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
+
+    def test_optional_capture_file_hash_verification(self):
+        from tempfile import TemporaryDirectory
+        from hashlib import sha256
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            data = deepcopy(self.bumper)
+            photos = {p["observation_id"]: p for p in data["photo_attempts"]}
+            for record in data["observations"]:
+                if record["kind"] != "capture":
+                    continue
+                filename = record["id"] + ".txt"
+                raw = record["id"].encode("utf-8")
+                (root / filename).write_bytes(raw)
+                checksum = sha256(raw).hexdigest()
+                record.update(artifact_path=filename, source_sha256=checksum)
+                photos[record["id"]]["image_sha256"] = checksum
+                for qc in data["observations"]:
+                    if qc["kind"] == "independent_quality" and qc["capture_observation_id"] == record["id"]:
+                        qc["image_sha256"] = checksum
+            report = assess_mission(data, artifact_root=root)
+            self.assertEqual(report["verdict"], "fixture_complete")
+            self.assertTrue(report["capture_bytes_verified"])
+            (root / (data["photo_attempts"][0]["observation_id"] + ".txt")).write_bytes(b"tampered")
+            with self.assertRaisesRegex(ValueError, "SHA256 mismatch"):
+                assess_mission(data, artifact_root=root)
+
     def test_bumper_recapture_after_specular_failure(self):
         r = assess_mission(self.bumper)
         self.assertEqual(r["verdict"], "fixture_complete")
@@ -131,6 +177,20 @@ class VehicleMissionTests(unittest.TestCase):
         bad["part_grounding"] = self.bumper["part_grounding"]
         with self.assertRaisesRegex(ValueError, "unexpected part_grounding"):
             assess_mission(bad)
+
+    def test_cli_rejects_duplicate_json_fields_and_nonfinite(self):
+        from tempfile import TemporaryDirectory
+        from contextlib import redirect_stderr
+        from io import StringIO
+        from unittest.mock import patch
+        from scripts.assess_vehicle_mission import main
+        with TemporaryDirectory() as temp:
+            path = Path(temp) / "trace.json"
+            for raw in ('{"schema_version":1,"schema_version":2}',
+                        '{"schema_version": NaN}'):
+                path.write_text(raw, encoding="utf-8")
+                with patch("sys.argv", ["assess_vehicle_mission.py", str(path)]), redirect_stderr(StringIO()):
+                    self.assertEqual(main(), 2)
 
     def test_nan_quality_rejected(self):
         bad = deepcopy(self.whole)

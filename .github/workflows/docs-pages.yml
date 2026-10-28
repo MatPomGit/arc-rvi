@@ -1,7 +1,5 @@
 name: Documentation (MkDocs + Pages)
 
-# Always validate the exact PR/main commit, including code-only changes.
-# Path filters here silently skipped Python regressions for source-only PRs.
 on:
   pull_request:
     branches: [main]
@@ -17,28 +15,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  tests:
+    name: Offline regression (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Offline software regression tests
+        run: python scripts/validate.py
+
   build:
     name: Validate and build documentation
+    needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
       - name: Install MkDocs
-        run: python -m pip install --disable-pip-version-check mkdocs==1.6.1
-      - name: Offline software regression tests
-        run: python scripts/validate.py
+        run: |
+          python -m pip install --disable-pip-version-check --no-deps -r docs/requirements-docs.txt
+          python -m pip check
       - name: Stage canonical sources
         run: python scripts/build_docs.py
       - name: Strict site build
         run: python -m mkdocs build --strict
       - name: Configure Pages
         if: github.event_name != 'pull_request'
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: .build/site
 
@@ -55,4 +69,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
