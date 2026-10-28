@@ -1,6 +1,6 @@
 # Commanded vehicle and component photography: mission contract
 
-**Version:** 1.1.0, 2026-10-28. **State:** prospective use case and
+**Version:** 1.2.0, 2026-10-28. **State:** prospective use case and
 software-fixture evidence contract. There is no deployed G1 EDU command,
 speech, camera, locomotion or human-return implementation in this change.
 Every result from the included examples is `software_fixture_only`.
@@ -52,6 +52,15 @@ must match the declared image SHA-256; independent QC records must bind to the
 same capture, image and a separately identified evaluator. Return evidence must
 be linked to the original handoff anchor. Invalid cross-session or missing
 bindings invalidate the trace. Legacy schema 1 is not accepted.
+
+Each registry observation now requires a finite nonnegative `timestamp_s` and
+object-binding metadata. Vehicle and part observations must name the selected
+vehicle (and part where relevant). A capture must link the same vehicle, part,
+slot and image SHA-256, and follow all referenced target/part observations in
+time. The independent QC must follow the capture, and the handoff must follow
+the photo and QC observations. Invalid temporal order fails closed. These are
+**synthetic event-time assertions**, not verified sensor-clock synchronization,
+causal provenance or confirmation by the requesting human.
 
 These synthetic source hashes are *declarations*, not verified raw camera
 artifacts. The optional `artifact_root` argument in the Python API verifies

@@ -127,19 +127,28 @@
       "id": "vision-frame-100",
       "session_id": "synthetic-rear-bumper-001-session",
       "kind": "vehicle_detection",
-      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000001"
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "timestamp_s": 1,
+      "vehicle_instance_id": "car-01"
     },
     {
       "id": "parts-mask-100",
       "session_id": "synthetic-rear-bumper-001-session",
       "kind": "part_detection",
-      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000002"
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000002",
+      "timestamp_s": 2,
+      "vehicle_instance_id": "car-01",
+      "part_label": "rear_bumper"
     },
     {
       "id": "synthetic-image-observation-attempt-glare",
       "session_id": "synthetic-rear-bumper-001-session",
       "kind": "capture",
-      "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "timestamp_s": 3,
+      "vehicle_instance_id": "car-01",
+      "part_label": "rear_bumper",
+      "slot_id": "bumper-centre"
     },
     {
       "id": "qc-attempt-glare",
@@ -148,13 +157,18 @@
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000004",
       "capture_observation_id": "synthetic-image-observation-attempt-glare",
       "image_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 4
     },
     {
       "id": "synthetic-image-observation-attempt-reoriented",
       "session_id": "synthetic-rear-bumper-001-session",
       "kind": "capture",
-      "source_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      "source_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "timestamp_s": 5,
+      "vehicle_instance_id": "car-01",
+      "part_label": "rear_bumper",
+      "slot_id": "bumper-centre"
     },
     {
       "id": "qc-attempt-reoriented",
@@ -163,13 +177,18 @@
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000006",
       "capture_observation_id": "synthetic-image-observation-attempt-reoriented",
       "image_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 6
     },
     {
       "id": "synthetic-image-observation-attempt-side",
       "session_id": "synthetic-rear-bumper-001-session",
       "kind": "capture",
-      "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "timestamp_s": 7,
+      "vehicle_instance_id": "car-01",
+      "part_label": "rear_bumper",
+      "slot_id": "bumper-oblique"
     },
     {
       "id": "qc-attempt-side",
@@ -178,14 +197,16 @@
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000008",
       "capture_observation_id": "synthetic-image-observation-attempt-side",
       "image_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-      "evaluator_id": "independent-annotator"
+      "evaluator_id": "independent-annotator",
+      "timestamp_s": 8
     },
     {
       "id": "handoff-synthetic-rear-bumper-001",
       "session_id": "synthetic-rear-bumper-001-session",
       "kind": "handoff",
       "source_sha256": "0000000000000000000000000000000000000000000000000000000000000009",
-      "anchor_id": "staging_operator_1"
+      "anchor_id": "staging_operator_1",
+      "timestamp_s": 9
     }
   ]
 }

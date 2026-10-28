@@ -49,6 +49,12 @@ def _fraction(value, name):
     return float(value)
 
 
+def _time(value, name):
+    if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
+        raise ValueError(f"{name} must be a nonnegative finite timestamp in seconds")
+    return float(value)
+
+
 def _unique_ids(items, name):
     values = [_text(_mapping(x, name).get("id"), f"{name}.id") for x in items]
     if len(values) != len(set(values)):
@@ -79,6 +85,8 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
             raise ValueError("observation belongs to another mission session")
         if observation.get("kind") not in kinds:
             raise ValueError("observation has unsupported kind")
+        observation["timestamp_s"] = _time(observation.get("timestamp_s"),
+                                           "observation.timestamp_s")
         source_hash = observation.get("source_sha256")
         if not isinstance(source_hash, str) or not _HEX256.fullmatch(source_hash):
             raise ValueError("observation source SHA-256 must be lowercase hex")
@@ -91,9 +99,13 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
                     "sha256": observation["source_sha256"],
                 }, "capture")
 
-    def linked(ids, kind):
+    def linked(ids, kind, instance_id=None, part_label=None):
         return bool(ids) and all(
-            item in registry and registry[item]["kind"] == kind for item in ids)
+            item in registry
+            and registry[item]["kind"] == kind
+            and (instance_id is None or registry[item].get("vehicle_instance_id") == instance_id)
+            and (part_label is None or registry[item].get("part_label") == part_label)
+            for item in ids)
 
     command = _mapping(d.get("command"), "command")
     _text(command.get("text"), "command.text")
@@ -154,7 +166,7 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
     if status == "resolved":
         if not isinstance(chosen, str) or chosen not in matches:
             violations.append("target_not_grounded_in_matching_observation")
-        elif not linked(obs, "vehicle_detection"):
+        elif not linked(obs, "vehicle_detection", chosen):
             violations.append("target_without_bound_observation_provenance")
         elif len(matches) > 1 and not clarified:
             violations.append("unresolved_multi_car_ambiguity")
@@ -175,7 +187,7 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
                 and len(part_data["observation_ids"]) > 0
                 and all(isinstance(v, str) and v.strip()
                         for v in part_data["observation_ids"])
-                and linked(part_data["observation_ids"], "part_detection")
+                and linked(part_data["observation_ids"], "part_detection", chosen, component)
                 and target_ok):
             part_ok = True
         else:
@@ -212,7 +224,10 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
             _flag(qc.get(k), f"independent_qc.{k}")
         reasons = []
         if (capture_record is None or capture_record.get("kind") != "capture"
-                or capture_record.get("source_sha256") != image_hash):
+                or capture_record.get("source_sha256") != image_hash
+                or capture_record.get("vehicle_instance_id") != chosen
+                or capture_record.get("part_label") != photo.get("part")
+                or capture_record.get("slot_id") != slot):
             reasons.append("capture_not_bound_to_matching_source")
             violations.append("capture_source_binding_invalid")
         if (qc_record is None or qc_record.get("kind") != "independent_quality"
@@ -223,6 +238,21 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
                 or qc_record["evaluator_id"] == policy_id):
             reasons.append("independent_qc_source_unverified")
             violations.append("independent_qc_source_binding_invalid")
+        if capture_record is not None and capture_record.get("kind") == "capture":
+            ground_ids = list(obs)
+            if scope == "component" and isinstance(d.get("part_grounding"), dict):
+                ground_ids.extend(d["part_grounding"].get("observation_ids", []))
+            if (not ground_ids or any(ref not in registry for ref in ground_ids)
+                    or capture_record["timestamp_s"] <= max(
+                        (registry[ref]["timestamp_s"] for ref in ground_ids if ref in registry),
+                        default=-1)):
+                reasons.append("capture_not_after_grounding")
+                violations.append("capture_timestamp_or_grounding_invalid")
+        if (capture_record is not None and qc_record is not None
+                and qc_record.get("kind") == "independent_quality"
+                and qc_record["timestamp_s"] <= capture_record["timestamp_s"]):
+            reasons.append("qc_not_after_capture")
+            violations.append("qc_timestamp_invalid")
         if not target_ok or not part_ok:
             reasons.append("unresolved_grounding")
         if slot not in req_by_id:
@@ -260,6 +290,12 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
                      and handoff_record.get("anchor_id") == origin)
     if not handoff_bound:
         violations.append("handoff_source_binding_invalid")
+    elif handoff_record["timestamp_s"] <= max(
+            (registry[item]["timestamp_s"] for photo in attempts
+             for item in (photo["observation_id"], photo["independent_qc"]["observation_id"])
+             if item in registry), default=-1):
+        handoff_bound = False
+        violations.append("handoff_not_after_photo_and_qc")
     if returned.get("status") not in ("arrived", "blocked", "not_attempted"):
         raise ValueError("unsupported return status")
     safe_route = _flag(returned.get("safe_route_verified"), "safe_route_verified")
@@ -295,6 +331,7 @@ def assess_mission(data: dict, *, artifact_root: Path | None = None) -> dict:
         "evidence_class": "software_fixture_only",
         "trace_schema_version": 2,
         "capture_bytes_verified": artifact_root is not None,
+        "observation_chronology": "validated_fixture_timestamps_not_clock_synchronized",
         "non_capture_evidence": "declared_fixture_sources_not_independently_verified",
         "physical_robot_success": False,
     }

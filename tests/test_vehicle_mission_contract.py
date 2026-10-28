@@ -40,6 +40,37 @@ class VehicleMissionTests(unittest.TestCase):
         bad["return_evidence"]["observation_id"] = "wrong-handoff"
         self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
 
+    def test_chronology_identity_and_part_binding(self):
+        bad = deepcopy(self.bumper)
+        # Capture is associated with a different vehicle than its photo record.
+        capture = next(x for x in bad["observations"] if x["kind"] == "capture")
+        capture["vehicle_instance_id"] = "another-car"
+        self.assertEqual(assess_mission(bad)["verdict"], "invalid_trace")
+        bad = deepcopy(self.bumper)
+        capture = next(x for x in bad["observations"] if x["kind"] == "capture")
+        capture["timestamp_s"] = 0  # before target and part were identified
+        self.assertIn("capture_not_after_grounding",
+                      assess_mission(bad)["rejected_attempts"][0]["reasons"])
+        bad = deepcopy(self.bumper)
+        qc = next(x for x in bad["observations"] if x["kind"] == "independent_quality")
+        qc["timestamp_s"] = 0  # reference result predates the photograph
+        self.assertIn("qc_not_after_capture",
+                      assess_mission(bad)["rejected_attempts"][0]["reasons"])
+        bad = deepcopy(self.bumper)
+        handoff = next(x for x in bad["observations"] if x["kind"] == "handoff")
+        handoff["timestamp_s"] = 0
+        report = assess_mission(bad)
+        self.assertEqual(report["verdict"], "invalid_trace")
+        self.assertIn("handoff_not_after_photo_and_qc", report["trace_violations"])
+        bad = deepcopy(self.bumper)
+        part = next(x for x in bad["observations"] if x["kind"] == "part_detection")
+        part["vehicle_instance_id"] = "different-car"
+        self.assertEqual(assess_mission(bad)["verdict"], "blocked_part")
+        bad = deepcopy(self.bumper)
+        bad["observations"][0]["timestamp_s"] = float("nan")
+        with self.assertRaisesRegex(ValueError, "timestamp"):
+            assess_mission(bad)
+
     def test_optional_capture_file_hash_verification(self):
         from tempfile import TemporaryDirectory
         from hashlib import sha256
