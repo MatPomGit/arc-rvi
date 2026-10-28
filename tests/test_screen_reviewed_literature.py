@@ -76,7 +76,7 @@ class ManualScreeningTests(unittest.TestCase):
         manifest["decisions"] = []
         rows, result = apply_decisions(candidates, receipt, manifest)
         self.assertEqual(result["reviewed_candidate_keys"], 0)
-        self.assertTrue(all(x["screening_status"] == "not_reviewed" for x in rows)
+        self.assertTrue(all(x["screening_status"] == "not_reviewed" for x in rows))
 
 
 if __name__ == "__main__":
