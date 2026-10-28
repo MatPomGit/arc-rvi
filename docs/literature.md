@@ -23,6 +23,20 @@ source-pinned, non-destructive screening receipt. The
 existing cross-morphology inspection planning and field deployments,
 without verifying an IEEE publisher DOI or a humanoid experiment.
 
+**New direct-comparator extraction, 2026-10-28:** the
+[P03/P04/P06 evidence matrix](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md)
+now distinguishes (1) abstract-only prior art in Staderini IROS 2024,
+Bettles arXiv 2026, and the Staderini 2026 doctoral thesis from
+(2) a source-method/result appraisal of Zhao et al. (2026) based on
+publisher HTML. The thesis includes **photometric visibility plus
+kinematic feasibility and route optimisation**; thus broad joint
+quality-aware planning is not a defensible novel contribution.
+Zhao's reported online-minus-initial paired quality interval crosses
+zero, and independently measured depth references are absent. All
+source-level effect summaries remain external reports, **not**
+ARC-RVI results. The P03/P04/P06 protocols now name stronger
+conceptual comparators and independent test oracles.
+
 **Editorial control:** original drafts and the 22-item reviewed DOI manifest remain unchanged; no imported CSV record is automatically labeled bibliographically verified.
 
 **Status:** editorial triage of four author-supplied research drafts, 2026-10-27.
