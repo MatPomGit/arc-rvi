@@ -142,7 +142,7 @@ recovery. Add their comparable scores only where units and data are compatible.
 
 ## Secondary comparator registration: closed-loop sensing recovery (2026-10-28, unfrozen)
 
-The [source-row-grounded review ledger](../../research/literature/secondary_comparator_decisions.json)
+The [source-row-grounded review ledger](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/secondary_comparator_decisions.json)
 makes [FRA-NBV](https://doi.org/10.1109/LRA.2026.3728374)
 an explicit **reflectivity and missing-depth reacquisition** comparator and
 [RASP](https://doi.org/10.1109/TASE.2025.3604455)
