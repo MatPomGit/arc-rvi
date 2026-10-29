@@ -243,6 +243,73 @@ class MultiAxisIndependentReferences(unittest.TestCase):
         self.assertNotEqual(result["status"],
                             "declared_proxies_only_screened")
 
+    def test_extreme_world_coordinates_fail_closed_instead_of_false_clear(self):
+        fk = self.model(GIMBAL)
+        a, b = {"yaw": -1.0, "pitch": -1.0}, {"yaw": 1.0, "pitch": 1.0}
+        poses = [fk(a), fk(b)]
+        for extent in (1_000_001, 1e12, 1e150):
+            box = ((extent, -0.05, -0.05), (extent + 1, 0.05, 0.05))
+            with self.subTest(extent=extent):
+                result = inspect_rotary_proxy_sweep(
+                    poses, gimbal_fixture(box), fk, max_evaluations=0)
+                self.assertEqual(result["status"], "rotary_sweep_unresolved")
+                self.assertEqual(result["segments"][0]["status"],
+                                 "unresolved_invalid_bound")
+                self.assertEqual(result["total_evaluations"], 0)
+                self.assertEqual(result["numeric_model_limit_m"], 1_000_000)
+
+    def test_invalid_model_scale_and_link_offset_fail_closed(self):
+        fk = self.model(GIMBAL)
+        poses = [fk({"yaw": -1.0, "pitch": -1.0}),
+                 fk({"yaw": 1.0, "pitch": 1.0})]
+        for bad in (float("nan"), float("inf"), -1, 1e20):
+            with self.subTest(bad=bad):
+                changed = [dict(p) for p in poses]
+                for p in changed:
+                    p["all_joint_origin_length_sum_m"] = bad
+                result = inspect_rotary_proxy_sweep(
+                    changed, gimbal_fixture(((10, 0, 0), (11, 1, 1))), fk)
+                self.assertEqual(result["status"], "rotary_sweep_unresolved")
+                self.assertEqual(result["segments"][0]["status"],
+                                 "unresolved_invalid_bound")
+        # The zero and midpoint samples can be fully finite while local
+        # proxy geometry itself violates the audited arithmetic envelope.
+        huge_sphere = gimbal_fixture(((10, 0, 0), (11, 1, 1)))
+        huge_sphere["spheres"][0]["center_local_m"] = [1e12, 0, 0]
+        result = inspect_rotary_proxy_sweep(poses, huge_sphere, fk)
+        self.assertEqual(result["status"], "rotary_sweep_unresolved")
+
+    def test_extreme_continuous_joint_angles_fail_closed(self):
+        xml = GIMBAL.replace('type="revolute"', 'type="continuous"')
+        fk = self.model(xml)
+        poses = [fk({"yaw": 101.0, "pitch": 0.0}),
+                 fk({"yaw": 102.0, "pitch": 0.0})]
+        result = inspect_rotary_proxy_sweep(
+            poses, gimbal_fixture(((10, 0, 0), (11, 1, 1))), fk)
+        self.assertEqual(result["status"], "rotary_sweep_unresolved")
+        self.assertEqual(result["segments"][0]["status"],
+                         "unresolved_invalid_bound")
+        self.assertEqual(result["numeric_joint_angle_limit_rad"], 100)
+
+    def test_tiny_contact_perturbations_do_not_create_false_clear(self):
+        fk = self.model(GIMBAL)
+        a, b = {"yaw": -1.4, "pitch": -1.4}, {"yaw": 1.4, "pitch": 1.4}
+        poses = [fk(a), fk(b)]
+        for perturbation in (-1e-7, -1e-9, -1e-11, 0.0, 1e-11):
+            box = ((1.1 + perturbation, -0.05, -0.05),
+                   (1.2, 0.05, 0.05))
+            with self.subTest(perturbation=perturbation):
+                analytic_gap = point_box_gap(analytic_gimbal(0, 0), box, 0.1)
+                self.assertAlmostEqual(analytic_gap, perturbation, places=12)
+                report = inspect_rotary_proxy_sweep(
+                    poses, gimbal_fixture(box), fk, max_evaluations=64)
+                if analytic_gap <= 0:
+                    self.assertNotEqual(report["status"],
+                                        "declared_proxies_only_screened")
+                self.assertLessEqual(report["total_evaluations"], 64)
+                self.assertEqual(report["full_body_or_robot_motion_certification"],
+                                 "not_performed")
+
     def test_deterministic_multi_axis_interior_contact_family(self):
         fk = self.model(GIMBAL)
         # Multiple approach directions, no endpoint oracle/truth leakage.
