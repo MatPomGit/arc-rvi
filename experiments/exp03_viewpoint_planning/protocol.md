@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.9
+Protocol version: 1.1.10
 
 Status: prospective design, not preregistered or frozen
 
@@ -175,6 +175,24 @@ Unitree G1 EDU joint controller interpolation, base motion,
 complete 3D foot collision geometry, friction, balance or
 inspection success. No planned viewpoint is counted as
 physically accessible or acquired from this fixture screening.
+
+## Synthetic multi-axis collision-reference expansion (2026-10-29)
+
+A separate P03 test oracle now exercises a **3D two-axis gimbal**
+and two rotating branches with a self-sphere contact between
+noncolliding endpoint configurations. Independent trigonometric
+position formulas, an interval-enclosure test and deterministic
+interior-obstacle fixtures expose false all-clear statuses in the
+limited offline sphere/AABB model. This improves the exploratory
+evidence for #100, not the coverage or validity of real G1 EDU
+robot motions. The simulator still omits mesh-body coverage,
+hardware/controller trajectory reconstruction, support on
+noncoplanar feet, contact forces and dynamic balance.
+
+No new viewpoints are credited as acquired, the P03 estimand
+and model-validity gates remain unfrozen, and #25/#26/#100 stay
+open pending full-body coverage and independent safety-domain
+review.
 
 ## Reference model preparation (exploratory)
 
