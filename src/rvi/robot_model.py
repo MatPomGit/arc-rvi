@@ -285,6 +285,7 @@ def inspect_urdf(
         report["configured_joint_pose"] = {
             "status": "offline_articulated_fk_only",
             "joints": dict(sorted(joint_positions.items())),
+            "movable_joint_types": dict(sorted(movable_types.items())),
             "frame_poses": {
                 name: {
                     "translation_m": list(configured[name][1]),
