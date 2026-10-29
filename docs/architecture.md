@@ -311,6 +311,28 @@ controller trajectories, missing robot volumes/meshes, uncertain
 terrain, contact forces, friction, unmodelled obstacles, sensor
 errors or physical robot movement.
 
+### Rotary numeric-domain rejection (fixture-only)
+
+The rotary sphere-proxy preflight now explicitly **fails closed**
+outside an arithmetic validity envelope. The total URDF origin
+length, effective proxy reach and world/obstacle coordinates
+must not exceed **1,000,000 m**, and the absolute rotary joint
+coordinate and cumulative rotary variation must not exceed
+**100 rad**. These are deliberately broad **software
+calculation limits**, **not** allowable G1 EDU reach, torque,
+joint movement or physical safety thresholds.
+
+Within this declared envelope, the clearance exclusion comparison
+includes a scale-aware floating-point allowance based on ULPs,
+number of active joints and the existing positive speed allowance.
+This is conservative engineering error budgeting, **not**
+formally directed-rounded interval arithmetic. Outside the
+envelope, or if a bound is nonfinite, a rotary segment is reported
+as `unresolved_invalid_bound`; it must never be called clear.
+Independent near-tangency, very-large-coordinate and continuous
+joint wrap tests in #100 remain bounded regression evidence,
+not a universal proof.
+
 The output records the evaluation count, remaining unresolved
 intervals, segment status and a fractional interpolation coordinate
 for an observed collision. Neither a sampled overlap nor a clear

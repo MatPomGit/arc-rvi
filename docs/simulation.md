@@ -90,6 +90,24 @@ Unitree G1 EDU. Issue [#100](https://github.com/MatPomGit/arc-rvi/issues/100)
 remains open until broader model-bound, property and numeric-domain
 validation is independently reviewed.
 
+## Numeric-domain and precision stress tests (2026-10-29)
+
+The rotary proxy solver now rejects geometry and model scale above
+1,000,000 m and rotary coordinate/accumulated travel above 100 rad
+as `unresolved_invalid_bound`. Within its domain the clearance
+test uses a ULP-based allowance proportional to scale and joint
+count. These limits protect **software numerical reasoning**
+rather than specify physical tolerances or a G1 EDU range.
+
+The deterministic independent 3D analytic fixture suite now also
+checks obstacle coordinates of 10^6–10^150 m, large continuous
+angles, invalid/nonfinite FK bound metadata, and near-tangent
+gaps and penetrations down to 10^-11 m. Values outside the domain
+are **unknown**, not verified collision-free. This is not a
+rounding-mode-certified proof across arbitrary URDF models or
+physical sensor precision; #100 remains open for formal and
+adversarial numeric review.
+
 ## Difficult-terrain and humanoid validity boundary (2026-10-28)
 
 The present circular-footprint, planar, holonomic motion model **cannot**
