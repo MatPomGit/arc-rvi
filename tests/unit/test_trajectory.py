@@ -75,6 +75,49 @@ class WaypointCollisionTests(unittest.TestCase):
                          "not_performed")
         self.assertEqual(outcome, inspect_waypoint_collision(poses, box, [0, 2]))
 
+    def test_affine_prismatic_sweep_clear_for_declared_proxies_only(self):
+        poses = inspected_poses(PRISMATIC, "slider", [-1.0, 1.0])
+        report = inspect_waypoint_collision(poses, obstacle(x=5), [0, 2])
+        self.assertEqual(report["status"], "affine_proxy_sweep_clear_unverified_body")
+        self.assertEqual(report["segment_kinematics"],
+                         ["affine_prismatic_interpolation"])
+        self.assertEqual(report["affine_proxy_segments"], 1)
+        self.assertEqual(report["rotationally_unresolved_segments"], 0)
+        self.assertEqual(report["possible_affine_self_contacts"], [])
+        self.assertEqual(report["full_body_collision_validation"], "not_performed")
+
+    def test_affine_self_proxy_collision_between_clear_endpoints(self):
+        poses = inspected_poses(PRISMATIC, "slider", [-1, 1])
+        fixture = {
+            "schema_version": "1.0.0", "clearance_margin_m": 0.0,
+            "spheres": [
+                {"id": "moving", "link": "camera",
+                 "center_local_m": [0, 0, 0], "radius_m": 0.2},
+                {"id": "stationary", "link": "root",
+                 "center_local_m": [0, 0, 0], "radius_m": 0.2},
+            ],
+            "boxes": [],
+            "self_pairs": [["moving", "stationary"]],
+        }
+        self.assertTrue(all(inspect_collision_proxies(p, fixture)["status"]
+                            == "no_proxy_overlap_unverified" for p in poses))
+        report = inspect_waypoint_collision(poses, fixture, [0, 1])
+        self.assertEqual(report["status"], "affine_self_proxy_overlap_candidate")
+        self.assertEqual(report["overlap_waypoint_indices"], [])
+        self.assertEqual(len(report["possible_affine_self_contacts"]), 1)
+        self.assertAlmostEqual(
+            report["possible_affine_self_contacts"][0]["minimum_signed_clearance_m"],
+            -0.4, places=12)
+        self.assertEqual(report["self_collision_between_waypoints"],
+                         "explicit_pairs_affine_only")
+
+    def test_multiple_joint_type_mismatch_rejected(self):
+        poses = inspected_poses(PRISMATIC, "slider", [-1.0, 1.0])
+        altered = dict(poses[1])
+        altered["movable_joint_types"] = {"slider": "revolute"}
+        with self.assertRaisesRegex(ValueError, "inconsistent FK joint"):
+            inspect_waypoint_collision([poses[0], altered], obstacle(x=5), [0, 1])
+
     def test_observed_waypoint_overlap_takes_priority(self):
         poses = inspected_poses(PRISMATIC, "slider", [-1, 0, 1])
         result = inspect_waypoint_collision(poses, obstacle(), [0, 1, 2])
@@ -88,10 +131,10 @@ class WaypointCollisionTests(unittest.TestCase):
         # intersecting the beam at x=1; their straight chord x=0 does not.
         poses = inspected_poses(REVOLUTE, "yaw", [-pi / 2, pi / 2])
         result = inspect_waypoint_collision(poses, obstacle(x=1.0), [0, 1])
-        self.assertEqual(result["status"],
-                         "sampled_proxy_clear_between_samples_unverified")
+        self.assertEqual(result["status"], "rotational_sweep_unresolved")
         self.assertEqual(result["possible_chord_contacts"], [])
-        self.assertEqual(result["inter_sample_joint_motion"], "not_reconstructed")
+        self.assertEqual(result["segment_kinematics"], ["rotary_motion_unresolved"])
+        self.assertEqual(result["rotationally_unresolved_segments"], 1)
         self.assertEqual(result["full_body_collision_validation"], "not_performed")
 
     def test_waypoint_schema_and_time_order_fail_closed(self):
