@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.8
+Protocol version: 1.1.9
 
 Status: prospective design, not preregistered or frozen
 
@@ -150,6 +150,31 @@ motion policy, torque, foot contact or G1 EDU hardware calibration
 has been added. Maintain all independent whole-body and
 terrain-stability blockers; even the affine proxy screen cannot
 score a P03 observation as physically acquired or valid.
+
+## Conservative rotary proxy-sweep development (2026-10-29, unfrozen)
+
+The existing offline `rvi robot-model --trajectory` can now
+screen some continuous inter-sample rotation **of declared
+spherical proxies** under an explicit fixed-base, linearly
+interpolated joint-coordinate assumption. A conservative upper
+bound based on all URDF joint origin lengths, prismatic offsets
+and sphere-centre offsets makes some subintervals provably
+noncontacting **in that narrow model**. Uncertain intervals
+trigger bounded midpoint FK checks; sampled overlaps are
+reported, while exhausted evaluation budgets and missing
+kinematic bounds remain unresolved. This deliberately improves
+over a false-negative camera chord for a rotation through an
+obstacle, but is **not** a full-body swept collision oracle.
+
+The new software capability is an initial implementation for
+[#99](https://github.com/MatPomGit/arc-rvi/issues/99);
+the independent source-disjoint analytic reference and
+adversarial calibration from [#100](https://github.com/MatPomGit/arc-rvi/issues/100)
+remain a separate gate. It also cannot infer the actual
+Unitree G1 EDU joint controller interpolation, base motion,
+complete 3D foot collision geometry, friction, balance or
+inspection success. No planned viewpoint is counted as
+physically accessible or acquired from this fixture screening.
 
 ## Reference model preparation (exploratory)
 
