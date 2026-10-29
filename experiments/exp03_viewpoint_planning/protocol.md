@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.11
+Protocol version: 1.1.12
 
 Status: prospective design, not preregistered or frozen
 
@@ -207,6 +207,20 @@ of formally verified interval rounding, missing link geometry
 or an unknown actual controller path must remain explicit in any
 scientific inference. No physical locomotion or P03 performance
 result was established.
+
+## Collision proxy model-coverage inventory (2026-10-29, unfrozen)
+
+The existing offline collision report now inventories the actual
+URDF link names represented by declared proxy spheres and records
+every absent link. It also counts unreviewed explicit cross-link
+self-pair declarations. This is a **diagnostic of missing model
+inputs**, not geometric proof of complete body volume, valid
+joint-contact exemptions or absence of collisions. A single
+sphere attached to a link does **not** make that link physically
+represented. Full-body collision validation and actual
+G1 EDU meshes/sensor clearances remain blocked by #101/#98.
+No feasibility decision or experimental coverage was upgraded
+from these inventory counts.
 
 ## Reference model preparation (exploratory)
 
