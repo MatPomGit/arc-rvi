@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.12
+Protocol version: 1.1.13
 
 Status: prospective design, not preregistered or frozen
 
@@ -221,6 +221,19 @@ represented. Full-body collision validation and actual
 G1 EDU meshes/sensor clearances remain blocked by #101/#98.
 No feasibility decision or experimental coverage was upgraded
 from these inventory counts.
+
+## Conservative primitive collision-volume comparison (2026-10-29, unfrozen)
+
+The offline P03 audit compares declared collision sphere proxies
+against conservative enclosing spheres for **source-hashed URDF
+sphere/box/cylinder primitives**, using link-local coordinates and
+collision margins. Mismatched/missing link-local volumes, unknown
+meshes and links with no collision geometry remain explicitly
+unverified. The result cannot turn a clear proxy trajectory
+into a physically validated full-body motion: the actual G1 EDU
+variant, externally referenced meshes, adjacent contacts, foot
+support and control motion are not verified. This is a preliminary
+step of #101, not the full M2 gate or a P03 observation.
 
 ## Reference model preparation (exploratory)
 
