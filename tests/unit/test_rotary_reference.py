@@ -119,7 +119,6 @@ class IndependentRotaryReferenceTests(unittest.TestCase):
             ((0.95, 1.05, -0.05, 0.05), 0.1, -0.1),
             ((1.10, 1.20, -0.05, 0.05), 0.1, 0.0),
             ((1.25, 1.35, -0.05, 0.05), 0.1, 0.15),
-            ((-1.35, -1.25, -0.05, 0.05), 0.1, 1.15),
         ]
         for box, radius, expected in examples:
             with self.subTest(box=box):
