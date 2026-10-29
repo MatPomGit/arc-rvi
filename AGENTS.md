@@ -46,6 +46,8 @@ This is an independently maintained academic research repository.
 
 ## Project state
 - Read `PROJECT_STATE.yaml` and `AUTOPILOT_PLAN.md` before continuing work.
+- For any **humanoid difficult-terrain, articulated P03 or vehicle-inspection** work, first read the live [master roadmap issue #6](https://github.com/MatPomGit/arc-rvi/issues/6) and its M0–M5 milestones. Select the first **unblocked** relevant child issue from [#98–#107](https://github.com/MatPomGit/arc-rvi/issues?q=is%3Aissue+is%3Aopen+M0+OR+M1+OR+M2+OR+M3+OR+M4+OR+M5), inspect dependencies and existing PRs, and complete one bounded checklist stage per PR. Follow parent [#25](https://github.com/MatPomGit/arc-rvi/issues/25) for kinematics/contacts, [#26](https://github.com/MatPomGit/arc-rvi/issues/26) for P03 benchmark, and [#88](https://github.com/MatPomGit/arc-rvi/issues/88) for safe vehicle/bumper photography and operator return.
+- Mark unknown robot variant, friction, missing collision geometry and changed rotary trajectory without a certified bound as **unverified**, not safe. Hardware-read-only tasks are BLOCKED without authorized access; physical motion always requires a separate safety approval. Milestones describe planned research, not functioning hardware.
 - Update canonical state after verified changes; do not copy state into parallel status files.
 
 ## Experiments and publications
