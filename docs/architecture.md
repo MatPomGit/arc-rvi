@@ -206,6 +206,45 @@ preflight to clear physical robot motion or certify whole-body
 collision safety. See [P03 protocol](../experiments/exp03_viewpoint_planning/protocol.md)
 and [safety](safety.md).
 
+### Conservative URDF primitive-envelope audit (2026-10-29)
+
+Existing `rvi robot-model --urdf ... --joint-state ... --collision-fixture
+... --output ...` now checks how the **already declared link-local sphere
+proxies** relate to the source-pinned URDF `<collision>` geometry.
+There is no new runtime adapter, separate CLI or third-party dependency.
+
+For each URDF `sphere`, `box` or `cylinder` collision element, a
+link-local circumscribing sphere is computed:
+
+- sphere: centre at the collision origin, radius as declared;
+- box: radius equal to half its 3D diagonal;
+- cylinder: radius `hypot(radius_m, length_m/2)`.
+
+This conservative bound is orientation-invariant for box/cylinder
+primitives. The report checks whether **at least one declared sphere on
+the same link** fully contains the reference circumsphere, including the
+explicit collision margin and a small numeric guard. Using more than one
+sphere to *collectively* cover a primitive is not currently proved and
+therefore remains `primitive_enclosure_not_demonstrated`.
+Missing, malformed, nonpositive, nonfinite, oversized or unsupported
+geometry is `unverified_reference_geometry`. **External mesh files
+are neither fetched nor parsed**: their reference volume cannot be
+verified and must stay unknown. Links lacking any URDF
+`<collision>` elements are listed independently, including possible
+virtual/world links pending manual exemption.
+
+The additive `urdf_primitive_envelope_audit` reports the pinned URDF
+hash, primitive counts, each conservative containment result and
+unknown references. Even
+`declared_urdf_primitives_enclosed_unverified_robot` means **only**
+that the specified ideal URDF primitives each fit within one
+corresponding supplied proxy sphere. It does *not* establish that the
+URDF represents the actual delivered G1 EDU geometry, that adjacent
+links are exempt from contact, that mesh volumes are covered, or that
+joint motion/terrain gait is safe. Full-body and hardware validation
+remain `not_performed`; see [#101](https://github.com/MatPomGit/arc-rvi/issues/101)
+and [#98](https://github.com/MatPomGit/arc-rvi/issues/98).
+
 ### Declared-link presence and self-pair omission audit (2026-10-29)
 
 The same existing `inspect_collision_proxies` JSON report now includes
