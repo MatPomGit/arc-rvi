@@ -14,7 +14,8 @@ import unittest
 from rvi.cli import main
 from rvi.collision import inspect_collision_proxies
 from rvi.robot_model import inspect_urdf
-from rvi.trajectory import (inspect_waypoint_collision, load_trajectory,
+from rvi.trajectory import (inspect_rotary_proxy_sweep,
+                            inspect_waypoint_collision, load_trajectory,
                             validate_waypoints)
 
 PRISMATIC = """<robot name="synthetic_translation">
@@ -136,6 +137,168 @@ class WaypointCollisionTests(unittest.TestCase):
         self.assertEqual(result["segment_kinematics"], ["rotary_motion_unresolved"])
         self.assertEqual(result["rotationally_unresolved_segments"], 1)
         self.assertEqual(result["full_body_collision_validation"], "not_performed")
+
+    def test_rotary_arc_midpoint_hits_box_with_clear_endpoint_chord(self):
+        # Exact reference: camera centre = (cos(yaw), sin(yaw), 0).
+        # At yaw=0 the point is (1,0,0) and intersects a small beam,
+        # although yaw=±pi/2 endpoints and their x=0 chord are clear.
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arc.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            checksum = sha256(raw).hexdigest()
+
+            def fk(state):
+                return inspect_urdf(path, checksum,
+                                    joint_positions=state)["configured_joint_pose"]
+
+            poses = [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})]
+            box = obstacle(x=1.0)
+            before = inspect_waypoint_collision(poses, box, [0, 2])
+            self.assertEqual(before["status"], "rotational_sweep_unresolved")
+            self.assertEqual(before["possible_chord_contacts"], [])
+            sweep = inspect_rotary_proxy_sweep(poses, box, fk)
+            self.assertEqual(sweep["status"], "proxy_overlap_between_waypoints")
+            self.assertEqual(sweep["segments"][0]["status"],
+                             "proxy_overlap_between_waypoints")
+            self.assertAlmostEqual(sweep["segments"][0]["collision_fraction"], 0.5)
+            self.assertGreaterEqual(sweep["total_evaluations"], 1)
+            self.assertEqual(sweep["full_body_or_robot_motion_certification"],
+                             "not_performed")
+
+    def test_rotary_far_obstacle_is_proxy_only_clear_by_global_bound(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arc.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            checksum = sha256(raw).hexdigest()
+            def fk(q):
+                return inspect_urdf(path, checksum,
+                                    joint_positions=q)["configured_joint_pose"]
+            poses = [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})]
+            sweep = inspect_rotary_proxy_sweep(poses, obstacle(x=10), fk,
+                                              max_evaluations=0)
+            self.assertEqual(sweep["status"], "declared_proxies_only_screened")
+            self.assertEqual(sweep["segments"][0]["status"],
+                             "rotary_declared_proxy_clear_only")
+            self.assertEqual(sweep["total_evaluations"], 0)
+            self.assertEqual(sweep["coverage"],
+                             "declared_spheres_AABBs_and_explicit_self_pairs_only")
+
+    def test_rotary_budget_exhaustion_is_unknown_not_clear(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arc.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            checksum = sha256(raw).hexdigest()
+            def fk(q):
+                return inspect_urdf(path, checksum,
+                                    joint_positions=q)["configured_joint_pose"]
+            poses = [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})]
+            sweep = inspect_rotary_proxy_sweep(poses, obstacle(x=1), fk,
+                                              max_evaluations=0)
+            self.assertEqual(sweep["status"], "rotary_sweep_unresolved")
+            self.assertEqual(sweep["total_evaluations"], 0)
+            self.assertEqual(sweep["segments"][0]["status"],
+                             "rotary_sweep_unresolved_budget")
+            self.assertGreater(sweep["segments"][0]["unresolved_intervals"], 0)
+            for invalid in (-1, True, 129, 2.5):
+                with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                    inspect_rotary_proxy_sweep(poses, obstacle(x=1), fk,
+                                               max_evaluations=invalid)
+
+    def test_rotary_self_contact_from_stationary_root_proxy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arc.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            checksum = sha256(raw).hexdigest()
+            def fk(q):
+                return inspect_urdf(path, checksum,
+                                    joint_positions=q)["configured_joint_pose"]
+            poses = [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})]
+            fixture = {
+                "schema_version": "1.0.0", "clearance_margin_m": 0.0,
+                "spheres": [
+                    {"id": "rotating", "link": "camera",
+                     "center_local_m": [0, 0, 0], "radius_m": 0.1},
+                    {"id": "fixed", "link": "root",
+                     "center_local_m": [1, 0, 0], "radius_m": 0.1},
+                ],
+                "boxes": [], "self_pairs": [["rotating", "fixed"]],
+            }
+            self.assertTrue(all(inspect_collision_proxies(p, fixture)["status"]
+                                == "no_proxy_overlap_unverified" for p in poses))
+            sweep = inspect_rotary_proxy_sweep(poses, fixture, fk)
+            self.assertEqual(sweep["status"], "proxy_overlap_between_waypoints")
+            self.assertAlmostEqual(sweep["segments"][0]["collision_fraction"], 0.5)
+
+    def test_rotary_bound_unknown_if_fk_metadata_missing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arc.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            checksum = sha256(raw).hexdigest()
+            def fk(q):
+                return inspect_urdf(path, checksum,
+                                    joint_positions=q)["configured_joint_pose"]
+            poses = [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})]
+            original = poses[1]["all_joint_origin_length_sum_m"]
+            poses[1] = dict(poses[1])
+            poses[1]["all_joint_origin_length_sum_m"] = original + 1
+            sweep = inspect_rotary_proxy_sweep(poses, obstacle(x=10), fk)
+            self.assertEqual(sweep["segments"][0]["status"],
+                             "unresolved_invalid_bound")
+            self.assertEqual(sweep["status"], "rotary_sweep_unresolved")
+            with self.assertRaisesRegex(ValueError, "intermediate FK state"):
+                inspect_rotary_proxy_sweep(
+                    [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})],
+                    obstacle(x=1), lambda q: fk({"yaw": pi / 2}))
+
+    def test_rotary_cli_status_and_provenance(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            urdf = root / "model.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            urdf.write_bytes(raw)
+            traj = root / "motion.json"
+            states = {"schema_version": "1.0.0", "waypoints": [
+                {"time_s": 0, "joint_positions": {"yaw": -pi / 2}},
+                {"time_s": 2, "joint_positions": {"yaw": pi / 2}},
+            ]}
+            trajectory_bytes = (json.dumps(states) + "\\n").encode()
+            traj.write_bytes(trajectory_bytes)
+            fixture = root / "boxes.json"
+            raw_fixture = (json.dumps(obstacle(x=1), sort_keys=True) + "\\n").encode()
+            fixture.write_bytes(raw_fixture)
+            out = root / "audit.json"
+            base = [
+                "robot-model", "--urdf", str(urdf), "--expected-sha256",
+                sha256(raw).hexdigest(), "--trajectory", str(traj),
+                "--collision-fixture", str(fixture),
+            ]
+            with redirect_stdout(StringIO()):
+                self.assertEqual(main(base + ["--output", str(out)]), 0)
+            result = json.loads(out.read_text())["trajectory_proxy"]
+            self.assertEqual(result["status"], "proxy_overlap_between_waypoints")
+            self.assertEqual(result["rotary_sweep"]["total_evaluations"], 1)
+            self.assertEqual(result["source_sha256"], sha256(trajectory_bytes).hexdigest())
+            self.assertEqual(result["collision_fixture_sha256"],
+                             sha256(raw_fixture).hexdigest())
+            blocked = root / "blocked.json"
+            with redirect_stdout(StringIO()):
+                self.assertEqual(main(base + ["--rotary-evaluations", "0",
+                                              "--output", str(blocked)]), 0)
+            incomplete = json.loads(blocked.read_text())["trajectory_proxy"]
+            self.assertEqual(incomplete["status"], "rotational_sweep_unresolved")
+            self.assertEqual(incomplete["rotary_sweep"]["status"],
+                             "rotary_sweep_unresolved")
+            self.assertEqual(blocked.read_bytes(),
+                             blocked.read_bytes())
+            with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
+                main(base + ["--rotary-evaluations", "129",
+                             "--output", str(root / "invalid.json")])
+            self.assertFalse((root / "invalid.json").exists())
 
     def test_waypoint_schema_and_time_order_fail_closed(self):
         def payload(times):
