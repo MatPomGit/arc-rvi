@@ -100,6 +100,78 @@ class CollisionProxyTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate"):
             inspect_collision_proxies(pose(), fixture)
 
+    def test_link_coverage_reports_missing_torso_and_base_without_certification(self):
+        result = inspect_collision_proxies(pose(), collision_fixture())
+        coverage = result["declared_link_presence_audit"]
+        self.assertEqual(coverage["urdf_link_count"], 3)
+        self.assertEqual(coverage["links_with_proxy_spheres"], ["camera"])
+        self.assertEqual(coverage["links_without_proxy_spheres"], ["arm", "root"])
+        self.assertFalse(coverage["all_declared_links_have_proxy"])
+        self.assertEqual(coverage["unreviewed_cross_link_self_pair_count"], 0)
+        self.assertEqual(coverage["actual_link_collision_volume_validation"],
+                         "not_performed")
+        self.assertEqual(result["full_body_collision_validation"], "not_performed")
+
+    def test_names_only_complete_does_not_certify_body_volumes(self):
+        fixture = collision_fixture()
+        fixture["boxes"][0] = {
+            "id": "far", "min_xyz_m": [10, 10, 10],
+            "max_xyz_m": [11, 11, 11],
+        }
+        for identifier, link in [("root_sphere", "root"), ("arm_sphere", "arm")]:
+            fixture["spheres"].append({
+                "id": identifier, "link": link,
+                "center_local_m": [0, 0, 0], "radius_m": 0.01,
+            })
+        report = inspect_collision_proxies(pose(), fixture)
+        covered = report["declared_link_presence_audit"]
+        self.assertTrue(covered["all_declared_links_have_proxy"])
+        self.assertEqual(covered["links_without_proxy_spheres"], [])
+        self.assertEqual(covered["unreviewed_cross_link_self_pair_count"], 3)
+        self.assertEqual(covered["unreviewed_cross_link_self_pair_examples"], [
+            ["arm_sphere", "camera_ball"], ["arm_sphere", "root_sphere"],
+            ["camera_ball", "root_sphere"],
+        ])
+        self.assertEqual(report["status"], "no_proxy_overlap_unverified")
+        self.assertEqual(covered["actual_link_collision_volume_validation"],
+                         "not_performed")
+        self.assertEqual(covered["adjacent_joint_contact_exemption_review"],
+                         "not_performed")
+        self.assertEqual(report["full_body_collision_validation"], "not_performed")
+        fixture["self_pairs"] = [["root_sphere", "camera_ball"]]
+        updated = inspect_collision_proxies(pose(), fixture)
+        self.assertEqual(updated["declared_link_presence_audit"]
+                         ["unreviewed_cross_link_self_pair_count"], 2)
+
+    def test_same_link_spheres_do_not_inflate_cross_link_omission_count(self):
+        fixture = collision_fixture()
+        fixture["spheres"].append({
+            "id": "second_camera", "link": "camera",
+            "center_local_m": [0.02, 0, 0], "radius_m": 0.01,
+        })
+        report = inspect_collision_proxies(pose(), fixture)
+        self.assertEqual(report["declared_link_presence_audit"]
+                         ["unreviewed_cross_link_self_pair_count"], 0)
+        self.assertEqual(report["declared_link_presence_audit"]
+                         ["links_without_proxy_spheres"], ["arm", "root"])
+
+    def test_bounded_omitted_self_pair_example_list_is_deterministic(self):
+        fixture = collision_fixture()
+        for i in range(20):
+            fixture["spheres"].append({
+                "id": f"root_{i:02d}", "link": "root",
+                "center_local_m": [0, 0, 0], "radius_m": 0.001,
+            })
+        report = inspect_collision_proxies(pose(), fixture)
+        audit = report["declared_link_presence_audit"]
+        self.assertEqual(audit["unreviewed_cross_link_self_pair_count"], 20)
+        self.assertEqual(len(audit["unreviewed_cross_link_self_pair_examples"]), 16)
+        self.assertEqual(audit["unreviewed_cross_link_self_pair_examples"][0],
+                         ["camera_ball", "root_00"])
+        self.assertEqual(audit["unreviewed_cross_link_self_pair_examples"][-1],
+                         ["camera_ball", "root_15"])
+        self.assertEqual(report, inspect_collision_proxies(pose(), fixture))
+
     def test_missing_scope_and_unknown_link_fail_closed(self):
         fixture = collision_fixture()
         fixture["boxes"] = []
@@ -166,6 +238,8 @@ class CollisionProxyTests(unittest.TestCase):
             collision = result["configured_joint_pose"]["collision_proxies"]
             self.assertEqual(collision["status"], "proxy_overlap_detected")
             self.assertEqual(collision["source_sha256"], sha256(raw_fixture).hexdigest())
+            self.assertEqual(collision["declared_link_presence_audit"]
+                             ["links_without_proxy_spheres"], ["arm", "root"])
             previous = report_file.read_bytes()
             with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
                 main(command)
