@@ -276,6 +276,49 @@ No unlisted link/box or self-pair is evaluated.
   and neither endpoints nor centre chords exposed contact. Real
   articulated paths can curve into an obstacle, so this is **not clear**.
 
+### Bounded rotary proxy-sweep screening (schema 1.0.0 output)
+
+The offline trajectory auditor now also performs an adaptive
+**fixed-virtual-base, linearly interpolated joint** screen for declared
+link-attached collision spheres. Its conservative global upper bound
+on sphere-centre travel is derived from the pinned URDF's sum of
+joint-origin translation lengths, the maximum absolute interpolated
+prismatic positions, local sphere-centre offsets, and the total
+joint-angle/prismatic variation over the segment. This intentionally
+overestimates the distance that any declared sphere centre can move.
+
+If every supplied signed proxy–obstacle and explicitly checked
+self-pair clearance at a subinterval's starting state exceeds the
+maximum possible travel over that entire interval (including a
+small numerical allowance), this **proxy subinterval** can be
+excluded from contact under the *declared interpolation and fixed-base
+assumptions*. Otherwise an intermediate FK state is evaluated and
+the interval subdivided, up to a bounded **total budget of 64
+additional FK evaluations** by default. Users may set
+`--rotary-evaluations N` on `rvi robot-model --trajectory`, where
+`0 <= N <= 128`; exhausting the budget yields
+`rotary_sweep_unresolved`, **never a clear**.
+
+Intermediate proxy overlap produces
+`proxy_overlap_between_waypoints`; excluded rotary proxy intervals
+may produce `rotary_proxy_sweep_clear_unverified_body` **only if
+every rotationally changing segment is excluded** and no other
+candidate contact is reported. More conservative legacy
+chord/waypoint hazards retain priority. A positive result asserts
+**only the supplied sphere/AABB and explicitly listed self-pair
+checks** for *linear joint interpolation*. It does not clear real
+controller trajectories, missing robot volumes/meshes, uncertain
+terrain, contact forces, friction, unmodelled obstacles, sensor
+errors or physical robot movement.
+
+The output records the evaluation count, remaining unresolved
+intervals, segment status and a fractional interpolation coordinate
+for an observed collision. Neither a sampled overlap nor a clear
+declared-proxy result is evidence of a completed physical experiment.
+The separate validation task [#100](https://github.com/MatPomGit/arc-rvi/issues/100)
+must independently challenge the analytic bound and near-contact
+cases before #99 can be treated as a verified feasibility oracle.
+
 The existing sampled collision and possible-chord statuses retain
 priority when those findings are present. Continuous arbitrary
 revolute joint motion, base motion, unlisted self-collisions, mesh

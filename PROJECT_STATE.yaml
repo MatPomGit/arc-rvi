@@ -100,6 +100,7 @@ implemented:
   - "Static FK-attached collision sphere/AABB and explicit self-pair proxy preflight with SHA provenance; no full-body or swept-motion certification"
   - "Bounded time-indexed FK waypoint collision screening with sphere-centre chords and explicit curved-path uncertainty; never certifies swept articulated motion"
   - "Affine-only prismatic proxy sweep screening and inter-waypoint listed self-pair checks; changed revolute joints explicitly unresolved and full-body collision still unvalidated"
+  - "Bounded adaptive rotary joint-interpolated declared-sphere sweep with conservative URDF-derived centre-displacement bounds; exhaustive whole-body and real-controller motion remains unverified"
 evidence_state:
   fixtures: software_correctness_checks_only
   planar_simulation: analytic_geometry_and_kinematics_checks_only
@@ -140,6 +141,7 @@ evidence_state:
   fk_collision_proxy: static_sphere_AABB_and_explicit_self_pairs_only_no_full_body_or_swept_collision_validation
   fk_waypoint_proxy: time_indexed_2_to_32_samples_chord_candidate_detection_not_continuous_articulated_collision
   fk_affine_proxy_sweep: prismatic_linear_interpolation_static_spheres_only_rotary_motion_unresolved
+  fk_rotary_proxy_sweep: budgeted_lipschitz_declared_spheres_only_independent_reference_issue100_pending
   comparator_literature_gates: P03_P04_P06_unfrozen_strong_baselines_with_independent_evaluator_no_ARC_empirical_validation
   confirmation_protocols: not_frozen_or_preregistered
 verification_history:

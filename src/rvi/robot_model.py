@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import Counter, deque
 from hashlib import sha256
 import json
-from math import cos, isfinite, sin, sqrt
+from math import cos, hypot, isfinite, sin, sqrt
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -190,6 +190,7 @@ def inspect_urdf(
     floating_parents = []
     movable_types = {}
     joint_limits = {}
+    joint_origin_length_sum = 0.0
     for joint in xml.findall("joint"):
         identifier, kind = joint.get("name", ""), joint.get("type")
         if not identifier.strip() or identifier in joint_names or kind not in JOINT_TYPES:
@@ -211,6 +212,9 @@ def inspect_urdf(
                       3, "joint xyz in metres")
         rpy = _vector(origin.get("rpy", "0 0 0") if origin is not None else "0 0 0",
                       3, "joint roll/pitch/yaw in radians")
+        joint_origin_length_sum += hypot(*xyz)
+        if not isfinite(joint_origin_length_sum):
+            raise ValueError("joint origins exceed finite motion-bound domain")
         v = (0.0, 0.0, 0.0)
         if kind not in ("fixed", "floating"):
             axis = joint.find("axis")
@@ -286,6 +290,7 @@ def inspect_urdf(
             "status": "offline_articulated_fk_only",
             "joints": dict(sorted(joint_positions.items())),
             "movable_joint_types": dict(sorted(movable_types.items())),
+            "all_joint_origin_length_sum_m": joint_origin_length_sum,
             "frame_poses": {
                 name: {
                     "translation_m": list(configured[name][1]),

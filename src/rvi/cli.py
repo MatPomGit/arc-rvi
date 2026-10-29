@@ -20,7 +20,8 @@ from .planning import plan_family_sample
 from .power_mc import analyze_cluster_monte_carlo
 from .robot_model import inspect_urdf, load_joint_state
 from .support import inspect_support_file
-from .trajectory import (inspect_waypoint_collision, load_trajectory,
+from .trajectory import (inspect_rotary_proxy_sweep,
+                         inspect_waypoint_collision, load_trajectory,
                          validate_waypoints)
 from .population import generate_population
 from .scenarios import load_scenario
@@ -90,6 +91,8 @@ def make_parser() -> argparse.ArgumentParser:
                              help="bounded fixture of local link spheres and obstacle AABBs")
     robot_model.add_argument("--trajectory", type=Path,
                              help="offline time-ordered joint configurations; never motion commands")
+    robot_model.add_argument("--rotary-evaluations", type=int, default=64,
+                             help="bounded extra offline FK evaluations over rotary segments (0–128)")
     robot_model.add_argument("--output", required=True, type=Path)
     stance = sub.add_parser("stance", help="audit synthetic static foot support; no gait or safety clearance")
     stance.add_argument("--spec", required=True, type=Path)
@@ -163,6 +166,8 @@ def main(argv: list[str] | None = None) -> int:
                     raise ValueError("collision fixture requires joint-state FK")
                 if any(arguments.output.resolve() == item.resolve() for item in inputs):
                     raise ValueError("output must differ from all robot-model inputs")
+                if arguments.trajectory is None and arguments.rotary_evaluations != 64:
+                    raise ValueError("rotary-evaluations applies only to trajectory")
                 if arguments.trajectory is not None:
                     trajectory, trajectory_sha = load_trajectory(arguments.trajectory)
                     waypoints = validate_waypoints(trajectory)
@@ -177,6 +182,20 @@ def main(argv: list[str] | None = None) -> int:
                     ]
                     report = inspect_waypoint_collision(
                         poses, collision, [float(item["time_s"]) for item in waypoints])
+                    sweep = inspect_rotary_proxy_sweep(
+                        poses, collision,
+                        lambda joints: inspect_urdf(
+                            arguments.urdf, arguments.expected_sha256,
+                            joint_positions=joints)["configured_joint_pose"],
+                        max_evaluations=arguments.rotary_evaluations,
+                    )
+                    report["rotary_sweep"] = sweep
+                    if (sweep["status"] == "proxy_overlap_between_waypoints"
+                            and report["status"] != "proxy_overlap_at_waypoint"):
+                        report["status"] = "proxy_overlap_between_waypoints"
+                    elif (report["status"] == "rotational_sweep_unresolved"
+                          and sweep["status"] == "declared_proxies_only_screened"):
+                        report["status"] = "rotary_proxy_sweep_clear_unverified_body"
                     report["source_sha256"] = trajectory_sha
                     report["collision_fixture_sha256"] = collision_sha
                     payload = inspect_urdf(arguments.urdf, arguments.expected_sha256,

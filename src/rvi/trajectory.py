@@ -141,6 +141,181 @@ def _relative_centre_segment_clearance(
     return result
 
 
+MAX_ROTARY_EVALUATIONS = 64
+
+
+def _conservative_centre_speed(first: dict, last: dict,
+                               fixture: dict) -> float:
+    """Global derivative bound in metres per unit interpolation parameter.
+
+    All URDF origin lengths upper-bound the length of any ancestor-to-point
+    chain. Adding absolute prismatic offsets and local sphere offsets
+    bounds the radius from any rotating joint axis to a declared proxy
+    centre. This deliberately over-approximates even unrelated joints.
+    """
+    base = first.get("all_joint_origin_length_sum_m")
+    if (isinstance(base, bool) or not isinstance(base, (int, float))
+            or not isfinite(base) or base < 0
+            or base != last.get("all_joint_origin_length_sum_m")):
+        raise ValueError("rotary proxy motion has no trusted finite URDF origin bound")
+    kinds = first["movable_joint_types"]
+    start, stop = first["joints"], last["joints"]
+    try:
+        prismatic_extent = sum(max(abs(start[name]), abs(stop[name]))
+                              for name in kinds if kinds[name] == "prismatic")
+        angular_travel = sum(abs(stop[name] - start[name])
+                             for name in kinds if kinds[name] in (
+                                 "revolute", "continuous"))
+        linear_travel = sum(abs(stop[name] - start[name])
+                            for name in kinds if kinds[name] == "prismatic")
+        local_extent = max(
+            sqrt(sum(component * component for component in sphere["center_local_m"]))
+            for sphere in fixture["spheres"])
+        radius_bound = base + prismatic_extent + local_extent
+        speed = angular_travel * radius_bound + linear_travel
+    except (OverflowError, ValueError) as exc:
+        raise ValueError("rotary proxy bound could not be computed") from exc
+    if not all(isfinite(value) for value in (
+            prismatic_extent, angular_travel, linear_travel,
+            local_extent, radius_bound, speed)):
+        raise ValueError("rotary proxy bound exceeds numeric validity")
+    return speed
+
+
+def _linear_joint_state(first: dict, second: dict, fraction: float) -> dict:
+    """Declare linear interpolation in joint coordinates, not controller motion."""
+    state = {}
+    for name in first["joints"]:
+        a, b = first["joints"][name], second["joints"][name]
+        value = a * (1.0 - fraction) + b * fraction
+        if not isfinite(value):
+            raise ValueError("interpolated joint position is not finite")
+        state[name] = value
+    return state
+
+
+def inspect_rotary_proxy_sweep(
+    poses: list[dict], fixture: dict, pose_at,
+    *, max_evaluations: int = MAX_ROTARY_EVALUATIONS,
+) -> dict:
+    """Bound static declared sphere-proxy contact over interpolated joints.
+
+    Under fixed-base linear joint interpolation, a global per-proxy centre
+    Lipschitz bound safely excludes collision if every declared contact
+    clearance is larger than the bound throughout a subinterval. Between-
+    waypoint FK samples expose counterexamples; budget exhaustion is UNKNOWN.
+    This is never proof for omitted robot geometry, dynamics or true motion.
+    """
+    if (isinstance(max_evaluations, bool)
+            or not isinstance(max_evaluations, int)
+            or not 0 <= max_evaluations <= 128):
+        raise ValueError("rotary evaluation limit must be an integer from 0 to 128")
+    if not isinstance(poses, list) or not 2 <= len(poses) <= MAX_WAYPOINTS:
+        raise ValueError("rotary sweep requires 2–32 FK waypoints")
+    budget_used = 0
+    outcomes = []
+    for index, (first, last) in enumerate(zip(poses, poses[1:])):
+        if _joint_segment_kind(first, last) == "affine_prismatic_interpolation":
+            outcomes.append({"segment_index": index, "status": "affine_handled_separately",
+                             "evaluations": 0, "collision_fraction": None,
+                             "unresolved_intervals": 0})
+            continue
+
+        try:
+            speed = _conservative_centre_speed(first, last, fixture)
+        except ValueError:
+            outcomes.append({"segment_index": index, "status": "unresolved_invalid_bound",
+                             "evaluations": 0, "collision_fraction": None,
+                             "unresolved_intervals": 1})
+            continue
+
+        # A small positive rounding allowance prevents classifying a
+        # numerical near-contact as geometrically proven clear.
+        epsilon = 1e-9 + 1e-12 * speed
+        queue = [(0.0, 1.0, first)]
+        unresolved = 0
+        collision_fraction = None
+        visited = 0
+        while queue:
+            left, right, initial = queue.pop()
+            static = inspect_collision_proxies(initial, fixture)
+            if static["status"] == "proxy_overlap_detected":
+                collision_fraction = left
+                break
+            width = right - left
+            if not isfinite(width) or width <= 0:
+                unresolved += 1
+                continue
+            safe = all(
+                check["signed_clearance_m"] >
+                speed * width * (2 if check["kind"] == "explicit_self_pair" else 1)
+                + epsilon
+                for check in static["checks"]
+            )
+            if safe:
+                continue
+            if budget_used >= max_evaluations:
+                unresolved += 1 + len(queue)
+                break
+            middle = (left + right) / 2.0
+            if middle == left or middle == right:
+                unresolved += 1
+                continue
+            state = _linear_joint_state(first, last, middle)
+            candidate = pose_at(state)
+            # Validate that the supplied evaluator returns the requested
+            # exact FK state; an untrusted/incompatible callback is rejected.
+            if (not isinstance(candidate, dict)
+                    or candidate.get("joints") != state
+                    or candidate.get("movable_joint_types")
+                    != first.get("movable_joint_types")
+                    or candidate.get("all_joint_origin_length_sum_m")
+                    != first.get("all_joint_origin_length_sum_m")):
+                raise ValueError("intermediate FK state does not match requested joints")
+            midpoint = inspect_collision_proxies(candidate, fixture)
+            budget_used += 1
+            visited += 1
+            if midpoint["status"] == "proxy_overlap_detected":
+                collision_fraction = middle
+                break
+            queue.append((middle, right, candidate))
+            queue.append((left, middle, initial))
+
+        if collision_fraction is not None:
+            status = "proxy_overlap_between_waypoints"
+        elif unresolved:
+            status = "rotary_sweep_unresolved_budget"
+        else:
+            status = "rotary_declared_proxy_clear_only"
+        outcomes.append({
+            "segment_index": index,
+            "status": status,
+            "evaluations": visited,
+            "collision_fraction": collision_fraction,
+            "unresolved_intervals": unresolved,
+        })
+
+    if any(x["status"] == "proxy_overlap_between_waypoints" for x in outcomes):
+        overall = "proxy_overlap_between_waypoints"
+    elif any(x["status"].startswith(("unresolved_", "rotary_sweep_unresolved"))
+             for x in outcomes):
+        overall = "rotary_sweep_unresolved"
+    else:
+        overall = "declared_proxies_only_screened"
+    return {
+        "schema_version": "1.0.0",
+        "model": "conservative_global_fk_centre_lipschitz_v1",
+        "evidence_type": "synthetic_fixture",
+        "status": overall,
+        "total_evaluations": budget_used,
+        "max_evaluations": max_evaluations,
+        "segments": outcomes,
+        "assumed_joint_motion": "linear_interpolation_fixed_virtual_base",
+        "coverage": "declared_spheres_AABBs_and_explicit_self_pairs_only",
+        "full_body_or_robot_motion_certification": "not_performed",
+    }
+
+
 def inspect_waypoint_collision(poses: list[dict], fixture: dict,
                                waypoint_times: list[float]) -> dict:
     """Screen waypoint FK proxies and a narrow affine-translation sweep.
