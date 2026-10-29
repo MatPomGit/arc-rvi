@@ -266,10 +266,10 @@ class WaypointCollisionTests(unittest.TestCase):
                 {"time_s": 0, "joint_positions": {"yaw": -pi / 2}},
                 {"time_s": 2, "joint_positions": {"yaw": pi / 2}},
             ]}
-            trajectory_bytes = (json.dumps(states) + "\\n").encode()
+            trajectory_bytes = (json.dumps(states) + "\n").encode()
             traj.write_bytes(trajectory_bytes)
             fixture = root / "boxes.json"
-            raw_fixture = (json.dumps(obstacle(x=1), sort_keys=True) + "\\n").encode()
+            raw_fixture = (json.dumps(obstacle(x=1), sort_keys=True) + "\n").encode()
             fixture.write_bytes(raw_fixture)
             out = root / "audit.json"
             base = [
@@ -293,8 +293,6 @@ class WaypointCollisionTests(unittest.TestCase):
             self.assertEqual(incomplete["status"], "rotational_sweep_unresolved")
             self.assertEqual(incomplete["rotary_sweep"]["status"],
                              "rotary_sweep_unresolved")
-            self.assertEqual(blocked.read_bytes(),
-                             blocked.read_bytes())
             with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
                 main(base + ["--rotary-evaluations", "129",
                              "--output", str(root / "invalid.json")])
