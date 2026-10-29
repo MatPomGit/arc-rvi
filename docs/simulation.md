@@ -53,6 +53,43 @@ outside the tested domain, uncertain real controller
 interpolation or humanoid terrain safety. The broader adversarial
 model validity task remains [#100](https://github.com/MatPomGit/arc-rvi/issues/100).
 
+## Independent multi-axis 3D rotary reference (2026-10-29)
+
+The test-only `tests/unit/test_rotary_reference_3d.py` extends the
+independent comparison beyond the single-axis planar circle without
+importing production FK matrices or the sweep derivative bound.
+
+- A synthetic **two-revolute-joint gimbal** has the independently
+  derived 3D tip position
+  `(cos(yaw)*cos(pitch), sin(yaw)*cos(pitch), -sin(pitch))`
+  in metres for a unit link. Tests compare this formula with the
+  pinned-URDF FK at six fixed configurations, and build multiple
+  intersecting/near-tangent 3D obstacle fixtures on the analytically
+  known *interior* of linear joint interpolations.
+- A **two-branch articulated tree** with independent z/y rotations has
+  analytic endpoint tip separation `sqrt(2)*sin(1.4)` metres and
+  a coincident pair of tips at the middle state. The corresponding
+  explicitly listed self-sphere pair must be flagged between two
+  individually nonoverlapping endpoint configurations.
+- An **independent trigonometric interval enclosure** uses exact
+  sine/cosine extrema and interval products to provide a sufficient
+  clear-domain test for declared gimbal proxy/obstacle geometry.
+  The interval oracle is separate from the production
+  global-speed/Lipschitz bound, and is used alongside exact known
+  interior contact examples. Its finite floating-point operations
+  are not formal directed-rounding interval arithmetic.
+
+The deterministic adversarial set includes six different paired
+two-axis motions, an independently clear distant obstacle and
+1-micrometre near-contact perturbations. All run without physics,
+mesh imports, camera calibration or paid services. Passing these
+tests does **not** validate arbitrary joint-tree geometry, every
+numeric regime, true swept body meshes, moving floating base, real
+controller interpolation, friction/foot dynamics or the actual
+Unitree G1 EDU. Issue [#100](https://github.com/MatPomGit/arc-rvi/issues/100)
+remains open until broader model-bound, property and numeric-domain
+validation is independently reviewed.
+
 ## Difficult-terrain and humanoid validity boundary (2026-10-28)
 
 The present circular-footprint, planar, holonomic motion model **cannot**
