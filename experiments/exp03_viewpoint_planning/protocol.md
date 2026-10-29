@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.7
+Protocol version: 1.1.8
 
 Status: prospective design, not preregistered or frozen
 
@@ -130,6 +130,26 @@ Continuous articulated swept-volume checks, verified complete
 collision geometry and contact/balance dynamics remain missing.
 Do not remove failures or score planned candidate viewpoints
 as inspection-valid acquisitions based on these diagnostics.
+
+## Restricted affine-proxy sweep gate (2026-10-29, unfrozen)
+
+The offline waypoint audit now distinguishes **stationary-angle /
+prismatic-only** intervals from those involving revolute or continuous
+joint changes. Under a fixed virtual base and linear prismatic
+interpolation, the explicit proxy-sphere centre paths are affine:
+the screened obstacles and explicitly listed self-sphere pairs can
+be checked between saved waypoints rather than just at endpoints.
+Results for this **limited fixture domain** may report
+`affine_proxy_sweep_clear_unverified_body`.
+
+Any changed rotary joint with no sampled collision is now
+`rotational_sweep_unresolved`. **Never** treat its clear endpoint
+chord as proof that a shoulder, torso, camera or foot did not sweep
+through an obstacle. No full-body clearance, complete robot mesh,
+motion policy, torque, foot contact or G1 EDU hardware calibration
+has been added. Maintain all independent whole-body and
+terrain-stability blockers; even the affine proxy screen cannot
+score a P03 observation as physically acquired or valid.
 
 ## Reference model preparation (exploratory)
 

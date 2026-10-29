@@ -256,13 +256,34 @@ The diagnostic statuses are:
   among the **supplied** sampled proxies and chords; the actual
   intermediate FK trajectories and full robot remain **unverified**.
 
-The tool does **not** interpolate joint angles, reconstruct
-continuous trajectories, check between-waypoint self-collision,
-solve inverse kinematics, validate contacts on stairs or certify
-any physical G1 EDU motion. Results always record
-`continuous_articulated_collision_validation: not_performed`.
-This is a screening aid for P03 candidate rejection, **not**
-a motion-clearance authorization.
+The latest fixture-only preflight also classifies segments using the
+**declared URDF joint types**. If **all revolute and continuous joint
+positions remain unchanged** between adjacent waypoints, and only
+prismatic joints change, then under **linear joint interpolation and
+fixed virtual base**, each proxy-sphere centre follows an *exact affine
+line*. The inflated-AABB chord screen can then conservatively rule out
+obstacle contact for **only those explicit proxies and obstacles**.
+Explicit self-sphere pairs are additionally checked along their
+relative centre-line, including contacts missed by both endpoints.
+No unlisted link/box or self-pair is evaluated.
+
+- `affine_proxy_sweep_clear_unverified_body`: no contact in the **declared
+  proxy subset** under the stated prismatic-only, linearly
+  interpolated motion; it does **not** clear the actual robot.
+- `affine_self_proxy_overlap_candidate`: an explicitly selected
+  sphere pair touches or overlaps between affine waypoints.
+- `rotational_sweep_unresolved`: a revolute or continuous joint changed
+  and neither endpoints nor centre chords exposed contact. Real
+  articulated paths can curve into an obstacle, so this is **not clear**.
+
+The existing sampled collision and possible-chord statuses retain
+priority when those findings are present. Continuous arbitrary
+revolute joint motion, base motion, unlisted self-collisions, mesh
+geometry, trajectory timing/dynamics, leg contacts, inverse kinematics,
+slip and physical Unitree G1 EDU safety are **still not evaluated**.
+The report retains `continuous_articulated_collision_validation:
+not_performed`. This is a bounded preflight for P03 **candidate
+rejection**, not authorization to move a robot.
 
 Current implementation: deterministic planar greedy viewpoint baseline, mission
 state guards, threshold decisions on supplied measurements, file hashing, paired fixture

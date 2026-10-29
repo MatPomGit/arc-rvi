@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 import json
-from math import isfinite
+from math import isfinite, sqrt
 from pathlib import Path
 
 from .collision import inspect_collision_proxies
@@ -103,13 +103,51 @@ def _chord_intersects_padded_box(
     return True
 
 
+def _joint_segment_kind(first: dict, second: dict) -> str:
+    """Only unchanged rotary joints allow affine, fixed-base FK proxy centres."""
+    kinds = first.get("movable_joint_types")
+    next_kinds = second.get("movable_joint_types")
+    initial = first.get("joints")
+    final = second.get("joints")
+    if (not isinstance(kinds, dict) or not kinds
+            or kinds != next_kinds or not isinstance(initial, dict)
+            or not isinstance(final, dict) or set(initial) != set(kinds)
+            or set(final) != set(kinds)):
+        raise ValueError("inconsistent FK joint types or state between waypoints")
+    if any(kind not in ("revolute", "continuous", "prismatic")
+           for kind in kinds.values()):
+        raise ValueError("unsupported joint kind for segmented proxy analysis")
+    if any(initial[name] != final[name]
+           for name, kind in kinds.items() if kind != "prismatic"):
+        return "rotary_motion_unresolved"
+    return "affine_prismatic_interpolation"
+
+
+def _relative_centre_segment_clearance(
+    first: list[float], second: list[float], radius_sum: float,
+) -> float:
+    """Minimum signed gap for linearly moving sphere centres, independently of time."""
+    delta = [b - a for a, b in zip(first, second)]
+    length_sq = sum(v * v for v in delta)
+    if not isfinite(length_sq):
+        raise ValueError("self-sweep delta exceeds finite range")
+    parameter = (max(0.0, min(1.0, -sum(a * d for a, d in zip(first, delta))
+                                / length_sq)) if length_sq > 0 else 0.0)
+    distance_sq = sum((a + parameter * d) ** 2
+                      for a, d in zip(first, delta))
+    result = sqrt(distance_sq) - radius_sum
+    if not isfinite(result):
+        raise ValueError("self-sweep clearance exceeds finite range")
+    return result
+
+
 def inspect_waypoint_collision(poses: list[dict], fixture: dict,
                                waypoint_times: list[float]) -> dict:
-    """Screen supplied FK snapshots and straight centre chords only.
+    """Screen waypoint FK proxies and a narrow affine-translation sweep.
 
-    Every snapshot must already be derived from an independently validated
-    URDF joint-state parser. No interpolation of actual robot joints or
-    physical continuous collision validation is performed.
+    When every revolute/continuous joint is unchanged, linearly interpolated
+    prismatic joint positions yield exactly affine centres for link spheres.
+    This does NOT establish continuous collision safety for the full robot.
     """
     if not isinstance(poses, list) or not 2 <= len(poses) <= MAX_WAYPOINTS:
         raise ValueError("invalid number of configured poses")
@@ -126,7 +164,11 @@ def inspect_waypoint_collision(poses: list[dict], fixture: dict,
     radii = {item["id"]: item["radius_m"] for item in fixture["spheres"]}
     margin = fixture["clearance_margin_m"]
     possible = []
+    possible_self = []
+    segment_kinds = []
     for index, (first, second) in enumerate(zip(evaluations, evaluations[1:])):
+        kind = _joint_segment_kind(poses[index], poses[index + 1])
+        segment_kinds.append(kind)
         for sid in sorted(ids):
             start = first["sphere_centres_world_m"][sid]
             stop = second["sphere_centres_world_m"][sid]
@@ -142,6 +184,25 @@ def inspect_waypoint_collision(poses: list[dict], fixture: dict,
                         "obstacle_id": bid,
                         "status": "possible_chord_obstacle_overlap",
                     })
+        if kind == "affine_prismatic_interpolation":
+            for pair in fixture["self_pairs"]:
+                left, right = sorted(pair)
+                centre_a = first["sphere_centres_world_m"]
+                centre_b = second["sphere_centres_world_m"]
+                start = [centre_a[left][i] - centre_a[right][i] for i in range(3)]
+                end = [centre_b[left][i] - centre_b[right][i] for i in range(3)]
+                clearance = _relative_centre_segment_clearance(
+                    start, end, radii[left] + radii[right] + margin)
+                if clearance <= 0:
+                    possible_self.append({
+                        "segment_index": index,
+                        "start_time_s": waypoint_times[index],
+                        "end_time_s": waypoint_times[index + 1],
+                        "first_sphere_id": left,
+                        "second_sphere_id": right,
+                        "minimum_signed_clearance_m": clearance,
+                        "status": "affine_self_proxy_overlap_candidate",
+                    })
 
     collisions = [i for i, item in enumerate(evaluations)
                   if item["status"] == "proxy_overlap_detected"]
@@ -149,8 +210,12 @@ def inspect_waypoint_collision(poses: list[dict], fixture: dict,
         status = "proxy_overlap_at_waypoint"
     elif possible:
         status = "possible_chord_obstacle_overlap"
+    elif possible_self:
+        status = "affine_self_proxy_overlap_candidate"
+    elif "rotary_motion_unresolved" in segment_kinds:
+        status = "rotational_sweep_unresolved"
     else:
-        status = "sampled_proxy_clear_between_samples_unverified"
+        status = "affine_proxy_sweep_clear_unverified_body"
     return {
         "schema_version": "1.0.0",
         "evidence_type": "synthetic_fixture",
@@ -161,11 +226,15 @@ def inspect_waypoint_collision(poses: list[dict], fixture: dict,
         "waypoint_times_s": waypoint_times,
         "overlap_waypoint_indices": collisions,
         "possible_chord_contacts": possible,
+        "possible_affine_self_contacts": possible_self,
+        "segment_kinematics": segment_kinds,
+        "affine_proxy_segments": segment_kinds.count("affine_prismatic_interpolation"),
+        "rotationally_unresolved_segments": segment_kinds.count("rotary_motion_unresolved"),
         "checked_static_proxy_pairs": sum(v["checked_pairs"] for v in evaluations),
         "waypoint_proxy_statuses": [v["status"] for v in evaluations],
         "continuous_articulated_collision_validation": "not_performed",
-        "inter_sample_joint_motion": "not_reconstructed",
-        "self_collision_between_waypoints": "not_evaluated",
+        "inter_sample_joint_motion": "affine_prismatic_only_or_unresolved_rotation",
+        "self_collision_between_waypoints": "explicit_pairs_affine_only",
         "support_and_dynamics": "not_evaluated",
         "full_body_collision_validation": "not_performed",
         "robot_adapter": "not_configured",
