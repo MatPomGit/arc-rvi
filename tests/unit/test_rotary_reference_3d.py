@@ -221,7 +221,7 @@ class MultiAxisIndependentReferences(unittest.TestCase):
     def test_independent_interval_exclusions_and_known_inclusions(self):
         fk = self.model(GIMBAL)
         a, b = {"yaw": -1.2, "pitch": -0.8}, {"yaw": 1.3, "pitch": 0.7}
-        box_distant = ((4, -1, -1), (4.2, 1, 1))
+        box_distant = ((10, -1, -1), (10.2, 1, 1))
         self.assertTrue(independent_interval_clear(
             tuple(a.values()), tuple(b.values()), box_distant, 0.1))
         result = inspect_rotary_proxy_sweep(
