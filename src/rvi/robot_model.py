@@ -123,6 +123,80 @@ def _reject_constant(value: str) -> None:
     raise ValueError(f"non-finite JSON value is forbidden: {value}")
 
 
+MAX_COLLISION_ELEMENTS = 256
+
+
+def _collision_primitive_inventory(xml: ET.Element) -> dict[str, list[dict]]:
+    """Bound local URDF collision geometry without loading external meshes.
+
+    A circumscribed sphere contains each supported ideal URDF primitive.
+    Unsupported or malformed geometry is *unverified*, never silently
+    substituted with an empty or zero-volume shape.
+    """
+    inventory = {}
+    count = 0
+    for link in xml.findall("link"):
+        name = link.get("name", "")
+        entries = []
+        for index, collision in enumerate(link.findall("collision")):
+            count += 1
+            if count > MAX_COLLISION_ELEMENTS:
+                raise ValueError("URDF collision-element inventory exceeds limit")
+            entry = {
+                "id": f"{name}:{index}",
+                "status": "unverified_geometry",
+                "primitive_kind": None,
+                "bounding_sphere_centre_local_m": None,
+                "bounding_sphere_radius_m": None,
+            }
+            try:
+                origin = collision.find("origin")
+                xyz = _vector(origin.get("xyz", "0 0 0")
+                              if origin is not None else "0 0 0",
+                              3, "collision origin")
+                if origin is not None:
+                    _vector(origin.get("rpy", "0 0 0"), 3, "collision rpy")
+                geometry = collision.find("geometry")
+                shapes = list(geometry) if geometry is not None else []
+                if len(shapes) != 1:
+                    raise ValueError("one supported shape required")
+                shape = shapes[0]
+                entry["primitive_kind"] = shape.tag
+                if shape.tag == "sphere":
+                    radius = _vector(shape.get("radius", ""), 1,
+                                     "collision sphere radius")[0]
+                elif shape.tag == "box":
+                    dims = _vector(shape.get("size", ""), 3,
+                                   "collision box size")
+                    if any(v <= 0 for v in dims):
+                        raise ValueError("collision box dimensions must be positive")
+                    radius = 0.5 * hypot(*dims)
+                elif shape.tag == "cylinder":
+                    r = _vector(shape.get("radius", ""), 1,
+                                "collision cylinder radius")[0]
+                    length = _vector(shape.get("length", ""), 1,
+                                     "collision cylinder length")[0]
+                    if r <= 0 or length <= 0:
+                        raise ValueError("collision cylinder dimensions must be positive")
+                    radius = hypot(r, 0.5 * length)
+                else:
+                    raise ValueError("external mesh or unsupported shape")
+                if not isfinite(radius) or radius <= 0:
+                    raise ValueError("unbounded or degenerate enclosing sphere")
+                entry.update({
+                    "status": "analytic_primitive_bound",
+                    "bounding_sphere_centre_local_m": list(xyz),
+                    "bounding_sphere_radius_m": radius,
+                })
+            except (ValueError, OverflowError):
+                # Keep an explicit unknown entry; do not assert geometric
+                # coverage for missing dimensions, malformed tags or meshes.
+                pass
+            entries.append(entry)
+        inventory[name] = entries
+    return inventory
+
+
 def inspect_urdf(
     path: Path, expected_sha256: str, *, camera_frame: str | None = None,
     joint_positions: dict[str, float] | None = None,
@@ -182,6 +256,7 @@ def inspect_urdf(
     if len(links) != len(set(links)):
         raise ValueError("duplicate URDF links")
     known = set(links)
+    collision_inventory = _collision_primitive_inventory(xml)
     by_parent: dict[str, list[tuple]] = {name: [] for name in links}
     child_parent: dict[str, str] = {}
     joint_names = set()
@@ -291,6 +366,11 @@ def inspect_urdf(
             "joints": dict(sorted(joint_positions.items())),
             "movable_joint_types": dict(sorted(movable_types.items())),
             "all_joint_origin_length_sum_m": joint_origin_length_sum,
+            "urdf_collision_geometry": {
+                "source_sha256": digest,
+                "status": "offline_urdf_primitive_reference_only",
+                "by_link": collision_inventory,
+            },
             "frame_poses": {
                 name: {
                     "translation_m": list(configured[name][1]),
