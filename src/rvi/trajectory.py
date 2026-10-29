@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 import json
-from math import isfinite, sqrt
+from math import isfinite, sqrt, ulp
 from pathlib import Path
 
 from .collision import inspect_collision_proxies
@@ -142,10 +142,13 @@ def _relative_centre_segment_clearance(
 
 
 MAX_ROTARY_EVALUATIONS = 64
+# Conservative software arithmetic envelope, NOT a physical robot range.
+MAX_ROTARY_NUMERIC_LENGTH_M = 1_000_000.0
+MAX_ROTARY_NUMERIC_ANGLE_RAD = 100.0
 
 
 def _conservative_centre_speed(first: dict, last: dict,
-                               fixture: dict) -> float:
+                               fixture: dict) -> tuple[float, float]:
     """Global derivative bound in metres per unit interpolation parameter.
 
     All URDF origin lengths upper-bound the length of any ancestor-to-point
@@ -160,6 +163,36 @@ def _conservative_centre_speed(first: dict, last: dict,
         raise ValueError("rotary proxy motion has no trusted finite URDF origin bound")
     kinds = first["movable_joint_types"]
     start, stop = first["joints"], last["joints"]
+    # Reject extreme scales rather than interpret rounded clearances as proof.
+    # This includes declared obstacles: their world-coordinate magnitude
+    # contributes to floating-point uncertainty even for a small robot.
+    try:
+        coordinates = [
+            abs(component)
+            for sphere in fixture["spheres"]
+            for component in sphere["center_local_m"]
+        ] + [
+            abs(component)
+            for obstacle in fixture["boxes"]
+            for key in ("min_xyz_m", "max_xyz_m")
+            for component in obstacle[key]
+        ]
+        for pose in (first, last):
+            coordinates.extend(
+                abs(component)
+                for frame in pose["frame_poses"].values()
+                for component in frame["translation_m"])
+        model_scale = max([1.0, base, *coordinates])
+        if (not isfinite(model_scale)
+                or model_scale > MAX_ROTARY_NUMERIC_LENGTH_M):
+            raise ValueError("rotary geometry exceeds audited numeric scale")
+        if any(abs(value) > (MAX_ROTARY_NUMERIC_ANGLE_RAD
+                            if kinds[name] in ("revolute", "continuous")
+                            else MAX_ROTARY_NUMERIC_LENGTH_M)
+               for name in kinds for value in (start[name], stop[name])):
+            raise ValueError("rotary joint coordinate exceeds audited numeric scale")
+    except (KeyError, TypeError, OverflowError) as exc:
+        raise ValueError("rotary numeric bound metadata invalid") from exc
     try:
         prismatic_extent = sum(max(abs(start[name]), abs(stop[name]))
                               for name in kinds if kinds[name] == "prismatic")
@@ -179,7 +212,18 @@ def _conservative_centre_speed(first: dict, last: dict,
             prismatic_extent, angular_travel, linear_travel,
             local_extent, radius_bound, speed)):
         raise ValueError("rotary proxy bound exceeds numeric validity")
-    return speed
+    if (radius_bound > MAX_ROTARY_NUMERIC_LENGTH_M
+            or angular_travel > MAX_ROTARY_NUMERIC_ANGLE_RAD
+            or linear_travel > MAX_ROTARY_NUMERIC_LENGTH_M):
+        raise ValueError("rotary interpolation exceeds audited numeric domain")
+    # A deliberately large error allowance for chained matrix operations,
+    # coordinate differences and distance evaluation (not formal interval
+    # arithmetic). Outside this measured software domain we fail closed.
+    error_guard = 1e-9 + 64.0 * (len(kinds) + 1) * ulp(
+        max(model_scale, radius_bound, 1.0))
+    if not isfinite(error_guard):
+        raise ValueError("rotary arithmetic guard is not finite")
+    return speed, error_guard
 
 
 def _linear_joint_state(first: dict, second: dict, fraction: float) -> dict:
@@ -222,7 +266,7 @@ def inspect_rotary_proxy_sweep(
             continue
 
         try:
-            speed = _conservative_centre_speed(first, last, fixture)
+            speed, rounding_guard = _conservative_centre_speed(first, last, fixture)
         except ValueError:
             outcomes.append({"segment_index": index, "status": "unresolved_invalid_bound",
                              "evaluations": 0, "collision_fraction": None,
@@ -231,7 +275,7 @@ def inspect_rotary_proxy_sweep(
 
         # A small positive rounding allowance prevents classifying a
         # numerical near-contact as geometrically proven clear.
-        epsilon = 1e-9 + 1e-12 * speed
+        epsilon = rounding_guard + 1e-12 * speed
         queue = [(0.0, 1.0, first)]
         unresolved = 0
         collision_fraction = None
@@ -309,6 +353,9 @@ def inspect_rotary_proxy_sweep(
         "status": overall,
         "total_evaluations": budget_used,
         "max_evaluations": max_evaluations,
+        "numeric_model_limit_m": MAX_ROTARY_NUMERIC_LENGTH_M,
+        "numeric_joint_angle_limit_rad": MAX_ROTARY_NUMERIC_ANGLE_RAD,
+        "numeric_guard_type": "conservative_ulp_allowance_not_formal_interval_arithmetic",
         "segments": outcomes,
         "assumed_joint_motion": "linear_interpolation_fixed_virtual_base",
         "coverage": "declared_spheres_AABBs_and_explicit_self_pairs_only",
