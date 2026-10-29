@@ -1,5 +1,5 @@
 version: 1
-updated: "2026-10-28"
+updated: "2026-10-29"
 purpose: "Canonical scientific and implementation status for arc-rvi and the ARC portfolio"
 repository:
   canonical_branch: main
@@ -40,6 +40,21 @@ reference_robot:
   sensor_topics_and_transforms: illustrative_not_measured
   offline_model_auditor: implemented_but_not_verified_on_exact_delivered_robot
 research_phase: exploratory_p01_p02_factorial_simulation
+execution_roadmap:
+  status: planned_not_implemented
+  updated: "2026-10-29"
+  tracker: "https://github.com/MatPomGit/arc-rvi/issues/6"
+  scope: humanoid_difficult_terrain_P03_and_safe_vehicle_return
+  milestone_convention: issue_based_M0_to_M5_not_native_github_milestones
+  m0_device_variant_evidence: [98]
+  m1_rotary_continuous_collision: [99, 100]
+  m2_full_body_collision_and_ik: [101, 102]
+  m3_multilevel_contacts_and_gait: [103, 104]
+  m4_terrain_and_inspection_mission: [105, 106, 26, 88]
+  m5_physical_readiness_blocked: [107, 18, 38]
+  immediate_virtual_work: [99, 100]
+  actual_robot_motion: not_authorized
+
 implemented:
   - "Three deterministic coverage baselines and paired fixture evaluation"
   - "Planar geometric/kinematic simulation with visibility, swept footprint and action time"
@@ -280,6 +295,8 @@ next_actions:
     done_when: "Coordinate, visibility, timing and sensor error models have independent reference checks"
 ai_handoff:
   read_first: [AGENTS.md, PROJECT_STATE.yaml, AUTOPILOT_PLAN.md, experiments/README.md]
+  github_issue_roadmap: "https://github.com/MatPomGit/arc-rvi/issues/6"
+  next_actionable_humanoid_issue: 99
   never_infer:
     - "physical_robot_safety_or_sensor_performance_from_planar_geometry"
     - "unknown_surface_perception_from_oracle_visibility"

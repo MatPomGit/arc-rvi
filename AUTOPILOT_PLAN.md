@@ -1,6 +1,6 @@
 # ARC-RVI research plan
 
-Version: 1.0.0
+Version: 1.1.0
 
 ARC-RVI is a separate line in the ARC research portfolio. Its canonical status is
 [PROJECT_STATE.yaml](PROJECT_STATE.yaml). The [eight-study index](experiments/README.md)
@@ -28,6 +28,35 @@ The software currently supports fixtures and planar geometric/kinematic simulati
 Candidate visibility comes from known geometry. Physics, physical acquisition and
 unknown-geometry perception require separate implementations and validation.
 The smoke suites check software arithmetic; they do not establish method superiority.
+
+## Humanoid difficult-terrain work packages and agent handoff (2026-10-29)
+
+The [master issue #6](https://github.com/MatPomGit/arc-rvi/issues/6)
+contains the current **M0–M5 issue-based milestones** with independent
+acceptance/evidence gates. It remains the source of truth for task order;
+do not create parallel task queues, alternate roadmaps or new schedulers.
+
+| Milestone | Atomic issues | Dependency and closing gate |
+| --- | --- | --- |
+| M0, model identity | [#98](https://github.com/MatPomGit/arc-rvi/issues/98) | Operator-approved **read-only** G1 EDU variant / URDF / sensor inventory, otherwise BLOCKED |
+| M1, continuous proxy rotary collision | [#99](https://github.com/MatPomGit/arc-rvi/issues/99) → [#100](https://github.com/MatPomGit/arc-rvi/issues/100) | Independently verified conservative bound; no false all-clear in declared domain |
+| M2, collision-volume coverage and IK | [#101](https://github.com/MatPomGit/arc-rvi/issues/101) → [#102](https://github.com/MatPomGit/arc-rvi/issues/102) | All relevant link volumes/constraints represented and independently cross-checked; unknown means unverified |
+| M3, difficult-terrain contact and gait | [#103](https://github.com/MatPomGit/arc-rvi/issues/103) → [#104](https://github.com/MatPomGit/arc-rvi/issues/104) | Multi-level support/unknown traction plus time-indexed movement and aborts, **virtual only** |
+| M4, terrain-aware inspect-and-return | [#105](https://github.com/MatPomGit/arc-rvi/issues/105) → [#106](https://github.com/MatPomGit/arc-rvi/issues/106); [#26](https://github.com/MatPomGit/arc-rvi/issues/26), [#88](https://github.com/MatPomGit/arc-rvi/issues/88) | Group-disjoint terrain, bounded independent view/route comparison, valid photos and return reserve |
+| M5, physical readiness review | [#107](https://github.com/MatPomGit/arc-rvi/issues/107); [#18](https://github.com/MatPomGit/arc-rvi/issues/18), [#38](https://github.com/MatPomGit/arc-rvi/issues/38) | Site/robot/human signoff or explicit NO-GO; no robot actuation by the research runner |
+
+**Next virtual-first choice:** #99, followed by #100, where no real
+hardware is needed. M0 #98 may proceed in parallel *only* with authorized
+read-only device access. All P03 geometry/contact work remains independent
+of actual G1 EDU configuration until its hardware evidence is verified.
+An agent run is one bounded, reviewed change with CI, not a calendar promise.
+Before working, inspect issue status, dependencies and prior/ongoing PRs.
+
+For each child issue: use the existing module/CLI where possible; write
+independent nominal, adversarial and negative tests; run existing full
+offline CI and strict MkDocs on the exact PR HEAD; update the canonical
+status and corresponding protocol. Never infer bipedal locomotion, a
+safe camera viewpoint or paper-ready results from synthetic proxies.
 
 ## Relationship to other ARC work
 
