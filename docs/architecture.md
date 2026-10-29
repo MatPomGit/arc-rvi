@@ -206,6 +206,30 @@ preflight to clear physical robot motion or certify whole-body
 collision safety. See [P03 protocol](../experiments/exp03_viewpoint_planning/protocol.md)
 and [safety](safety.md).
 
+### Declared-link presence and self-pair omission audit (2026-10-29)
+
+The same existing `inspect_collision_proxies` JSON report now includes
+`declared_link_presence_audit`, listing all URDF links that have
+at least one declared collision sphere, the missing URDF link names,
+and the number and a bounded (16-entry) deterministic sample of
+**unchecked cross-link sphere pairs**. An explicit self-pair
+removes that pair from the *unchecked count*; the audit does not
+silently treat adjacent links as safe or automatically invent
+allowed-contact exclusions.
+
+This is an **inventory of link names and pair declarations only**.
+A link can have a tiny sphere whose volume grossly underrepresents
+the physical link or a proxy can entirely omit rigid-body details.
+Virtual root links may have no physical mesh; they are included
+in the conservative name inventory until explicitly reviewed.
+Even when `all_declared_links_have_proxy: true` and all explicit
+checks are clear, `actual_link_collision_volume_validation`
+and `full_body_collision_validation` remain
+`not_performed`. Full collision-body coverage, licensed
+reference mesh matching, self-contact exemptions and physical
+G1 EDU verification belong to [#101](https://github.com/MatPomGit/arc-rvi/issues/101)
+and [#98](https://github.com/MatPomGit/arc-rvi/issues/98).
+
 ### Offline waypoint collision diagnostics (fixture-only)
 
 The canonical `rvi robot-model` command can review **2–32**
