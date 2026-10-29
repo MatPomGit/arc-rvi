@@ -99,7 +99,9 @@ class UrdfPrimitiveEnvelopeAuditTests(unittest.TestCase):
         audit = report["urdf_primitive_envelope_audit"]
         self.assertEqual(audit["enclosed_primitive_bounds"], 2)
         self.assertEqual(audit["not_demonstrated_or_unknown"], 1)
-        self.assertEqual(audit["primitive_checks"][1]["status"],
+        arm_check = next(item for item in audit["primitive_checks"]
+                         if item["link"] == "arm")
+        self.assertEqual(arm_check["status"],
                          "primitive_enclosure_not_demonstrated")
         self.assertEqual(audit["status"],
                          "incomplete_or_unverified_reference_coverage")
@@ -110,8 +112,9 @@ class UrdfPrimitiveEnvelopeAuditTests(unittest.TestCase):
         declared["spheres"][1]["radius_m"] = 1.5
         _, report = self.check(declared=declared)
         # Tip geometry is centred 1 m along arm: 1 + sqrt(1.04) > 1.5.
-        self.assertEqual(report["urdf_primitive_envelope_audit"]
-                         ["primitive_checks"][1]["status"],
+        arm_check = next(item for item in report["urdf_primitive_envelope_audit"]
+                         ["primitive_checks"] if item["link"] == "arm")
+        self.assertEqual(arm_check["status"],
                          "primitive_enclosure_not_demonstrated")
         declared["spheres"] = [s for s in declared["spheres"]
                                if s["link"] != "camera"]
