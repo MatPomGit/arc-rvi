@@ -29,6 +29,30 @@ Translation, rotation and capture occur sequentially. The circular footprint doe
 not change during rotation. Movement is holonomic; there are no steering, gait,
 stability, acceleration or articulated-body constraints.
 
+## Independent analytic rotary-proxy reference (2026-10-29)
+
+The test-only independent reference
+`tests/unit/test_rotary_reference.py` checks the limited
+rotation-screening model with an **analytic unit-circle arc versus
+axis-aligned rectangle**. The reference does not call the
+implementation's displacement-bound or adaptive subdivision logic.
+It enumerates interval endpoints, circle/rectangle coordinate
+crossings and stationary bearing angles, then computes the exact
+minimum planar distance to the rectangle in the declared test
+domain. Tests include positive collision despite clear endpoint
+chords, near-corner contact, tangency within floating-point
+tolerance, 1-micrometre near-miss and penetration, a distal
+obstacle that can be excluded by the bound, and a zero-budget
+unresolved result.
+
+This is an **independent analytic oracle only for one unit-radius
+planar revolute link at fixed base** (synthetic fixture, no robot
+model confirmation). It does **not** validate arbitrary 3D
+multi-joint motion, mesh collisions, finite-precision guarantees
+outside the tested domain, uncertain real controller
+interpolation or humanoid terrain safety. The broader adversarial
+model validity task remains [#100](https://github.com/MatPomGit/arc-rvi/issues/100).
+
 ## Difficult-terrain and humanoid validity boundary (2026-10-28)
 
 The present circular-footprint, planar, holonomic motion model **cannot**
