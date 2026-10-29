@@ -1,6 +1,6 @@
 # Study 03: Whole-Body-Aware Viewpoint and Path Planning for Humanoid Visual Inspection
 
-Protocol version: 1.1.10
+Protocol version: 1.1.11
 
 Status: prospective design, not preregistered or frozen
 
@@ -193,6 +193,20 @@ No new viewpoints are credited as acquired, the P03 estimand
 and model-validity gates remain unfrozen, and #25/#26/#100 stay
 open pending full-body coverage and independent safety-domain
 review.
+
+## Rotary sweep numeric evidence gate (2026-10-29, unfrozen)
+
+Large world coordinates, geometric scales and extensive continuous
+joint rotation previously lacked a declared arithmetic validity
+envelope. The offline preflight now rejects scales exceeding
+1,000,000 m or rotary coordinate/travel exceeding 100 rad and uses
+a scale-aware roundoff margin on declared sphere-proxy clearance
+checks. These are **software numerical bounds only**, never
+physical robot operating limits. Even inside the range, absence
+of formally verified interval rounding, missing link geometry
+or an unknown actual controller path must remain explicit in any
+scientific inference. No physical locomotion or P03 performance
+result was established.
 
 ## Reference model preparation (exploratory)
 
