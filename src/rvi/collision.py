@@ -63,6 +63,101 @@ def _reject_constant(value: str) -> None:
     raise ValueError(f"non-finite collision fixture JSON constant: {value}")
 
 
+def _audit_urdf_primitive_envelopes(
+    frames: dict, declared: dict, margin: float, metadata: object,
+) -> dict:
+    """Assess containment of *ideal URDF primitives*, not physical meshes.
+
+    A separate declared sphere must enclose each primitive's conservative
+    circumsphere in the same link-local coordinate frame. This deliberately
+    rejects cases where a union of spheres might suffice but is unproved.
+    """
+    if metadata is None:
+        return {"status": "urdf_collision_reference_unavailable",
+                "actual_link_collision_volume_validation": "not_performed"}
+    if (not isinstance(metadata, dict)
+            or set(metadata) != {"source_sha256", "status", "by_link"}
+            or metadata["status"] != "offline_urdf_primitive_reference_only"
+            or not isinstance(metadata["by_link"], dict)
+            or set(metadata["by_link"]) != set(frames)):
+        raise ValueError("invalid pinned URDF collision-reference metadata")
+    checks = []
+    missing_reference = []
+    unverified = 0
+    enclosed = 0
+    by_link = metadata["by_link"]
+    for link in sorted(frames):
+        entries = by_link[link]
+        if not isinstance(entries, list):
+            raise ValueError("invalid URDF collision-reference entries")
+        if not entries:
+            missing_reference.append(link)
+        local_spheres = [
+            (_point3(item["center_local_m"], "declared local proxy centre"),
+             _number(item["radius_m"], "declared radius", positive=True))
+            for item in declared if item["link"] == link
+        ]
+        for item in entries:
+            if not isinstance(item, dict) or set(item) != {
+                    "id", "status", "primitive_kind",
+                    "bounding_sphere_centre_local_m",
+                    "bounding_sphere_radius_m"}:
+                raise ValueError("invalid URDF collision primitive entry")
+            status = "unverified_reference_geometry"
+            best = None
+            if item["status"] == "analytic_primitive_bound":
+                centre = _point3(item["bounding_sphere_centre_local_m"],
+                                 "URDF primitive enclosing centre")
+                radius = _number(item["bounding_sphere_radius_m"],
+                                 "URDF primitive enclosing radius",
+                                 positive=True)
+                for proxy_centre, proxy_radius in local_spheres:
+                    remaining = proxy_radius - (dist(proxy_centre, centre)
+                                                + radius + margin)
+                    if not isfinite(remaining):
+                        raise ValueError("non-finite primitive-envelope clearance")
+                    best = remaining if best is None else max(best, remaining)
+                if best is None:
+                    status = "missing_declared_link_proxy"
+                else:
+                    # Strict positive margin, not a claim of certified
+                    # floating-point interval enclosure near tangency.
+                    guard = 1e-9 + 1e-12 * max(radius, abs(best), 1.0)
+                    status = ("circumsphere_enclosed_by_declared_proxy"
+                              if best > guard else
+                              "primitive_enclosure_not_demonstrated")
+            elif item["status"] != "unverified_geometry":
+                raise ValueError("invalid collision primitive reference status")
+            if status == "circumsphere_enclosed_by_declared_proxy":
+                enclosed += 1
+            else:
+                unverified += 1
+            checks.append({
+                "primitive_id": item["id"],
+                "link": link,
+                "primitive_kind": item["primitive_kind"],
+                "status": status,
+                "best_signed_enclosing_margin_m": best,
+            })
+    return {
+        "status": (
+            "declared_urdf_primitives_enclosed_unverified_robot"
+            if checks and not unverified and not missing_reference else
+            "incomplete_or_unverified_reference_coverage"
+        ),
+        "urdf_source_sha256": metadata["source_sha256"],
+        "primitive_collision_elements": len(checks),
+        "enclosed_primitive_bounds": enclosed,
+        "not_demonstrated_or_unknown": unverified,
+        "links_without_urdf_collision_reference": missing_reference,
+        "primitive_checks": checks,
+        "reference_scope": "ideal_urdf_sphere_box_cylinder_only",
+        "mesh_files_loaded": False,
+        "actual_link_collision_volume_validation": "not_performed",
+        "full_body_collision_validation": "not_performed",
+    }
+
+
 def inspect_collision_proxies(configured_pose: dict, fixture: dict) -> dict:
     """Report only explicit spheres/boxes/pairs at one static FK configuration.
 
@@ -198,6 +293,8 @@ def inspect_collision_proxies(configured_pose: dict, fixture: dict) -> dict:
                    else "no_proxy_overlap_unverified"),
         "checked_pairs": len(checks),
         "proxy_spheres": len(spheres),
+        "urdf_primitive_envelope_audit": _audit_urdf_primitive_envelopes(
+            frames, spheres, margin, configured_pose.get("urdf_collision_geometry")),
         "declared_link_presence_audit": {
             "urdf_link_count": len(frames),
             "links_with_proxy_spheres": represented_links,
