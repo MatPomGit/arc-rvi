@@ -98,6 +98,7 @@ def inspect_collision_proxies(configured_pose: dict, fixture: dict) -> dict:
 
     sphere_centres = {}
     sphere_radii = {}
+    sphere_links = {}
     for entry in spheres:
         if not isinstance(entry, dict) or set(entry) != {
                 "id", "link", "center_local_m", "radius_m"}:
@@ -125,6 +126,7 @@ def inspect_collision_proxies(configured_pose: dict, fixture: dict) -> dict:
             raise ValueError("transformed collision sphere centre exceeds numeric range")
         sphere_centres[sid] = centre
         sphere_radii[sid] = radius
+        sphere_links[sid] = link
 
     obstacles = {}
     for entry in boxes:
@@ -155,6 +157,19 @@ def inspect_collision_proxies(configured_pose: dict, fixture: dict) -> dict:
         seen_pairs.add(key)
         self_pairs.append(key)
 
+    # Presence of a declared sphere for a URDF link is not evidence of
+    # complete collision volume for that link. Missing links and omitted
+    # cross-link self-pairs must remain explicit even when observed checks
+    # report non-overlap.
+    represented_links = sorted(set(sphere_links.values()))
+    missing_links = sorted(set(frames) - set(represented_links))
+    unreviewed_pairs = [
+        (first, second)
+        for i, first in enumerate(sorted(sphere_links))
+        for second in sorted(sphere_links)[i + 1:]
+        if (sphere_links[first] != sphere_links[second]
+            and (first, second) not in seen_pairs)
+    ]
     checks = []
     for sid, centre in sorted(sphere_centres.items()):
         for bid, (lo, hi) in sorted(obstacles.items()):
@@ -183,6 +198,18 @@ def inspect_collision_proxies(configured_pose: dict, fixture: dict) -> dict:
                    else "no_proxy_overlap_unverified"),
         "checked_pairs": len(checks),
         "proxy_spheres": len(spheres),
+        "declared_link_presence_audit": {
+            "urdf_link_count": len(frames),
+            "links_with_proxy_spheres": represented_links,
+            "links_without_proxy_spheres": missing_links,
+            "all_declared_links_have_proxy": not missing_links,
+            "unreviewed_cross_link_self_pair_count": len(unreviewed_pairs),
+            "unreviewed_cross_link_self_pair_examples": [
+                list(pair) for pair in unreviewed_pairs[:16]
+            ],
+            "actual_link_collision_volume_validation": "not_performed",
+            "adjacent_joint_contact_exemption_review": "not_performed",
+        },
         "sphere_centres_world_m": {
             identifier: list(point)
             for identifier, point in sorted(sphere_centres.items())
