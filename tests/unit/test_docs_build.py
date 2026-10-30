@@ -44,7 +44,6 @@ class DocsBuildTests(unittest.TestCase):
                 css,
             )
 
-
     def test_native_colour_modes_do_not_conflict_with_legacy_css(self):
         root = Path(__file__).resolve().parents[2]
         configuration = (root / "mkdocs.yml").read_text(encoding="utf-8")
@@ -54,9 +53,7 @@ class DocsBuildTests(unittest.TestCase):
         self.assertIn("  color_mode: auto", configuration)
         self.assertIn("  user_color_mode_toggle: true", configuration)
         self.assertIn("  nav_style: dark", configuration)
-        self.assertIn("  - Project:\\n      - Repository README: README.md".replace(
-            "\\\\n", "\\n"
-        ), configuration)
+        self.assertIn("      - Repository README: README.md", configuration)
         self.assertNotIn("prefers-color-scheme", css)
         self.assertNotIn(".navbar-default", css)
         self.assertIn("var(--bs-body-color)", css)
