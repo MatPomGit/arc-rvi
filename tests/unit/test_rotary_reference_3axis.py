@@ -53,6 +53,16 @@ def at_fraction(first: dict, last: dict, fraction: float) -> dict:
             for name in first}
 
 
+def point_box_clearance(point: tuple, box: dict, radius: float) -> float:
+    """Exact point-to-AABB distance minus sphere radius in fixture units."""
+    minimum, maximum = box["min_xyz_m"], box["max_xyz_m"]
+    squared = sum(
+        max(lo - value, 0.0, value - hi) ** 2
+        for value, lo, hi in zip(point, minimum, maximum)
+    )
+    return sqrt(squared) - radius
+
+
 def box_near(center: tuple, radius: float = 0.1) -> dict:
     return {
         "schema_version": "1.0.0", "clearance_margin_m": 0.0,
@@ -122,7 +132,13 @@ class ThreeAxisReferenceTests(unittest.TestCase):
                 center = analytic_tip(**at_fraction(first, last, fraction))
                 self.assertGreater(dist(analytic_tip(**first), center), 0.2)
                 self.assertGreater(dist(analytic_tip(**last), center), 0.2)
-                result = self.sweep(first, last, box_near(center))
+                fixture = box_near(center)
+                self.assertAlmostEqual(
+                    point_box_clearance(center, fixture["boxes"][0], 0.1),
+                    -0.1,
+                    places=12,
+                )
+                result = self.sweep(first, last, fixture)
                 self.assertNotEqual(
                     result["status"], "declared_proxies_only_screened"
                 )
@@ -135,17 +151,22 @@ class ThreeAxisReferenceTests(unittest.TestCase):
     def test_tangent_contact_and_zero_budget_fail_closed(self):
         first = {"yaw": -0.9, "pitch": -0.8, "roll": -0.7}
         last = {"yaw": 0.9, "pitch": 0.8, "roll": 0.7}
-        for delta in (-1e-6, 0.0):
+        midpoint = analytic_tip(0.0, 0.0, 0.0)
+        for delta in (-1e-6, 0.0, 1e-6):
             with self.subTest(delta=delta):
-                # Midpoint is analytically (1,1,1); box begins at
-                # x=1.1+delta and sphere radius is 0.1 metres.
+                # The analytically known midpoint is (1, 1, 1).
+                # The sphere radius is 0.1 m; the AABB starts at
+                # x=1.1+delta. Negative delta denotes penetration.
                 fixture = box_near((1.125 + delta, 1.0, 1.0))
-                fixture["boxes"][0]["min_xyz_m"][0] = 1.1 + delta
-                fixture["boxes"][0]["max_xyz_m"][0] = 1.2
-                result = self.sweep(first, last, fixture)
-                self.assertNotEqual(
-                    result["status"], "declared_proxies_only_screened"
+                gap = point_box_clearance(
+                    midpoint, fixture["boxes"][0], 0.1
                 )
+                self.assertAlmostEqual(gap, delta, places=11)
+                result = self.sweep(first, last, fixture)
+                if delta <= 0:
+                    self.assertNotEqual(
+                        result["status"], "declared_proxies_only_screened"
+                    )
                 blocked = self.sweep(first, last, fixture, budget=0)
                 self.assertEqual(blocked["status"], "rotary_sweep_unresolved")
 
