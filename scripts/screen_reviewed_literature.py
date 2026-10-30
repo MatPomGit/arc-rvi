@@ -55,7 +55,7 @@ def apply_decisions(candidates: list[dict], inventory: dict, manifest: dict) -> 
         if not isinstance(rationale, str) or not rationale.strip():
             raise ValueError("a reviewer decision requires a rationale")
         if not isinstance(review_date, str) or not re.fullmatch(
-                r"\\d{4}-\\d{2}-\\d{2}", review_date):
+                r"\d{4}-\d{2}-\d{2}", review_date):
             raise ValueError("a reviewer decision requires an ISO review date")
         try:
             date.fromisoformat(review_date)
