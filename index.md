@@ -34,3 +34,5 @@ and [validation rules](docs/development/testing.md).
 
 The source code and ongoing development are hosted in
 [MatPomGit/arc-rvi](https://github.com/MatPomGit/arc-rvi).
+
+[Ruleset CI probe, expected broken link](missing-ruleset-probe-20261030.md)
