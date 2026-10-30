@@ -53,7 +53,7 @@ Przed zadaniem przeczytaj ten plik i właściwe lokalne `AGENTS.md`, jeśli istn
 - Przed PR przeczytaj [testowanie i CI](docs/development/testing.md) oraz [publikację dokumentacji](docs/website.md).
 - Zawsze uruchom `python scripts/validate.py` i `python scripts/check_agent_docs.py`; przy dokumentacji także `python scripts/build_docs.py` i `python -m mkdocs build --strict`.
 - W CI sprawdzaj Python 3.11, 3.12 i 3.13 oraz MkDocs strict. Raportuj `PASS`, `FAIL`, `BLOCKED` i `NOT_RUN` na dokładnym SHA.
-- Dla PR zmieniających kod, bezpieczeństwo, metodologię lub zasady agentów wymagaj niezależnej akceptacji; własny komentarz nie zastępuje review.
+- Dla PR zmieniających kod, bezpieczeństwo, metodologię lub zasady agentów wymagaj odrębnej recenzji technicznej. Recenzja zapisana jako GitHub `COMMENTED` albo merytoryczny komentarz PR jest dopuszczalna przy wspólnym koncie człowieka i agenta, jeśli wskazuje rolę recenzenta, SHA, zakres, ustalenia, wynik i dowody. Komentarz autora bez odrębnej oceny nie wystarcza; `COMMENTED` nie oznacza GitHub `APPROVED`.
 - Nie obchodź ochrony `main`, nie wykonuj force push na wspólnych gałęziach; nie deklaruj wdrożenia na podstawie scalenia.
 - Sprzątaj wyłącznie własne zbędne gałęzie i worktree po sprawdzeniu braku niescalonych zmian i historycznej wartości danych.
 
@@ -94,7 +94,7 @@ Przed zadaniem przeczytaj ten plik i właściwe lokalne `AGENTS.md`, jeśli istn
 
 ### Krok 7. Zintegruj i sprawdź wdrożenie
 1. Przeczytaj aktualną procedurę [integracji](docs/development/agent-workflow.md); zaktualizuj zgodny PR, nie zakładaj duplikatu.
-2. Zsynchronizuj z `main`, sprawdź diff, wymagane checki na finalnym SHA i zatwierdzenia od niezależnego recenzenta.
+2. Zsynchronizuj z `main`, sprawdź diff i wymagane checki na finalnym SHA oraz odrębną recenzję techniczną, także udokumentowaną przez `COMMENT`. Zachowaj wszystkie faktycznie wymagane zatwierdzenia GitHub.
 3. Scal wyłącznie przy spełnionych bramkach i uprawnieniach. Jeśli brakuje akceptacji, pozostaw PR z jawną blokadą.
 4. Jeżeli dotyczy, zweryfikuj osobno deployment, publikację MkDocs, odpowiednią rewizję i test smoke.
 
@@ -106,5 +106,5 @@ Przed zadaniem przeczytaj ten plik i właściwe lokalne `AGENTS.md`, jeśli istn
 
 ### Eskalacja
 - Rozwiązuj samodzielnie rutynowe błędy i wybory między równoważnymi, bezpiecznymi rozwiązaniami.
-- Eskaluj konflikt uprawnień, wydatek, operację fizyczną, ryzyko danych, brak niezależnego review i nierozstrzygalny konflikt zasad.
+- Eskaluj konflikt uprawnień, wydatek, operację fizyczną, ryzyko danych, brak odrębnej recenzji technicznej lub wymaganego zatwierdzenia GitHub i nierozstrzygalny konflikt zasad.
 - Nie obchodź blokad. Przy niemożliwej pracy zachowaj sprawdzony postęp, oznacz `BLOCKED` i wybierz następne dozwolone zadanie.

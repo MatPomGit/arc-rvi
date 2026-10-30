@@ -72,6 +72,27 @@ class AgentDocsAuditTests(unittest.TestCase):
             [],
         )
 
+    def test_shared_account_comment_review_is_documented(self):
+        root = Path(__file__).resolve().parents[2]
+        sources = (
+            "AGENTS.md",
+            "docs/development/agent-workflow.md",
+            "docs/development/testing.md",
+            "docs/website.md",
+        )
+        for name in sources:
+            with self.subTest(path=name):
+                content = (root / name).read_text(encoding="utf-8")
+                self.assertIn("COMMENTED", content)
+                self.assertIn("APPROVED", content)
+                self.assertIn("SHA", content)
+        policy = (root / "docs/development/testing.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("TECHNICAL_REVIEW_PASS", policy)
+        self.assertIn("GITHUB_APPROVED", policy)
+        self.assertIn("stale SHA", policy)
+
     def test_user_document_rejects_typographic_dashes(self):
         self.assertEqual(inspect_user_text("Plain text - OK"), [])
         self.assertTrue(inspect_user_text("Unwanted \u2014 separator"))
