@@ -52,10 +52,18 @@ def audit(archive: Path) -> tuple[dict, list[dict], list[dict]]:
             raw = source.read(filename)
             hashes[filename] = hashlib.sha256(raw).hexdigest()
             reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")))
-            if not REQUIRED.issubset(reader.fieldnames or ()):
+            columns = reader.fieldnames or []
+            if not REQUIRED.issubset(columns):
                 raise ValueError(f"missing columns in {filename}")
+            if (len(columns) != len(set(columns))
+                    or any(not column or not column.strip() for column in columns)):
+                raise ValueError(f"duplicate or unnamed columns in {filename}")
             counts[study] = 0
             for record_number, row in enumerate(reader, start=1):
+                if None in row or any(row[column] is None for column in columns):
+                    raise ValueError(
+                        f"mismatched CSV field count in {filename}#{record_number}"
+                    )
                 counts[study] += 1
                 original_doi = (row["DOI"] or "").strip()
                 doi = normalized_doi(original_doi)
