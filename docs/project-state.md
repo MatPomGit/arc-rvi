@@ -10,6 +10,6 @@ The `repository.software_version` field in `PROJECT_STATE.yaml` must match it;
 Historical verification receipts and their exact SHAs remain historical records;
 do not rewrite them when the current package or instructions change.
 
-[AGENTS.md](../AGENTS.md) governs agent decisions. Current Issues and PRs
+The root `AGENTS.md` governs agent decisions. Current Issues and PRs
 rather than historical next-action hints determine the active work queue.
 The [documentation build guide](website.md) describes CI checks and review gates.
