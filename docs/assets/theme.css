@@ -1,41 +1,114 @@
-/* Accessible system-driven themes for MkDocs' built-in Bootstrap theme. */
-:root {
-  color-scheme: light dark;
-  --bg-main: #ffffff;
-  --text-primary: #17212b;
-  --surface-card: #f1f4f8;
-  --surface-border: #d1dae4;
-  --link-primary: #07599c;
-  --nav-bg: #eef2f6;
+/* Layout only. MkDocs 1.6 (Bootstrap 5) owns light/dark colours. */
+body {
+  font-size: 1rem;
+  line-height: 1.7;
 }
-body { background: var(--bg-main); color: var(--text-primary); }
-a, a:visited { color: var(--link-primary); }
-.navbar, .navbar-default, .well, .panel, .dropdown-menu {
-  background-color: var(--surface-card);
-  color: var(--text-primary);
-  border-color: var(--surface-border);
+
+/* Prevent the brand and navigation from competing for horizontal space. */
+.navbar .navbar-brand {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: normal;
 }
-pre, code, .highlight, blockquote, .table {
-  color: var(--text-primary);
-  border-color: var(--surface-border);
-}
-pre, .highlight, .table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: var(--surface-card);
-}
-.navbar-default .navbar-nav > li > a, .navbar-default .navbar-brand,
-.dropdown-menu > li > a { color: var(--text-primary); }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-main: #151a22;
-    --text-primary: #edf2f8;
-    --surface-card: #222b37;
-    --surface-border: #425065;
-    --link-primary: #9bd0ff;
-    --nav-bg: #1e2631;
+@media (min-width: 992px) {
+  .navbar .navbar-brand {
+    margin-right: 0.75rem;
   }
-  .navbar-default .navbar-nav > li > a:hover,
-  .dropdown-menu > li > a:hover { color: var(--link-primary); }
-  table > thead > tr > th, .table > tbody > tr > td,
-  .table > thead > tr > th { border-color: var(--surface-border); }
-  code { background-color: var(--surface-card); }
+  .navbar .navbar-nav .nav-link {
+    padding-inline: 0.55rem;
+  }
+}
+
+/* Comfortable measure for dense academic prose without narrowing tables. */
+[role="main"] {
+  min-width: 0;
+}
+[role="main"] > p,
+[role="main"] > ul,
+[role="main"] > ol,
+[role="main"] > blockquote {
+  max-width: 78ch;
+}
+[role="main"] p,
+[role="main"] li {
+  line-height: 1.7;
+}
+[role="main"] p {
+  margin-bottom: 1.15rem;
+}
+[role="main"] h1 {
+  margin-bottom: 1.2rem;
+}
+[role="main"] h2,
+[role="main"] h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Use the active Bootstrap colour mode rather than fixed light colours. */
+.bs-sidebar {
+  background: var(--bs-tertiary-bg);
+  color: var(--bs-body-color);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+.bs-sidebar .nav-link,
+.bs-sidebar .nav > li > a {
+  color: var(--bs-body-color);
+  overflow-wrap: anywhere;
+}
+.bs-sidebar .nav-link:hover,
+.bs-sidebar .nav-link:focus-visible,
+.bs-sidebar .nav > li > a:hover {
+  color: var(--bs-body-color);
+  background: var(--bs-secondary-bg);
+}
+.bs-sidebar .active > .nav-link,
+.bs-sidebar .nav > .active > a {
+  color: var(--bs-primary-text-emphasis);
+  background: var(--bs-primary-bg-subtle);
+  font-weight: 650;
+}
+
+/* Long commands stay available, but never dominate the first viewport. */
+pre {
+  max-height: 22rem;
+  max-width: 100%;
+  overflow: auto;
+  padding: 1rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+}
+pre code {
+  white-space: inherit;
+}
+p code,
+li code {
+  overflow-wrap: anywhere;
+}
+[role="main"] img,
+[role="main"] svg {
+  max-width: 100%;
+  height: auto;
+}
+[role="main"] table {
+  max-width: 100%;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 3px;
+}
+@media (max-width: 767px) {
+  [role="main"] h1 {
+    font-size: 1.8rem;
+  }
+  .bs-sidebar {
+    margin-bottom: 1.25rem;
+  }
+  pre {
+    max-height: 16rem;
+  }
 }
