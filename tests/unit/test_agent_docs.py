@@ -27,6 +27,20 @@ class AgentDocsAuditTests(unittest.TestCase):
             )
             self.assertEqual(inspect_links(root, ("README.md",)), [])
 
+    def test_published_readme_alias_maps_to_canonical_source(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "index.md").write_text(
+                "[Full README](project-readme.md)", encoding="utf-8"
+            )
+            original = root / "README.md"
+            original.write_text("# Project", encoding="utf-8")
+            self.assertEqual(inspect_links(root, ("index.md",)), [])
+            original.unlink()
+            issues = inspect_links(root, ("index.md",))
+            self.assertEqual(len(issues), 1)
+            self.assertIn("missing link target", issues[0])
+
     def test_missing_local_target_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
