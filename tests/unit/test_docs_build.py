@@ -33,9 +33,10 @@ class DocsBuildTests(unittest.TestCase):
                 "# Welcome\n",
             )
             self.assertEqual(
-                (destination / "README.md").read_text(encoding="utf-8"),
+                (destination / "project-readme.md").read_text(encoding="utf-8"),
                 "# Full README\n",
             )
+            self.assertFalse((destination / "README.md").exists())
             self.assertTrue((destination / "docs" / "guide.md").exists())
             self.assertEqual(
                 (destination / "docs" / "assets" / "theme.css").read_text(
@@ -53,7 +54,7 @@ class DocsBuildTests(unittest.TestCase):
         self.assertIn("  color_mode: auto", configuration)
         self.assertIn("  user_color_mode_toggle: true", configuration)
         self.assertIn("  nav_style: dark", configuration)
-        self.assertIn("      - Repository README: README.md", configuration)
+        self.assertIn("      - Repository README: project-readme.md", configuration)
         self.assertNotIn("prefers-color-scheme", css)
         self.assertNotIn(".navbar-default", css)
         self.assertIn("var(--bs-body-color)", css)
