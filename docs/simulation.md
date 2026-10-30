@@ -90,6 +90,28 @@ Unitree G1 EDU. Issue [#100](https://github.com/MatPomGit/arc-rvi/issues/100)
 remains open until broader model-bound, property and numeric-domain
 validation is independently reviewed.
 
+## Independent three-axis synthetic reference (2026-10-30)
+
+The P03 test `tests/unit/test_rotary_reference_3axis.py` adds a
+three-revolute-joint chain with nonparallel z, y and x axes, a fixed
+off-axis tip (1,1,1) m and an independently derived trigonometric
+reference `Rz(yaw) Ry(pitch) Rx(roll) (1,1,1)`. Seven prescribed
+joint states compare URDF FK against that closed form; two distinct
+interior joint-interpolation contacts are placed using the analytic
+reference rather than a production collision solver. Exact-midpoint
+tangency, a one-micrometre penetration, zero-budget uncertainty and
+a distant collision-free declared-proxy case are also checked.
+
+This extension independently tests a wider **synthetic 3-DOF**
+kinematic topology without invoking real robot interfaces. A result
+`declared_proxies_only_screened` applies only to the declared
+sphere/AABB model. These discrete reference points do not provide
+a global proof for arbitrary URDF trees, directed-rounding interval
+bounds, self-collision of all links, meshes, moving bases, true
+controller motion or hardware safety. Issue
+[#100](https://github.com/MatPomGit/arc-rvi/issues/100) remains open
+for the unverified cases and independent acceptance.
+
 ## Numeric-domain and precision stress tests (2026-10-29)
 
 The rotary proxy solver now rejects geometry and model scale above
