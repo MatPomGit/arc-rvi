@@ -78,6 +78,7 @@ Nie uznawaj planów, fikcyjnych przykładów ani opisów dokumentacyjnych za dow
 
 ### Sprawdzanie zmian
 - Uruchom odpowiednie testy modułu i pełny zestaw offline poleceniem `python scripts/validate.py` w katalogu głównym.
+- Sprawdź instrukcje, odnośniki i zgodność wersji poleceniem `python scripts/check_agent_docs.py`.
 - Dla komend `rvi` użyj środowiska Python 3.11+ i, gdy potrzebna instalacja, `python -m pip install -e .`.
 - Dla dokumentacji zastosuj `python scripts/build_docs.py`, a następnie `python -m mkdocs build --strict`.
 - Instrukcje instalacji zależności MkDocs są w `docs/website.md`; nie zakładaj, że MkDocs jest częścią zależności pakietu.
@@ -135,8 +136,8 @@ Nie uznawaj planów, fikcyjnych przykładów ani opisów dokumentacyjnych za dow
 2. Zsynchronizuj z `main`, oceń diff i konflikty, uzupełnij opis PR o zakres, Issue, dowody i ograniczenia.
 3. Jeśli szablon PR istnieje, zastosuj go; w przeciwnym razie użyj zwięzłego opisu bez tworzenia szablonu.
 4. Sprawdź status wszystkich obowiązkowych kontroli na dokładnym końcowym `head SHA`.
-5. Uzyskaj wymagane niezależne review; własny przegląd agenta nie zastępuje niezależnej akceptacji.
-6. Nie obchodź ochrony gałęzi, statusów CI, reguł bezpieczeństwa ani nie fałszuj zatwierdzeń.
+5. Wymagaj niezależnej akceptacji dla PR zmieniającego kod, metodologię, bezpieczeństwo lub zasady agentów; własny przegląd nie wystarcza.
+6. Jeśli brak niezależnego recenzenta albo konfiguracji reguł, oznacz blokadę integracji takiego PR; nie obchodź ochrony gałęzi ani statusów CI.
 7. Scal tylko w granicach uprawnień i po przejściu bramek; w innym razie opisz blokadę w PR.
 
 ### Krok 8. Zamknij i wybierz następny etap

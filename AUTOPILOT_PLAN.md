@@ -45,9 +45,10 @@ do not create parallel task queues, alternate roadmaps or new schedulers.
 | M4, terrain-aware inspect-and-return | [#105](https://github.com/MatPomGit/arc-rvi/issues/105) → [#106](https://github.com/MatPomGit/arc-rvi/issues/106); [#26](https://github.com/MatPomGit/arc-rvi/issues/26), [#88](https://github.com/MatPomGit/arc-rvi/issues/88) | Group-disjoint terrain, bounded independent view/route comparison, valid photos and return reserve |
 | M5, physical readiness review | [#107](https://github.com/MatPomGit/arc-rvi/issues/107); [#18](https://github.com/MatPomGit/arc-rvi/issues/18), [#38](https://github.com/MatPomGit/arc-rvi/issues/38) | Site/robot/human signoff or explicit NO-GO; no robot actuation by the research runner |
 
-**Next virtual-first choice:** #99, followed by #100, where no real
-hardware is needed. M0 #98 may proceed in parallel *only* with authorized
-read-only device access. All P03 geometry/contact work remains independent
+**Historical virtual-first candidates (as of 2026-10-29):** #99 and #100.
+Before starting new work, fetch live issue and PR state and select the first
+unblocked stage; this prose is not an active task queue. M0 #98 may proceed
+in parallel *only* with authorized read-only device access. All P03 geometry/contact work remains independent
 of actual G1 EDU configuration until its hardware evidence is verified.
 An agent run is one bounded, reviewed change with CI, not a calendar promise.
 Before working, inspect issue status, dependencies and prior/ongoing PRs.
@@ -74,5 +75,6 @@ Do not copy confidential source material or identities into public research arti
 
 Use the existing controller and repository instructions. Registration is not a deployment
 receipt or a new execution policy. Do not add another scheduler, task queue or merge path.
-Run `python scripts/validate.py` before recording new software verification evidence.
+Run `python scripts/validate.py` and `python scripts/check_agent_docs.py`
+before recording new software verification evidence.
 Record exact revisions in PR evidence; physical results need independently traceable measurements.

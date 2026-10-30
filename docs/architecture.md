@@ -2,9 +2,14 @@
 
 For the primary operational scenario, see [commanded car / bumper photography and return-to-human](vehicle-inspection-missions.md). It specifies a fail-closed target/part-resolution contract, reflective car-body image acceptance and an operator-verified return. The implemented evaluator is **offline fixture-only**; no physical robot motion or sensor is controlled.
 
-The shared core contains neutral algorithms and data contracts. A future
-orchestrator will connect target localization, navigation, viewpoint selection,
-acquisition, quality control and evidence generation via one adapter boundary.
+The shared core contains neutral algorithms and data contracts under `src/rvi/`.
+`src/rvi/cli.py` exposes the `rvi` offline CLI, `src/rvi/interfaces.py`
+defines device boundaries, and `src/rvi/adapters/robot.py` deliberately
+rejects hardware requests. `src/rvi/adapters/simulator.py` implements a
+bounded planar geometric model. Independent offline unit, integration and
+simulation checks live under `tests/`. A future orchestrator may connect
+localization, navigation, viewpoint selection, acquisition, quality control
+and provenance only through validated adapter boundaries.
 
 1. Confirm a target identifier.
 2. Localize the target and its required visual regions.
@@ -417,8 +422,10 @@ Current implementation: deterministic planar greedy viewpoint baseline, mission
 state guards, threshold decisions on supplied measurements, file hashing, paired fixture
 benchmarking and a planar geometric simulator. The simulator has a separate observation
 contract and never implements physical-device motion. See [the model](simulation.md).
-Not implemented: perception, motion control, image feature extraction, real
-camera capture, actual physics simulator integration and closed-loop operation.
+Not implemented: measured natural-image recognition, physical motion control,
+real camera capture, calibrated physics-engine integration and autonomous
+closed-loop robot operation. Existing synthetic image-feature and offline ROI
+routines do not constitute physical perception or validated camera capture.
 
 The baseline hardware target for forthcoming simulation-model integration and
 authorized physical validation is **Unitree G1 EDU**, as declared in

@@ -1,6 +1,6 @@
 # Autonomous Robotic Visual Inspection (RVI)
 
-Independent research software for autonomous perception, mobile inspection, viewpoint planning and reproducible image acquisition. The initial platform of interest is a humanoid robot, but algorithms and experiments should remain hardware- and object-agnostic.
+Independent research software for reproducible robotic visual inspection: target localization, viewpoint planning, coverage evaluation and photographic quality assessment. The reference platform is a humanoid robot; the current executable tools are offline, and the shared algorithms remain hardware-agnostic.
 
 **Primary concrete use case (2026-10-28):** a human instructs Unitree G1 EDU to photograph a specifically identified **car**, or a single named part such as the **rear bumper**; the robot must localise the correct car and part, satisfy an authorised required-shot checklist despite specular reflections, and return for an operator-confirmed handoff. See the [mission specification and offline fail-closed evaluator](docs/vehicle-inspection-missions.md). This does not imply speech/vision/robot integration has been implemented; its example logs are synthetic.
 
@@ -27,19 +27,37 @@ and [physical test safety gates](docs/safety.md).
 - `src/rvi/`: shared research library; hardware adapters are separate.
 - `config/`: neutral configuration templates, not device credentials.
 - `simulation/`: scenario fixtures and planar geometric worlds.
-- `experiments/exp01_...exp08_/`: eight independent research protocols.
-- `papers/paper01/...paper08/`: manuscripts and citation material.
+- `experiments/exp01_...exp08_/`: eight prospective research protocols, not completed studies.
+- `papers/paper01/...paper08/`: candidate manuscripts and citation material, not publication evidence.
 - `datasets/`: data governance; large/raw/private datasets live outside Git.
 - `tests/`: offline unit, integration and fixture checks.
 - `docs/`: architecture, methodology, safety and reproducibility.
 
+## Verified software versus prospective research
+
+| Component | Current scope | Not established |
+| --- | --- | --- |
+| `rvi plan`, `rvi benchmark`, `rvi simulate` | Deterministic fixtures and planar geometry/kinematics | Calibrated physics, physical coverage or robot safety |
+| `rvi localize`, image-quality utilities | Synthetic proxies, offline PGM crops, supplied masks and bounded quality checks | General natural-image recognition or measured camera calibration |
+| `rvi robot-model`, `rvi stance` | Source-hashed URDF, limited FK/collision-proxy and static support preflight | Certified full-body collision, dynamic balance or locomotion |
+| Car/bumper inspection mission | Fixture-only identity, required-view, glare and return/handoff evaluation | Live target detection, autonomous photographs or safe physical return |
+| P01-P08 research | Protocol drafts, exploratory synthetic analyses and publication scaffolds | Confirmatory evidence, physical field trials or submitted papers |
+
+**Physical motion remains disabled.** `config/robot.yaml` retains
+`adapter: not_configured`; `src/rvi/adapters/robot.py` rejects device operations.
+Read [hardware safety gates](docs/safety.md) before any authorized hardware work.
+For implementation details, see [architecture](docs/architecture.md),
+[reproducibility](docs/reproducibility.md) and
+[prospective study protocols](experiments/README.md).
+
 ## Offline start
 
-Requires Python 3.11+; core tooling uses the standard library.
+Requires Python 3.11+; core package runtime uses the standard library.
 
 ```bash
 python -m pip install -e .
 python scripts/validate.py
+python scripts/check_agent_docs.py
 rvi plan --scenario simulation/scenarios/inspection_small.json --output results/plan.json
 rvi benchmark --suite simulation/suites/fixture_smoke.json --output results/benchmark.json
 rvi simulate --scene simulation/worlds/planar_inspection.json --output results/simulation.json
@@ -109,6 +127,22 @@ exploratory Study 01. It blocks holdout access and does not cover physical studi
 
 No client identities, proprietary data, credentials, real vehicle identifiers, raw imagery or confidential project documents are committed. Any article using external material must first clear its publication and licensing rights. Existing source code is subject to the repository's `LICENSE`; manuscript rights and third-party content must be reviewed separately.
 
+## Development and validation
+
+`AGENTS.md` defines the autonomous workflow, required safety gates, Issue
+selection and PR integration procedure. Start with existing Issues and PRs,
+not a copied list of tasks. The [architecture](docs/architecture.md),
+[methodology](docs/methodology.md) and [research state](docs/project-state.md)
+are the canonical entry points for relevant details.
+
+All PRs run the offline test matrix (Python 3.11, 3.12 and 3.13).
+Documentation CI also executes `python scripts/check_agent_docs.py`
+and a strict MkDocs build. This checks local documentation links, the agent
+workflow and package/version consistency; it does **not** verify external
+citations or physically validate a robot. Review and branch protection
+requirements are documented in the [build and governance guide](docs/website.md).
+Do not mistake successful CI for independent scientific or safety review.
+
 ## Research development
 
 Start with the [research program](experiments/README.md) and
@@ -120,4 +154,4 @@ The [ARC plan](AUTOPILOT_PLAN.md) defines its portfolio role and proposed sensor
 Technical documentation build and publication instructions are maintained in
 [Documentation build](docs/website.md).
 
-For contribution rules, see `AGENTS.md`.
+For contribution and autonomous-agent rules, read the root `AGENTS.md`.
