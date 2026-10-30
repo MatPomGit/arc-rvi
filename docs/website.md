@@ -44,15 +44,20 @@ strict. Require those four check names on the final PR SHA; do not use
 an earlier green run. A skipped publishing job on PRs is expected.
 
 GitHub settings are **not** configured by this Markdown or the workflow.
-An administrator must set a ruleset for `main` under
-**Settings > Rules > Rulesets**, requiring PRs, the four named passing
-checks, and at least one approval from a qualified reviewer other than
-the change author. Dismiss stale approvals and restrict bypass rights.
-For work affecting code, methodology, safety or agent operating rules,
-do not merge without an independently recorded approval. Changes to
-branch settings are a separate administrative action and must be verified
-in the GitHub interface. Treat unreadable branch protection (API 403)
-as unknown, not disabled.
+An administrator must verify an active ruleset for `main` under
+**Settings > Rules > Rulesets**, with PR integration, the four named
+passing checks, restrictions on destructive actions and appropriate bypass
+permissions. The owner and reviewer agent share a GitHub account: a genuine,
+traceable independent technical review recorded as a PR `COMMENTED` review
+or comment meets the project's technical review policy without formal
+GitHub `APPROVED`. Each review requires the exact SHA, reviewer role,
+inspected scope, evidence, findings and an explicit pass/block conclusion.
+A comment is not a GitHub approval and does not satisfy any configured
+rule demanding `APPROVED`. Do not change or bypass enforced rules as part
+of reviewing or merging. Changes to branch settings are separate
+administrative actions; verify them in the GitHub interface. Treat an
+unreadable protection API (403) as unknown, not disabled. See [technical
+review policy](development/testing.md) and [governance Issue #117](https://github.com/MatPomGit/arc-rvi/issues/117).
 
 ## Publishing
 
