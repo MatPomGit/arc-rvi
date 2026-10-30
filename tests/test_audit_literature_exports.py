@@ -133,6 +133,82 @@ class LiteratureExportAuditTests(unittest.TestCase):
             ))
             self.assertEqual(report["screening_queue_candidates"], 2)
 
+    def test_reject_ragged_rows_and_ambiguous_headers(self) -> None:
+        cases = (
+            "extra_cell", "missing_cell",
+            "duplicate_header", "unnamed_header",
+            "whitespace_duplicate_header", "unterminated_quote",
+            "invalid_quote_suffix",
+        )
+        for kind in cases:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                archive = Path(tmp) / "malformed.zip"
+                with ZipFile(archive, "w") as sink:
+                    for idx, filename in enumerate(literature.STUDIES.values()):
+                        columns = sorted(literature.REQUIRED)
+                        fields = {
+                            "Paper Title": f"Reference {idx}",
+                            "DOI": f"10.1234/test{idx}",
+                            "Publication Year": "2024",
+                            "Author Names": "Author",
+                            "Abstract": "Abstract",
+                            "Paper Link": "https://example.org",
+                        }
+                        row = [fields[column] for column in columns]
+                        header = columns[:]
+                        if idx == 0:
+                            if kind == "extra_cell":
+                                row.append("surplus")
+                            elif kind == "missing_cell":
+                                row.pop()
+                            elif kind == "duplicate_header":
+                                header.append("DOI")
+                                row.append("10.1234/ambiguous")
+                            elif kind == "unnamed_header":
+                                header.append("")
+                                row.append("surplus")
+                            elif kind == "whitespace_duplicate_header":
+                                header.append("DOI ")
+                                row.append("10.1234/ambiguous")
+                        body = io.StringIO()
+                        writer = csv.writer(body)
+                        writer.writerow(header)
+                        if idx == 0 and kind == "unterminated_quote":
+                            body.write('"unfinished field')
+                        elif idx == 0 and kind == "invalid_quote_suffix":
+                            body.write('"bad"x,' + ",".join(row[1:]) + "\n")
+                        else:
+                            writer.writerow(row)
+                        sink.writestr(filename, body.getvalue())
+                first = next(iter(literature.STUDIES.values()))
+                with self.assertRaisesRegex(ValueError, first):
+                    literature.audit(archive)
+
+    def test_blank_values_in_well_formed_csv_remain_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            archive = Path(tmp) / "valid_with_missing_fields.zip"
+            with ZipFile(archive, "w") as sink:
+                for idx, filename in enumerate(literature.STUDIES.values()):
+                    fields = {
+                        "Paper Title": f"Reference {idx}",
+                        "DOI": f"10.1234/test{idx}",
+                        "Publication Year": "2024",
+                        "Author Names": "Author",
+                        "Abstract": "" if idx == 0 else "Abstract",
+                        "Paper Link": "https://example.org",
+                    }
+                    body = io.StringIO()
+                    writer = csv.DictWriter(
+                        body, fieldnames=sorted(literature.REQUIRED)
+                    )
+                    writer.writeheader()
+                    writer.writerow(fields)
+                    sink.writestr(filename, body.getvalue())
+            report, candidates, _ = literature.audit(archive)
+            self.assertEqual(report["export_records"], 8)
+            self.assertEqual(report["missing_fields"]["missing_abstract"], 1)
+            self.assertEqual(len(candidates), 8)
+
     def test_reject_missing_columns(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             archive = Path(temp) / "incomplete.zip"
