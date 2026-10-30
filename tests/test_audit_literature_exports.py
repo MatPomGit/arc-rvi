@@ -137,6 +137,8 @@ class LiteratureExportAuditTests(unittest.TestCase):
         cases = (
             "extra_cell", "missing_cell",
             "duplicate_header", "unnamed_header",
+            "whitespace_duplicate_header", "unterminated_quote",
+            "invalid_quote_suffix",
         )
         for kind in cases:
             with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
@@ -165,10 +167,18 @@ class LiteratureExportAuditTests(unittest.TestCase):
                             elif kind == "unnamed_header":
                                 header.append("")
                                 row.append("surplus")
+                            elif kind == "whitespace_duplicate_header":
+                                header.append("DOI ")
+                                row.append("10.1234/ambiguous")
                         body = io.StringIO()
                         writer = csv.writer(body)
                         writer.writerow(header)
-                        writer.writerow(row)
+                        if idx == 0 and kind == "unterminated_quote":
+                            body.write('"unfinished field')
+                        elif idx == 0 and kind == "invalid_quote_suffix":
+                            body.write('"bad"x,' + ",".join(row[1:]) + "\n")
+                        else:
+                            writer.writerow(row)
                         sink.writestr(filename, body.getvalue())
                 first = next(iter(literature.STUDIES.values()))
                 with self.assertRaisesRegex(ValueError, first):
