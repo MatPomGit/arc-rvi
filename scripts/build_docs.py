@@ -21,6 +21,7 @@ def main() -> None:
         ROOT / "AUTOPILOT_PLAN.md",
         ROOT / "PROJECT_STATE.yaml",
         *sorted((ROOT / "docs").rglob("*.md")),
+        *sorted((ROOT / "docs").rglob("*.css")),
         *sorted((ROOT / "experiments").rglob("*.md")),
         *sorted((ROOT / "papers").glob("paper*/manuscript.tex")),
     ]
