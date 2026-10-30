@@ -13,15 +13,46 @@ updating MkDocs, then validate the strict site build.
 ```bash
 python -m pip install --no-deps -r docs/requirements-docs.txt
 python -m pip check
+python scripts/validate.py
+python scripts/check_agent_docs.py
 python scripts/build_docs.py
 python -m mkdocs build --strict
 python -m mkdocs serve
 ```
 
 The staging source and built site live under ignored `.build/`. Do not edit
-generated files. The site index is copied from `README.md`; experiment pages
+generated files. The root `AGENTS.md` is a repository instruction, not a
+published MkDocs page; its local Markdown links are checked against the
+repository filesystem. The site index is copied from `README.md`; experiment pages
 come from their canonical protocols. Manuscript `.tex` files are provided as
 source links, not interpreted as finished publications.
+
+## Agent documentation contract and PR gates
+
+`scripts/check_agent_docs.py` is a no-network, standard-library check.
+It verifies the two main `AGENTS.md` sections, eight workflow steps,
+required safety/testing instructions, local links in canonical project
+documents and agreement between `pyproject.toml` and
+`PROJECT_STATE.yaml`. Tests with intentionally broken examples live in
+`tests/unit/test_agent_docs.py`. Other documents, external URLs, citations,
+runtime correctness and research validity require separate review.
+
+The existing [GitHub workflow](https://github.com/MatPomGit/arc-rvi/blob/main/.github/workflows/docs-pages.yml)
+runs offline regression on Python 3.11, 3.12 and 3.13. After tests,
+its `Validate and build documentation` job runs this audit and MkDocs
+strict. Require those four check names on the final PR SHA; do not use
+an earlier green run. A skipped publishing job on PRs is expected.
+
+GitHub settings are **not** configured by this Markdown or the workflow.
+An administrator must set a ruleset for `main` under
+**Settings > Rules > Rulesets**, requiring PRs, the four named passing
+checks, and at least one approval from a qualified reviewer other than
+the change author. Dismiss stale approvals and restrict bypass rights.
+For work affecting code, methodology, safety or agent operating rules,
+do not merge without an independently recorded approval. Changes to
+branch settings are a separate administrative action and must be verified
+in the GitHub interface. Treat unreadable branch protection (API 403)
+as unknown, not disabled.
 
 ## Publishing
 
