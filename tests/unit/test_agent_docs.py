@@ -8,6 +8,8 @@ from pathlib import Path
 
 from scripts.check_agent_docs import (
     inspect_agent_structure,
+    inspect_agent_scenarios,
+    inspect_user_text,
     inspect_links,
     inspect_version,
 )
@@ -61,6 +63,19 @@ class AgentDocsAuditTests(unittest.TestCase):
         )
         self.assertTrue(any("steps 1 through 8" in p for p in problems))
         self.assertTrue(any("100..200 lines" in p for p in problems))
+
+    def test_all_twenty_scenario_rows_are_required(self):
+        rows = "\n".join(f"| {n:02} Case | Decision |" for n in range(1, 21))
+        self.assertEqual(inspect_agent_scenarios(rows), [])
+        self.assertNotEqual(
+            inspect_agent_scenarios(rows.replace("| 14 Case | Decision |", "")),
+            [],
+        )
+
+    def test_user_document_rejects_typographic_dashes(self):
+        self.assertEqual(inspect_user_text("Plain text - OK"), [])
+        self.assertTrue(inspect_user_text("Unwanted \u2014 separator"))
+        self.assertTrue(inspect_user_text("Unwanted \u2013 separator"))
 
 
 if __name__ == "__main__":

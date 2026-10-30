@@ -1,0 +1,41 @@
+/* Accessible system-driven themes for MkDocs' built-in Bootstrap theme. */
+:root {
+  color-scheme: light dark;
+  --bg-main: #ffffff;
+  --text-primary: #17212b;
+  --surface-card: #f1f4f8;
+  --surface-border: #d1dae4;
+  --link-primary: #07599c;
+  --nav-bg: #eef2f6;
+}
+body { background: var(--bg-main); color: var(--text-primary); }
+a, a:visited { color: var(--link-primary); }
+.navbar, .navbar-default, .well, .panel, .dropdown-menu {
+  background-color: var(--surface-card);
+  color: var(--text-primary);
+  border-color: var(--surface-border);
+}
+pre, code, .highlight, blockquote, .table {
+  color: var(--text-primary);
+  border-color: var(--surface-border);
+}
+pre, .highlight, .table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--surface-card);
+}
+.navbar-default .navbar-nav > li > a, .navbar-default .navbar-brand,
+.dropdown-menu > li > a { color: var(--text-primary); }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-main: #151a22;
+    --text-primary: #edf2f8;
+    --surface-card: #222b37;
+    --surface-border: #425065;
+    --link-primary: #9bd0ff;
+    --nav-bg: #1e2631;
+  }
+  .navbar-default .navbar-nav > li > a:hover,
+  .dropdown-menu > li > a:hover { color: var(--link-primary); }
+  table > thead > tr > th, .table > tbody > tr > td,
+  .table > thead > tr > th { border-color: var(--surface-border); }
+  code { background-color: var(--surface-card); }
+}

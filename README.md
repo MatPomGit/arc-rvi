@@ -2,7 +2,7 @@
 
 Independent research software for reproducible robotic visual inspection: target localization, viewpoint planning, coverage evaluation and photographic quality assessment. The reference platform is a humanoid robot; the current executable tools are offline, and the shared algorithms remain hardware-agnostic.
 
-**Primary concrete use case (2026-10-28):** a human instructs Unitree G1 EDU to photograph a specifically identified **car**, or a single named part such as the **rear bumper**; the robot must localise the correct car and part, satisfy an authorised required-shot checklist despite specular reflections, and return for an operator-confirmed handoff. See the [mission specification and offline fail-closed evaluator](docs/vehicle-inspection-missions.md). This does not imply speech/vision/robot integration has been implemented; its example logs are synthetic.
+**Primary use case:** photographing a specified car or part (e.g. rear bumper) despite specular reflections, then returning for operator-confirmed handoff. The [mission contract](docs/vehicle-inspection-missions.md) is evaluated offline on synthetic fixtures; live robot integration and physical trials are not implemented.
 
 
 ## Scope
@@ -155,3 +155,14 @@ Technical documentation build and publication instructions are maintained in
 [Documentation build](docs/website.md).
 
 For contribution and autonomous-agent rules, read the root `AGENTS.md`.
+The agent [operating procedure](docs/development/agent-workflow.md) covers
+Issues, concurrent tasks, DoR/DoD, exact-SHA CI, deployment and cleanup.
+Before implementation consult [coding conventions](docs/development/coding-standards.md)
+and [testing guidance](docs/development/testing.md); for prose consult
+[writing standards](docs/development/writing-standards.md) and the
+[scientific glossary](docs/glossary.md). [Teaching rules](docs/teaching-standards.md)
+apply only when student materials are specifically requested.
+
+The MkDocs site follows the system light/dark preference. It does not yet
+include rendered LaTeX manuscript previews; source manuscripts remain drafts.
+

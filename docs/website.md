@@ -71,3 +71,31 @@ Only public synthetic examples, open documentation, and text manuscript
 scaffolds are staged. Raw data, secrets, run artifacts, and equipment
 identifiers must never enter the site. The site is research documentation,
 not evidence of completed studies or physical safety certification.
+
+## Published guidance and appearance
+
+The public navigation includes agent operating guidance, coding and testing
+standards, writing rules, the optional teaching standard and the bilingual
+terminology glossary. The root `AGENTS.md` remains a repository instruction;
+the website displays linked supporting documents without replacing it.
+
+`docs/assets/theme.css` provides a light and dark palette selected by
+`prefers-color-scheme`. No third-party theme package, manual toggle or
+persistent preference mechanism is added. CSS is copied from its canonical
+source into the MkDocs staging directory by `scripts/build_docs.py`.
+Review both modes visually when changing theme styles; a strict build
+does not measure WCAG contrast or establish browser-level accessibility.
+
+Existing sources provide the project's roadmap (`AUTOPILOT_PLAN.md` and
+live [Issue #6](https://github.com/MatPomGit/arc-rvi/issues/6)),
+software inventory (`pyproject.toml`, `README.md` and architecture),
+hardware boundaries (`config/robot.yaml`, architecture and safety) and
+research methods (`docs/methodology.md`, `docs/reproducibility.md`).
+Do not create separate `docs/roadmap.md`, `docs/software.md`,
+`docs/hardware.md` or parallel research protocols without a new,
+independent information need. Future experiment dates require an
+approved schedule; planned milestones are not verified deadlines.
+
+Source LaTeX manuscripts are not automatically compiled to browser
+previews by this pipeline; publication of rendered drafts requires
+a separately verified build and rights review.

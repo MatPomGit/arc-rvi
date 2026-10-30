@@ -7,6 +7,8 @@ edit_uri: '' # staged sources have different locations in Git
 docs_dir: .build/mkdocs-src
 site_dir: .build/site
 strict: true
+extra_css:
+  - docs/assets/theme.css
 theme:
   name: mkdocs
   locale: en
@@ -38,6 +40,7 @@ nav:
       - Sample-size sensitivity: docs/sample-size.md
       - Cluster Monte Carlo: docs/cluster-monte-carlo.md
       - Data interface: docs/data-interface.md
+      - Scientific glossary: docs/glossary.md
   - Research integrity:
       - Literature evidence and publication gates: docs/literature.md
       - Critical prior-art appraisal: docs/prior-art-critical.md
@@ -45,6 +48,11 @@ nav:
       - Reproducibility: docs/reproducibility.md
       - Safety: docs/safety.md
   - Project:
+      - Agent workflow: docs/development/agent-workflow.md
+      - Coding standards: docs/development/coding-standards.md
+      - Testing and integration: docs/development/testing.md
+      - Writing standards: docs/development/writing-standards.md
+      - Teaching standards (conditional): docs/teaching-standards.md
       - Current state: docs/project-state.md
       - Roadmap: AUTOPILOT_PLAN.md
       - Documentation build: docs/website.md
