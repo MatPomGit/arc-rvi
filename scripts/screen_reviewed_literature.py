@@ -16,6 +16,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 STATUSES = {"direct_prior_art", "contextual_only", "exclude_direct_evidence"}
+SOURCE_RECORD = re.compile(r"[^#;\s]+\.csv#[1-9]\d*")
 
 
 def _valid_evidence_url(value: object) -> bool:
@@ -44,18 +45,38 @@ def apply_decisions(candidates: list[dict], inventory: dict, manifest: dict) -> 
     if len(candidates) != inventory.get("candidate_keys"):
         raise ValueError("candidate inventory count mismatch")
     by_id = {}
+    seen_sources = set()
+    total_mentions = 0
     for row in candidates:
         key = row.get("candidate_id", "")
         if not key or key in by_id:
             raise ValueError("missing or duplicate candidate ID")
-        if not row.get("source_records"):
-            raise ValueError("candidate source trace is missing")
+        source_records = row.get("source_records")
+        try:
+            mentions = int(row["mentions"])
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError("invalid source mention count") from error
+        if not isinstance(source_records, str) or mentions < 1:
+            raise ValueError("candidate source trace is missing or invalid")
+        references = source_records.split(";")
+        if (len(references) != mentions
+                or len(set(references)) != len(references)
+                or any(not SOURCE_RECORD.fullmatch(ref) or ref in seen_sources
+                       for ref in references)):
+            raise ValueError("invalid, missing or duplicate source row reference")
+        seen_sources.update(references)
+        total_mentions += mentions
         by_id[key] = row
-    if sum(int(r["mentions"]) for r in candidates) != inventory.get("export_records"):
+    if total_mentions != inventory.get("export_records"):
         raise ValueError("source mention count mismatch")
 
+    items = manifest.get("decisions")
+    if not isinstance(items, list):
+        raise ValueError("screening decisions must be an explicit list")
     decisions = {}
-    for item in manifest.get("decisions", []):
+    for item in items:
+        if not isinstance(item, dict):
+            raise ValueError("screening decision must be an object")
         key = item.get("candidate_id", "")
         if key not in by_id or key in decisions:
             raise ValueError("unknown or duplicate screening candidate")
