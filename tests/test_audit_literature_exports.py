@@ -74,6 +74,64 @@ class LiteratureExportAuditTests(unittest.TestCase):
             self.assertTrue(all(c["review_status"] == "pending" for c in conflicts))
             self.assertTrue(all(c["source_records"] for c in conflicts))
 
+    def test_malformed_nonempty_years_are_screening_flags(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            archive = Path(temp) / "year_quality.zip"
+            with ZipFile(archive, "w") as sink:
+                for idx, filename in enumerate(literature.STUDIES.values(), 1):
+                    body = io.StringIO()
+                    writer = csv.DictWriter(
+                        body, fieldnames=sorted(literature.REQUIRED)
+                    )
+                    writer.writeheader()
+                    row = {
+                        "Paper Title": f"Study {idx}",
+                        "DOI": f"10.1234/year{idx}",
+                        "Publication Year": "2025",
+                        "Author Names": "Author",
+                        "Abstract": "Summary",
+                        "Paper Link": "https://example.org",
+                    }
+                    if idx == 1:
+                        writer.writerow({
+                            **row, "DOI": "10.1234/mixed",
+                            "Publication Year": "",
+                        })
+                        writer.writerow({
+                            **row, "DOI": "10.1234/mixed",
+                            "Publication Year": "20XX",
+                        })
+                        writer.writerow({
+                            **row, "DOI": "10.1234/invalidonly",
+                            "Publication Year": "2025/26",
+                        })
+                    else:
+                        writer.writerow(row)
+                    sink.writestr(filename, body.getvalue())
+
+            report, candidates, queue = literature.audit(archive)
+            self.assertEqual(report["export_records"], 10)
+            self.assertEqual(report["candidate_keys"], 9)
+            self.assertEqual(
+                report["missing_fields"]["missing_or_invalid_year"], 3
+            )
+            by_doi = {record["doi"]: record for record in candidates}
+            self.assertEqual(
+                by_doi["10.1234/mixed"]["flags"],
+                "year_invalid;year_missing",
+            )
+            self.assertEqual(
+                by_doi["10.1234/invalidonly"]["flags"], "year_invalid"
+            )
+            self.assertEqual(
+                len(by_doi["10.1234/mixed"]["source_records"].split(";")), 2
+            )
+            self.assertEqual(len(queue), 2)
+            self.assertTrue(all(
+                row["status"] == "provisional_doi" for row in queue
+            ))
+            self.assertEqual(report["screening_queue_candidates"], 2)
+
     def test_reject_missing_columns(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             archive = Path(temp) / "incomplete.zip"
