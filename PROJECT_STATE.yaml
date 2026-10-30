@@ -1,11 +1,11 @@
 version: 1
-updated: "2026-10-29"
+updated: "2026-10-30"
 purpose: "Canonical scientific and implementation status for arc-rvi and the ARC portfolio"
 repository:
   canonical_branch: main
   source_revision_at_onboarding: "4029a4e6fb62798ee3f993e186b19bd4e5b994f5"
   software_version_source: pyproject.toml
-  software_version: 1.22.0
+  software_version: 1.22.2
   shared_code_root: src/rvi
   experiment_root: experiments
   manuscript_root: papers
