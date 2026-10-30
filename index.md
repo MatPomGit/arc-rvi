@@ -16,7 +16,7 @@ not establish physical safety or confirm scientific hypotheses.
 | Research programme | [Eight prospective studies](experiments/README.md) and [shared analysis](experiments/analysis/README.md) |
 | Software and models | [System architecture](docs/architecture.md), [simulator limits](docs/simulation.md) and [benchmark](docs/benchmark.md) |
 | Scientific integrity | [Methodology](docs/methodology.md), [reproducibility](docs/reproducibility.md) and [physical safety](docs/safety.md) |
-| Project status | [Current scientific state](docs/project-state.md), [roadmap](AUTOPILOT_PLAN.md) and [complete README](README.md) |
+| Project status | [Current scientific state](docs/project-state.md), [roadmap](AUTOPILOT_PLAN.md) and [complete README](project-readme.md) |
 
 ## Main research scenario
 
@@ -27,7 +27,7 @@ defines an offline evaluation, not a verified autonomous physical mission.
 
 ## Working with the software
 
-The [complete repository README](README.md) contains the installation
+The [complete repository README](project-readme.md) contains the installation
 instructions, command examples and scope of implemented tools. For
 engineering changes, consult the [agent workflow](docs/development/agent-workflow.md)
 and [validation rules](docs/development/testing.md).
