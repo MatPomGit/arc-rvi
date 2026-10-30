@@ -99,8 +99,10 @@ reference `Rz(yaw) Ry(pitch) Rx(roll) (1,1,1)`. Seven prescribed
 joint states compare URDF FK against that closed form; two distinct
 interior joint-interpolation contacts are placed using the analytic
 reference rather than a production collision solver. Exact-midpoint
-tangency, a one-micrometre penetration, zero-budget uncertainty and
-a distant collision-free declared-proxy case are also checked.
+tangency, one-micrometre penetration and separation, zero-budget
+uncertainty and a distant declared-proxy case are also checked.
+The boundary fixtures are checked against a separate analytic
+point-to-AABB signed-gap calculation, rather than just their offset parameter.
 
 This extension independently tests a wider **synthetic 3-DOF**
 kinematic topology without invoking real robot interfaces. A result
