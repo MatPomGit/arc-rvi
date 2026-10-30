@@ -1,6 +1,6 @@
 # Autonomous agent workflow
 
-This page expands [AGENTS.md](../../AGENTS.md). The root file is normative;
+This page expands the repository root `AGENTS.md`. The root file is normative;
 this page gives the operational sequence. Confirm current GitHub state before acting.
 
 ## Start and ownership
