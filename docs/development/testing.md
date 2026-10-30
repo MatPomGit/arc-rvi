@@ -38,10 +38,21 @@ and cover positive, negative, boundary and regression behavior.
 - Do not create paid workloads, disable workflow steps or weaken assertions.
 - Confirm explicit safety and provenance gates for any robotics or research
   functionality before accepting software-correctness results.
-- A self-review or a PR discussion comment is not an independent approval.
-- For changes to code, safety, research methodology or agent instructions,
-  require at least one independent reviewer and verified required CI.
-- If the ruleset or approval cannot be verified, mark the integration blocked.
+- The owner and AI agent use one GitHub login. Accept an independent
+  technical review posted as `COMMENTED` or a substantive PR comment as
+  the repository's review evidence, even without a GitHub `APPROVED` event.
+  Require a distinct review role or agent execution trace, exact head SHA,
+  inspected scope, technical findings, test evidence, and an explicit
+  `REVIEW: PASS` or `REVIEW: CHANGES_REQUIRED` conclusion.
+- Mere `COMMENTED` state without a real assessment, an author's unverified
+  self-review, a stale SHA, or unresolved blocking findings do not satisfy
+  the technical review requirement. Keep `TECHNICAL_REVIEW_PASS` separate
+  from `GITHUB_APPROVED`.
+- For code, safety, research methodology and agent instructions, require
+  the above technical review and verified required CI.
+- GitHub rulesets are authoritative: if an active rule actually requires
+  `APPROVED`, `COMMENTED` cannot meet it. Do not bypass or report PASS.
+  If the rule or evidence is unavailable, mark the relevant gate blocked.
 - Current administrative setup is tracked by
   [Issue #117](https://github.com/MatPomGit/arc-rvi/issues/117).
   Configuration in a document does not establish branch protection.
