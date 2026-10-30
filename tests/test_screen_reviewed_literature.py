@@ -76,7 +76,7 @@ class ManualScreeningTests(unittest.TestCase):
             ["https://"], ["https:///path"], ["http://example.org/a"],
             ["https://[broken"], [42], "https://example.org/a",
             ["https:// bad.example/a"], ["https://exa mple.org/a"],
-            ["https://example.org/\\npath"],
+            ["https://example.org/" + chr(10) + "path"],
             ["https://example.org:invalid/a"],
             ["https://user:password@example.org/a"],
         ):
