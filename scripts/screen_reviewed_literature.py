@@ -18,6 +18,24 @@ from urllib.parse import urlsplit
 STATUSES = {"direct_prior_art", "contextual_only", "exclude_direct_evidence"}
 
 
+def _valid_evidence_url(value: object) -> bool:
+    """Require a parseable HTTPS URL with a host and no embedded credentials."""
+    if (not isinstance(value, str) or not value
+            or any(character.isspace() or ord(character) < 32
+                   or ord(character) == 127 for character in value)):
+        return False
+    try:
+        parsed = urlsplit(value)
+        if (parsed.scheme != "https" or not parsed.hostname
+                or parsed.username is not None or parsed.password is not None):
+            return False
+        # urlsplit accepts malformed ports until the port property is read.
+        parsed.port
+    except ValueError:
+        return False
+    return True
+
+
 def apply_decisions(candidates: list[dict], inventory: dict, manifest: dict) -> tuple[list[dict], dict]:
     if manifest.get("schema_version") != "1.0.0":
         raise ValueError("unsupported screening manifest version")
@@ -47,8 +65,7 @@ def apply_decisions(candidates: list[dict], inventory: dict, manifest: dict) -> 
             raise ValueError("unsupported manual screening status")
         evidence = item.get("evidence_urls")
         if (not isinstance(evidence, list) or not evidence
-                or not all(isinstance(url, str) and urlsplit(url).scheme == "https"
-                           and urlsplit(url).hostname for url in evidence)):
+                or not all(_valid_evidence_url(url) for url in evidence)):
             raise ValueError("a reviewer decision requires HTTPS evidence")
         rationale = item.get("rationale")
         review_date = item.get("review_date")
