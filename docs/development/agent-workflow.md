@@ -35,8 +35,16 @@ must reflect the final state; abandoned work cannot be called complete.
 
 - Use PRs with purpose, scope, linked Issue, risk, tests, remaining gaps and
   precise final SHA. Recheck check-runs after the final commit or rebase.
-- Require independent approval for source, safety, scientific or agent-policy
-  changes. Self-review and comments cannot replace GitHub approval.
+- Require a separate substantive technical review for source, safety,
+  scientific or agent-policy changes. The reviewer may be a distinct AI agent
+  using the author's GitHub account. A documented PR `COMMENTED` review or
+  discussion comment can satisfy the project's technical-review requirement,
+  even without a formal GitHub `APPROVED` event, provided it covers the exact
+  head SHA, scope, findings, test evidence and a clear pass/block verdict.
+  Verify independent execution or role provenance; the same account alone
+  cannot prove that author and reviewer are separate. Ordinary comments,
+  self-attestation, stale reviews or unresolved blocking findings do not pass.
+  This project decision does not satisfy a mandatory GitHub approval rule.
 - If branch rules cannot be read, record UNKNOWN; do not infer they are absent.
 - Do not use administrator bypass, weaker CI or changed tests as a shortcut.
 - If a pull request is merged by another actor, verify what was actually merged,
@@ -47,6 +55,20 @@ must reflect the final state; abandoned work cannot be called complete.
 - After successful merge, check that no work remains on your branch, then remove
   your branch/worktree; never delete another agent's unmerged changes.
 - Record bounded partial progress and `BLOCKED` when a gate cannot be satisfied.
+
+## Shared-account review record
+
+For each code or methodology PR, check the latest PR review and discussion
+comments rather than searching only for GitHub `APPROVED`. A qualifying
+review must identify the distinct reviewer role or independently executed
+agent and the reviewed commit SHA, state the technical conclusion, document
+tests and any blocking findings, and link to evidence. A final conclusion
+such as `REVIEW: PASS` or `REVIEW: CHANGES_REQUIRED` makes the result
+unambiguous. A reviewer can submit it as `COMMENTED` or a PR comment.
+After a new commit, the old review becomes stale until its scope and SHA are
+rechecked. If review provenance is missing, record `REVIEW_UNVERIFIED`.
+Never call a `COMMENTED` review `APPROVED` in GitHub or bypass a configured
+branch rule requiring an approval event, permissions or CI.
 
 ## Decisions for a new agent
 
