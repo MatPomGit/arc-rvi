@@ -77,5 +77,10 @@ python -m scripts.screen_reviewed_literature \
 
 The tool fails on a mismatched source hash, unexpected candidate count,
 unknown decision IDs or DOI mismatches, duplicate decisions and unsupported
-statuses. Outputs are non-destructive. [Full-text OmniPlanner appraisal](../../docs/prior-art-critical.md)
+statuses. Reviewer decisions require a real ISO calendar date (`YYYY-MM-DD`),
+nonempty rationale and absolute HTTPS evidence URLs with a host, a valid
+port (if specified), no embedded credentials and no whitespace or control
+characters. These checks validate only the shape of provenance, not the
+actual content or accessibility
+of the cited external sources. Outputs are non-destructive. [Full-text OmniPlanner appraisal](../../docs/prior-art-critical.md)
 narrows P03/P04/P08 novelty claims without asserting a G1 EDU finding.

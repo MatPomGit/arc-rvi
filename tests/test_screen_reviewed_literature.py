@@ -58,6 +58,47 @@ class ManualScreeningTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 apply_decisions(candidates, receipt, bad)
 
+    def test_review_date_must_be_an_actual_iso_calendar_date(self):
+        candidates, receipt, manifest = fixtures()
+        for invalid in (
+            "2026-02-30", "2026-1-2", "2026-W44-3",
+            "yesterday", "2026-10-28T14:00:00", "", None, 20261028,
+        ):
+            with self.subTest(value=invalid):
+                bad = deepcopy(manifest)
+                bad["decisions"][0]["review_date"] = invalid
+                with self.assertRaises(ValueError):
+                    apply_decisions(candidates, receipt, bad)
+
+    def test_review_evidence_requires_an_https_host(self):
+        candidates, receipt, manifest = fixtures()
+        for invalid in (
+            ["https://"], ["https:///path"], ["http://example.org/a"],
+            ["https://[broken"], [42], "https://example.org/a",
+            ["https:// bad.example/a"], ["https://exa mple.org/a"],
+            ["https://example.org/" + chr(10) + "path"],
+            ["https://example.org:invalid/a"],
+            ["https://user:password@example.org/a"],
+        ):
+            with self.subTest(value=invalid):
+                bad = deepcopy(manifest)
+                bad["decisions"][0]["evidence_urls"] = invalid
+                with self.assertRaises(ValueError):
+                    apply_decisions(candidates, receipt, bad)
+
+    def test_valid_calendar_date_and_https_evidence_are_preserved(self):
+        candidates, receipt, manifest = fixtures()
+        manifest["decisions"][0]["review_date"] = "2024-02-29"
+        manifest["decisions"][0]["evidence_urls"] = [
+            "https://example.org:443/study?version=2",
+        ]
+        rows, summary = apply_decisions(candidates, receipt, manifest)
+        self.assertEqual(rows[0]["review_date"], "2024-02-29")
+        self.assertEqual(
+            rows[0]["evidence_urls"], "https://example.org:443/study?version=2"
+        )
+        self.assertEqual(summary["reviewed_candidate_keys"], 1)
+
     def test_source_provenance_and_missing_rows_rejected(self):
         candidates, receipt, manifest = fixtures()
         for key, value in [("source_archive_sha256", "b" * 64),
