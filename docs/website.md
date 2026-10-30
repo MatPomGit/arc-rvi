@@ -23,9 +23,11 @@ python -m mkdocs serve
 The staging source and built site live under ignored `.build/`. Do not edit
 generated files. The root `AGENTS.md` is a repository instruction, not a
 published MkDocs page; its local Markdown links are checked against the
-repository filesystem. The site index is copied from `README.md`; experiment pages
-come from their canonical protocols. Manuscript `.tex` files are provided as
-source links, not interpreted as finished publications.
+repository filesystem. The site homepage comes from the concise root
+`index.md`; the complete `README.md` is available separately from the
+Project navigation. Experiment pages come from their canonical protocols.
+Manuscript `.tex` files are provided as source links, not interpreted as
+finished publications.
 
 ## Agent documentation contract and PR gates
 
@@ -79,12 +81,17 @@ standards, writing rules, the optional teaching standard and the bilingual
 terminology glossary. The root `AGENTS.md` remains a repository instruction;
 the website displays linked supporting documents without replacing it.
 
-`docs/assets/theme.css` provides a light and dark palette selected by
-`prefers-color-scheme`. No third-party theme package, manual toggle or
-persistent preference mechanism is added. CSS is copied from its canonical
-source into the MkDocs staging directory by `scripts/build_docs.py`.
-Review both modes visually when changing theme styles; a strict build
-does not measure WCAG contrast or establish browser-level accessibility.
+MkDocs 1.6.1 provides native Bootstrap 5 colour schemes. The site uses
+`color_mode: auto`, an explicit light/dark/auto menu and a dark high-contrast
+navigation bar. The CSS in `docs/assets/theme.css` changes only layout,
+reading width and code-block scrolling; it uses native Bootstrap colour
+variables rather than overriding light/dark backgrounds globally. The
+stylesheet is copied into the MkDocs staging tree by
+`scripts/build_docs.py`. The short homepage avoids placing the complete
+CLI reference above the fold; full commands remain in the README.
+Validate dark and light appearances at desktop and mobile widths when
+browsers are available. A strict build does not measure WCAG contrast,
+keyboard usability or actual rendered layout.
 
 Existing sources provide the project's roadmap (`AUTOPILOT_PLAN.md` and
 live [Issue #6](https://github.com/MatPomGit/arc-rvi/issues/6)),
