@@ -4,7 +4,7 @@
 [AUTOPILOT_PLAN.md](../AUTOPILOT_PLAN.md) defines portfolio work packages.
 The [study index](../experiments/README.md) owns scientific protocol and publication boundaries.
 
-The software version is defined in [pyproject.toml](../pyproject.toml).
+The software version is defined in `pyproject.toml`.
 The `repository.software_version` field in `PROJECT_STATE.yaml` must match it;
 `python scripts/check_agent_docs.py` enforces this relationship.
 Historical verification receipts and their exact SHAs remain historical records;
