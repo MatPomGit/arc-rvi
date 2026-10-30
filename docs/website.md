@@ -24,8 +24,10 @@ The staging source and built site live under ignored `.build/`. Do not edit
 generated files. The root `AGENTS.md` is a repository instruction, not a
 published MkDocs page; its local Markdown links are checked against the
 repository filesystem. The site homepage comes from the concise root
-`index.md`; the complete `README.md` is available separately from the
-Project navigation. Experiment pages come from their canonical protocols.
+`index.md`; the complete root `README.md` is staged as
+`project-readme.md` and appears separately in the Project navigation.
+This distinct name avoids MkDocs treating README as a second homepage.
+Experiment pages come from their canonical protocols.
 Manuscript `.tex` files are provided as source links, not interpreted as
 finished publications.
 
