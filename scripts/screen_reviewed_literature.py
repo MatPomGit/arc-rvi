@@ -10,7 +10,10 @@ from collections import Counter
 import csv
 import hashlib
 import json
+import re
+from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 STATUSES = {"direct_prior_art", "contextual_only", "exclude_direct_evidence"}
 
@@ -44,10 +47,20 @@ def apply_decisions(candidates: list[dict], inventory: dict, manifest: dict) -> 
             raise ValueError("unsupported manual screening status")
         evidence = item.get("evidence_urls")
         if (not isinstance(evidence, list) or not evidence
-                or not all(isinstance(url, str) and url.startswith("https://") for url in evidence)):
+                or not all(isinstance(url, str) and urlsplit(url).scheme == "https"
+                           and urlsplit(url).hostname for url in evidence)):
             raise ValueError("a reviewer decision requires HTTPS evidence")
-        if not item.get("rationale", "").strip() or not item.get("review_date", "").strip():
-            raise ValueError("a reviewer decision requires rationale and date")
+        rationale = item.get("rationale")
+        review_date = item.get("review_date")
+        if not isinstance(rationale, str) or not rationale.strip():
+            raise ValueError("a reviewer decision requires a rationale")
+        if not isinstance(review_date, str) or not re.fullmatch(
+                r"\\d{4}-\\d{2}-\\d{2}", review_date):
+            raise ValueError("a reviewer decision requires an ISO review date")
+        try:
+            date.fromisoformat(review_date)
+        except ValueError as error:
+            raise ValueError("invalid calendar review date") from error
         decisions[key] = item
 
     output = []
