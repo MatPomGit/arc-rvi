@@ -121,6 +121,10 @@ def inspect_links(root: Path, documents: tuple[str, ...]) -> list[str]:
                 path = unquote(url.path)
                 if not path:
                     continue
+                # The site publishes root README.md under a non-reserved name.
+                # Check the canonical source, not the generated site path.
+                if name == "index.md" and path == "project-readme.md":
+                    path = "README.md"
                 resolved = (source.parent / path).resolve()
                 try:
                     resolved.relative_to(base)
