@@ -10,7 +10,7 @@ from scripts.screen_reviewed_literature import apply_decisions
 def fixtures():
     candidates = [
         {"candidate_id": "id1", "doi": "10.1234/first", "title": "One",
-         "source_records": "a.csv#1", "studies": "P01", "mentions": "2"},
+         "source_records": "a.csv#1;a.csv#2", "studies": "P01", "mentions": "2"},
         {"candidate_id": "id2", "doi": "10.1234/second", "title": "Two",
          "source_records": "b.csv#1", "studies": "P02", "mentions": "1"},
     ]
@@ -33,7 +33,7 @@ class ManualScreeningTests(unittest.TestCase):
         self.assertEqual(result["status_counts"], {"exclude_direct_evidence": 1,
                                                   "not_reviewed": 1})
         self.assertEqual(result["export_row_mentions"], 3)
-        self.assertEqual(rows[0]["source_records"], "a.csv#1")
+        self.assertEqual(rows[0]["source_records"], "a.csv#1;a.csv#2")
         self.assertEqual(rows[1]["rationale"], "")
         self.assertEqual(rows[1]["screening_status"], "not_reviewed")
 
@@ -111,6 +111,47 @@ class ManualScreeningTests(unittest.TestCase):
         bad[1]["candidate_id"] = "id1"
         with self.assertRaises(ValueError):
             apply_decisions(bad, receipt, manifest)
+
+    def test_source_rows_match_mention_counts_and_are_unique(self):
+        candidates, receipt, manifest = fixtures()
+        for invalid in (
+            "a.csv#1", "a.csv#0;a.csv#2",
+            "a.csv#1;a.csv#1", "a.csv#1;",
+            "a.csv#1;other.csv#-2", "a.csv#1;foo.txt#2",
+            "a.csv#1;bad file.csv#2", 123,
+        ):
+            with self.subTest(source_records=invalid):
+                bad = deepcopy(candidates)
+                bad[0]["source_records"] = invalid
+                with self.assertRaises(ValueError):
+                    apply_decisions(bad, receipt, manifest)
+
+        bad = deepcopy(candidates)
+        bad[1]["source_records"] = "a.csv#2"
+        with self.assertRaises(ValueError):
+            apply_decisions(bad, receipt, manifest)
+
+    def test_malformed_mention_counts_are_rejected(self):
+        candidates, receipt, manifest = fixtures()
+        for invalid in (None, "", "abc", "0", "-1", "3"):
+            with self.subTest(mentions=invalid):
+                bad = deepcopy(candidates)
+                bad[0]["mentions"] = invalid
+                with self.assertRaises(ValueError):
+                    apply_decisions(bad, receipt, manifest)
+
+    def test_missing_or_malformed_decision_list_is_not_silent(self):
+        candidates, receipt, manifest = fixtures()
+        for invalid in (None, "[]", {}, [None], ["decision"]):
+            with self.subTest(decisions=invalid):
+                bad = deepcopy(manifest)
+                bad["decisions"] = invalid
+                with self.assertRaises(ValueError):
+                    apply_decisions(candidates, receipt, bad)
+        bad = deepcopy(manifest)
+        del bad["decisions"]
+        with self.assertRaises(ValueError):
+            apply_decisions(candidates, receipt, bad)
 
     def test_no_rules_do_not_imply_screened(self):
         candidates, receipt, manifest = fixtures()
