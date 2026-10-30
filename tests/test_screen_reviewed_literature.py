@@ -75,6 +75,10 @@ class ManualScreeningTests(unittest.TestCase):
         for invalid in (
             ["https://"], ["https:///path"], ["http://example.org/a"],
             ["https://[broken"], [42], "https://example.org/a",
+            ["https:// bad.example/a"], ["https://exa mple.org/a"],
+            ["https://example.org/\\npath"],
+            ["https://example.org:invalid/a"],
+            ["https://user:password@example.org/a"],
         ):
             with self.subTest(value=invalid):
                 bad = deepcopy(manifest)
@@ -86,12 +90,12 @@ class ManualScreeningTests(unittest.TestCase):
         candidates, receipt, manifest = fixtures()
         manifest["decisions"][0]["review_date"] = "2024-02-29"
         manifest["decisions"][0]["evidence_urls"] = [
-            "https://example.org/study?version=2",
+            "https://example.org:443/study?version=2",
         ]
         rows, summary = apply_decisions(candidates, receipt, manifest)
         self.assertEqual(rows[0]["review_date"], "2024-02-29")
         self.assertEqual(
-            rows[0]["evidence_urls"], "https://example.org/study?version=2"
+            rows[0]["evidence_urls"], "https://example.org:443/study?version=2"
         )
         self.assertEqual(summary["reviewed_candidate_keys"], 1)
 
