@@ -80,7 +80,13 @@ unknown decision IDs or DOI mismatches, duplicate decisions and unsupported
 statuses. Reviewer decisions require a real ISO calendar date (`YYYY-MM-DD`),
 nonempty rationale and absolute HTTPS evidence URLs with a host, a valid
 port (if specified), no embedded credentials and no whitespace or control
-characters. These checks validate only the shape of provenance, not the
-actual content or accessibility
-of the cited external sources. Outputs are non-destructive. [Full-text OmniPlanner appraisal](../../docs/prior-art-critical.md)
+characters. Each candidate must also provide unique `file.csv#row`
+source references; their count must match `mentions`, and the same source
+row cannot appear under two candidate IDs. The `decisions` list is required,
+even when explicitly empty, so missing reviewer input cannot silently become
+`not_reviewed`. These checks validate only the structure and consistency of
+provenance, not the source ZIP bytes, actual content or accessibility of the
+cited external sources. Outputs are non-destructive.
+
+The [full-text OmniPlanner appraisal](../../docs/prior-art-critical.md)
 narrows P03/P04/P08 novelty claims without asserting a G1 EDU finding.
