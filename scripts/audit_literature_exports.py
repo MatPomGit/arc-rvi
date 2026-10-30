@@ -103,6 +103,9 @@ def audit(archive: Path) -> tuple[dict, list[dict], list[dict]]:
             flags.append("title_disagreement")
         if any(not r["year"] for r in records):
             flags.append("year_missing")
+        if any(r["year"] and not re.fullmatch(r"(?:19|20)\d{2}", r["year"])
+               for r in records):
+            flags.append("year_invalid")
         if status != "provisional_doi":
             flags.append("doi_missing_or_invalid")
         if any(len(title_dois.get(normalized_title(r["title"]), set())) > 1 for r in records):

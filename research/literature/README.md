@@ -65,7 +65,13 @@ source-linked candidate decisions: 1 direct inspection prior-art item,
 2 contextual items and 2 items excluded from direct inspection-evidence claims.
 **1690/1695 candidate keys remain unreviewed**; exclusion affects the
 *interpretation*, not retention, of original CSV rows. The earlier
-**435** automatic data-quality flags are a different dimension.
+**435** automatic data-quality flags are a different dimension. That
+number belongs to the pinned 2026-10-28 audit: rerun the ZIP audit before
+reporting a new queue size after changes to the flagging rules. The offline
+queue now distinguishes a missing publication year (`year_missing`) from a
+nonempty invalid year (`year_invalid`) using the existing four-digit
+`19xx/20xx` syntax. Both are data-quality review prompts, never automatic
+eligibility exclusions.
 
 ```bash
 python scripts/audit_literature_exports.py /path/to/agent-artifacts-zip_robo.zip --output-dir /tmp/rvi-raw-audit
