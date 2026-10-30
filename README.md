@@ -155,3 +155,14 @@ Technical documentation build and publication instructions are maintained in
 [Documentation build](docs/website.md).
 
 For contribution and autonomous-agent rules, read the root `AGENTS.md`.
+The agent [operating procedure](docs/development/agent-workflow.md) covers
+Issues, concurrent tasks, DoR/DoD, exact-SHA CI, deployment and cleanup.
+Before implementation consult [coding conventions](docs/development/coding-standards.md)
+and [testing guidance](docs/development/testing.md); for prose consult
+[writing standards](docs/development/writing-standards.md) and the
+[scientific glossary](docs/glossary.md). [Teaching rules](docs/teaching-standards.md)
+apply only when student materials are specifically requested.
+
+The MkDocs site follows the system light/dark preference. It does not yet
+include rendered LaTeX manuscript previews; source manuscripts remain drafts.
+
