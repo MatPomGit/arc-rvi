@@ -103,6 +103,7 @@ class LiteratureExportAuditTests(unittest.TestCase):
                         })
                         writer.writerow({
                             **row, "DOI": "10.1234/invalidonly",
+                            "Paper Title": "Distinct invalid-year study",
                             "Publication Year": "2025/26",
                         })
                     else:
