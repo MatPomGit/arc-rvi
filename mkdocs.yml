@@ -52,7 +52,7 @@ nav:
       - Reproducibility: docs/reproducibility.md
       - Safety: docs/safety.md
   - Project:
-      - Repository README: README.md
+      - Repository README: project-readme.md
       - Agent workflow: docs/development/agent-workflow.md
       - Coding standards: docs/development/coding-standards.md
       - Testing and integration: docs/development/testing.md
