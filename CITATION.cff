@@ -1,11 +1,25 @@
 cff-version: 1.2.0
-message: "If you use the robotic visual inspection tools, protocols, or research artifacts, please cite this repository and any relevant published manuscript."
-title: "ARC-RVI: Autonomous Robotic Visual Inspection"
+message: >-
+  If you use this software in your research, please cite it using
+  the metadata provided in this file.
 type: software
+title: Autonomous Robotic Visual Inspection (RVI)
 authors:
   - family-names: Pomianek
     given-names: Mateusz
-    affiliation: Politechnika Rzeszowska
 repository-code: https://github.com/MatPomGit/arc-rvi
-version: "1.22.2"
+url: https://matpomgit.github.io/arc-rvi/
+version: 1.22.2
 license: Apache-2.0
+abstract: >-
+  Research software for reproducible robotic visual inspection.
+  The current implementation provides offline, hardware-independent
+  tools and synthetic evaluations for target localization, viewpoint
+  planning, coverage estimation and image-quality assessment.
+  Physical robot integration and confirmatory validation are not implemented.
+keywords:
+  - autonomous robotic visual inspection
+  - robotics
+  - viewpoint planning
+  - simulation
+  - reproducible research
