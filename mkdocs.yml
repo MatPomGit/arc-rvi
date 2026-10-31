@@ -17,7 +17,7 @@ theme:
   nav_style: dark
   prev_next_buttons_location: bottom
 nav:
-  - Reproducibility: research/reproducibility.md
+  - Reproducibility: docs/research/reproducibility.md
   - Home: index.md
   - Research programme:
       - Study index: experiments/README.md
