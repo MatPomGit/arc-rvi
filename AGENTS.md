@@ -108,3 +108,7 @@ Przed zadaniem przeczytaj ten plik i właściwe lokalne `AGENTS.md`, jeśli istn
 - Rozwiązuj samodzielnie rutynowe błędy i wybory między równoważnymi, bezpiecznymi rozwiązaniami.
 - Eskaluj konflikt uprawnień, wydatek, operację fizyczną, ryzyko danych, brak odrębnej recenzji technicznej lub wymaganego zatwierdzenia GitHub i nierozstrzygalny konflikt zasad.
 - Nie obchodź blokad. Przy niemożliwej pracy zachowaj sprawdzony postęp, oznacz `BLOCKED` i wybierz następne dozwolone zadanie.
+
+### Dodatkowa dyscyplina reprodukowalności (2026-10-31)
+- Przed formułowaniem twierdzeń naukowych, analizą nowych wyników, zmianą protokołu lub planowaniem publikacji czytaj [klasy dowodów i checklistę reprodukowalności](docs/research/reproducibility.md). Dotychczasowe protokoły, bariery etyczne, fizyczne i kontrola wersji mają pierwszeństwo.
+- Dokumentuj decyzje i dowody w istniejących rejestrach, nie w nowym ledgerze. Potwierdzaj wyniki dokładnym SHA, nie przypisuj empirycznego statusu testom syntetycznym.
