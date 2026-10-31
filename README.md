@@ -166,3 +166,4 @@ apply only when student materials are specifically requested.
 The MkDocs site follows the system light/dark preference. It does not yet
 include rendered LaTeX manuscript previews; source manuscripts remain drafts.
 
+Kryteria dowodów badawczych: [reprodukowalność](docs/research/reproducibility.md), zasady w głównym `AGENTS.md`.
