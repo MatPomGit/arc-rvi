@@ -1,6 +1,6 @@
 # Reprodukowalność i klasy dowodów: arc-rvi
 
-**Wersja:** 1.0.0 (2026-10-31). Uzupełnia [AGENTS.md](../../AGENTS.md), [cykl agenta](../development/agent-workflow.md) i istniejące protokoły. Nie ustanawia nowego rejestru.
+**Wersja:** 1.0.0 (2026-10-31). Uzupełnia `AGENTS.md` w katalogu głównym, [cykl agenta](../development/agent-workflow.md) i istniejące protokoły. Nie ustanawia nowego rejestru.
 
 ## Kontrakt przed badaniem
 ARC-RVI: obecnie dostępne są offline testy inspekcji wizualnej, a adapter robota fizycznego nie jest aktywny. Nie przedstawiaj jakości zdjęć syntetycznych, planowania widoków lub testów stabilności podpór jako fizycznej demonstracji bezpieczeństwa. Próba humanoida wymaga oddzielnej autoryzacji i zabezpieczeń.
