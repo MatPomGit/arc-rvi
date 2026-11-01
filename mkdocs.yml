@@ -50,6 +50,8 @@ nav:
           - Commands and SDK: docs/g1-reference/commands.md
           - ROS 2 and Livox data: docs/g1-reference/data-and-configuration.md
           - Evidence and limitations: docs/g1-reference/evidence.md
+          - Historical programs: docs/g1-reference/legacy-programs.md
+          - RoboMVP ROS interfaces: docs/g1-reference/robomvp.md
       - Scientific glossary: docs/glossary.md
   - Research integrity:
       - Literature evidence and publication gates: docs/literature.md
