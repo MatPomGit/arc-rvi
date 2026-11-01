@@ -87,6 +87,39 @@ class WaypointCollisionTests(unittest.TestCase):
         self.assertEqual(report["possible_affine_self_contacts"], [])
         self.assertEqual(report["full_body_collision_validation"], "not_performed")
 
+    def test_rotary_only_report_cannot_clear_unscreened_affine_contact(self):
+        # Analytic reference: slider x(t) = -1 + 2*t intersects x=0,
+        # while neither endpoint sphere overlaps the central obstacle.
+        poses = inspected_poses(PRISMATIC, "slider", [-1.0, 1.0])
+        fixture = obstacle()
+        self.assertTrue(all(
+            inspect_collision_proxies(pose, fixture)["status"]
+            == "no_proxy_overlap_unverified" for pose in poses
+        ))
+        report = inspect_rotary_proxy_sweep(
+            poses, fixture, lambda _: self.fail("no rotary FK expected"),
+            max_evaluations=0,
+        )
+        self.assertEqual(report["status"], "rotary_sweep_unresolved")
+        self.assertEqual(report["total_evaluations"], 0)
+        self.assertEqual(report["segments"][0]["status"],
+                         "affine_handled_separately")
+        self.assertEqual(report["segments"][0]["unresolved_intervals"], 1)
+        separate = inspect_waypoint_collision(poses, fixture, [0, 2])
+        self.assertEqual(separate["status"], "possible_chord_obstacle_overlap")
+
+    def test_rotary_only_report_cannot_clear_stationary_overlap(self):
+        # A stationary segment still needs static waypoint screening.
+        poses = inspected_poses(PRISMATIC, "slider", [0.0, 0.0])
+        fixture = obstacle()
+        report = inspect_rotary_proxy_sweep(
+            poses, fixture, lambda _: self.fail("no rotary FK expected"),
+        )
+        self.assertEqual(report["status"], "rotary_sweep_unresolved")
+        self.assertEqual(report["segments"][0]["unresolved_intervals"], 1)
+        separate = inspect_waypoint_collision(poses, fixture, [0, 1])
+        self.assertEqual(separate["status"], "proxy_overlap_at_waypoint")
+
     def test_affine_self_proxy_collision_between_clear_endpoints(self):
         poses = inspected_poses(PRISMATIC, "slider", [-1, 1])
         fixture = {
