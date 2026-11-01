@@ -11,6 +11,8 @@ from scripts.check_agent_docs import (
     inspect_agent_scenarios,
     inspect_user_text,
     inspect_links,
+    inspect_nav_coverage,
+    published_markdown,
     inspect_version,
 )
 
@@ -60,6 +62,37 @@ class AgentDocsAuditTests(unittest.TestCase):
             issues = inspect_links(root, ("README.md",))
             self.assertEqual(len(issues), 1)
             self.assertIn("escapes repository", issues[0])
+
+    def test_new_markdown_sources_are_audited(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            directory = root / "docs" / "g1-reference"
+            directory.mkdir(parents=True)
+            source = directory / "legacy-programs.md"
+            source.write_text("[RoboMVP](robomvp.md)", encoding="utf-8")
+            pages = published_markdown(root)
+            self.assertIn("docs/g1-reference/legacy-programs.md", pages)
+            issues = inspect_links(root, pages)
+            self.assertTrue(any("robomvp.md" in item for item in issues))
+            (directory / "robomvp.md").write_text("# RoboMVP", encoding="utf-8")
+            self.assertEqual(inspect_links(root, published_markdown(root)), [])
+
+    def test_missing_navigation_entry_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            directory = root / "docs" / "g1-reference"
+            directory.mkdir(parents=True)
+            (directory / "legacy-programs.md").write_text("# Legacy", encoding="utf-8")
+            config = root / "mkdocs.yml"
+            config.write_text("nav:\n  - Home: index.md\n", encoding="utf-8")
+            issues = inspect_nav_coverage(root)
+            self.assertEqual(len(issues), 1)
+            self.assertIn("legacy-programs.md", issues[0])
+            config.write_text(
+                "nav:\n  - Legacy: docs/g1-reference/legacy-programs.md\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(inspect_nav_coverage(root), [])
 
     def test_version_consistency_and_mismatch(self):
         project = '[project]\nname = "arc-rvi"\nversion = "1.22.2"\n'
