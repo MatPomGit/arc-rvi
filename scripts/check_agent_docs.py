@@ -58,6 +58,37 @@ REQUIRED_RULES = (
 VERSION = re.compile(r"(?m)^  software_version:\s*['\"]?([^'\"\s#]+)")
 
 
+def published_markdown(root: Path) -> tuple[str, ...]:
+    """Discover Markdown sources published by the canonical documentation build."""
+    paths = (
+        path
+        for directory in ("docs", "experiments")
+        for path in (root / directory).rglob("*.md")
+        if path.is_file()
+    )
+    return tuple(sorted(path.relative_to(root).as_posix() for path in paths))
+
+
+def inspect_nav_coverage(root: Path) -> list[str]:
+    """Require a navigation entry for every public docs/ page."""
+    config = root / "mkdocs.yml"
+    if not config.is_file():
+        return ["mkdocs.yml: missing site configuration"]
+    content = "\n" + config.read_text(encoding="utf-8")
+    if "\nnav:\n" not in content:
+        return ["mkdocs.yml: missing nav section"]
+    nav = content.split("\nnav:\n", 1)[1]
+    entries = set(re.findall(
+        r"(?m)^[ \t]*-[ \t]+(?:[^:\n]+:[ \t]*)?(docs/[^\s#]+\.md)[ \t]*(?:#.*)?$",
+        nav,
+    ))
+    return [
+        f"mkdocs.yml: public page missing from nav: {name}"
+        for name in published_markdown(root)
+        if name.startswith("docs/") and name not in entries
+    ]
+
+
 def inspect_agent_structure(content: str) -> list[str]:
     """Reject missing workflow steps, core safety gates and malformed structure."""
     issues = []
@@ -159,7 +190,9 @@ def inspect_version(pyproject: str, state: str) -> list[str]:
 
 def audit(root: Path) -> list[str]:
     """Return all actionable errors; do not alter any files."""
-    issues = inspect_links(root, DOCUMENTS)
+    documents = tuple(dict.fromkeys((*DOCUMENTS, *published_markdown(root))))
+    issues = inspect_links(root, documents)
+    issues.extend(inspect_nav_coverage(root))
     agent_file = root / "AGENTS.md"
     if agent_file.is_file():
         issues.extend(
@@ -205,7 +238,7 @@ def main() -> int:
         print(f"[DONE] FAIL: {len(problems)} consistency violations")
         return 1
     print(
-        f"[DONE] PASS: {len(DOCUMENTS)} documents, agent workflow and "
+        f"[DONE] PASS: {len(documents)} documents, agent workflow, nav and "
         "package/state versions"
     )
     return 0
