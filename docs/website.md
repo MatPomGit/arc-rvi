@@ -35,11 +35,15 @@ finished publications.
 
 `scripts/check_agent_docs.py` is a no-network, standard-library check.
 It verifies the two main `AGENTS.md` sections, eight workflow steps,
-required safety/testing instructions, local links in canonical project
-documents and agreement between `pyproject.toml` and
-`PROJECT_STATE.yaml`. Tests with intentionally broken examples live in
-`tests/unit/test_agent_docs.py`. Other documents, external URLs, citations,
+required safety/testing instructions, local links in all published Markdown
+sources, full `docs/` navigation coverage and agreement between
+`pyproject.toml` and `PROJECT_STATE.yaml`. Negative regressions live in
+`tests/unit/test_agent_docs.py`; workflow release gates are covered by
+`tests/unit/test_docs_build.py`. Other documents, external URLs, citations,
 runtime correctness and research validity require separate review.
+
+The documentation job runs alongside the Python matrix; publication requires
+both jobs to pass and is restricted to `main`.
 
 The existing [GitHub workflow](https://github.com/MatPomGit/arc-rvi/blob/main/.github/workflows/docs-pages.yml)
 runs offline regression on Python 3.11, 3.12 and 3.13. After tests,

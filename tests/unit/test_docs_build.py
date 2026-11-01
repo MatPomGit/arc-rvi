@@ -61,5 +61,19 @@ class DocsBuildTests(unittest.TestCase):
         self.assertIn("var(--bs-border-color)", css)
 
 
+    def test_pages_release_is_gated_by_branch_and_validation(self):
+        root = Path(__file__).resolve().parents[2]
+        workflow = (root / ".github" / "workflows" / "docs-pages.yml").read_text(
+            encoding="utf-8"
+        )
+        release_gate = (
+            "if: github.ref == 'refs/heads/main' && "
+            "github.event_name != 'pull_request'"
+        )
+        self.assertEqual(workflow.count(release_gate), 3)
+        self.assertIn("needs: [tests, build]", workflow)
+        self.assertEqual(workflow.count("persist-credentials: false"), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

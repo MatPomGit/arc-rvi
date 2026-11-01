@@ -14,8 +14,8 @@ python -m mkdocs build --strict
 ```
 
 The first command discovers `unittest` tests under `tests/`. The second
-checks the agent workflow, canonical Markdown links and package version
-consistency. Install pinned MkDocs packages as described in
+checks the agent workflow, all published Markdown links, navigation coverage
+and package version consistency. Install pinned MkDocs packages as described in
 [the website guide](../website.md) before its build. MkDocs is not a core
 package dependency.
 
