@@ -237,8 +237,9 @@ def main() -> int:
     if problems:
         print(f"[DONE] FAIL: {len(problems)} consistency violations")
         return 1
+    document_count = len(set((*DOCUMENTS, *published_markdown(ROOT))))
     print(
-        f"[DONE] PASS: {len(documents)} documents, agent workflow, nav and "
+        f"[DONE] PASS: {document_count} documents, agent workflow, nav and "
         "package/state versions"
     )
     return 0
