@@ -255,6 +255,96 @@ class WaypointCollisionTests(unittest.TestCase):
                     [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})],
                     obstacle(x=1), lambda q: fk({"yaw": pi / 2}))
 
+    def test_rotary_model_and_fixed_base_provenance_fail_closed(self):
+        # A consistent joint vector does not imply the same URDF or root.
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arm.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            digest = sha256(raw).hexdigest()
+
+            def fk(joints):
+                return inspect_urdf(
+                    path, digest, joint_positions=joints
+                )["configured_joint_pose"]
+
+            initial = fk({"yaw": -pi / 2})
+            terminal = fk({"yaw": pi / 2})
+            fixture = obstacle(x=10)
+            self.assertEqual(initial["model_source_sha256"], digest)
+            self.assertEqual(initial["root_link"], "root")
+
+            alternatives = []
+            changed_digest = dict(terminal)
+            changed_digest["model_source_sha256"] = "0" * 64
+            alternatives.append(changed_digest)
+            changed_root = dict(terminal)
+            changed_root["root_link"] = "camera"
+            alternatives.append(changed_root)
+            missing_digest = dict(terminal)
+            del missing_digest["model_source_sha256"]
+            alternatives.append(missing_digest)
+            changed_pose = dict(terminal)
+            changed_pose["frame_poses"] = dict(terminal["frame_poses"])
+            changed_pose["frame_poses"]["root"] = dict(
+                terminal["frame_poses"]["root"])
+            changed_pose["frame_poses"]["root"]["translation_m"] = [0.1, 0, 0]
+            alternatives.append(changed_pose)
+            changed_rotation = dict(terminal)
+            changed_rotation["frame_poses"] = dict(terminal["frame_poses"])
+            changed_rotation["frame_poses"]["root"] = dict(
+                terminal["frame_poses"]["root"])
+            changed_rotation["frame_poses"]["root"]["rotation_matrix"] = [
+                [0, -1, 0], [1, 0, 0], [0, 0, 1]]
+            alternatives.append(changed_rotation)
+
+            for invalid in alternatives:
+                with self.subTest(invalid=invalid):
+                    result = inspect_rotary_proxy_sweep(
+                        [initial, invalid], fixture, fk, max_evaluations=0)
+                    self.assertEqual(result["status"],
+                                     "rotary_sweep_unresolved")
+                    self.assertEqual(
+                        result["segments"][0]["status"],
+                        "unresolved_model_or_base_mismatch")
+                    self.assertEqual(result["total_evaluations"], 0)
+                    waypoint = inspect_waypoint_collision(
+                        [initial, invalid], fixture, [0, 1])
+                    self.assertEqual(waypoint["status"],
+                                     "rotational_sweep_unresolved")
+
+    def test_rotary_intermediate_fk_changed_base_is_unresolved(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arm.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            digest = sha256(raw).hexdigest()
+
+            def fk(joints):
+                return inspect_urdf(
+                    path, digest, joint_positions=joints
+                )["configured_joint_pose"]
+
+            poses = [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})]
+            for mode in ("model", "root"):
+                def inconsistent_fk(joints):
+                    candidate = fk(joints)
+                    if mode == "model":
+                        candidate["model_source_sha256"] = "f" * 64
+                    else:
+                        candidate["frame_poses"]["root"]["translation_m"] = [
+                            0.25, 0, 0]
+                    return candidate
+
+                with self.subTest(mode=mode):
+                    result = inspect_rotary_proxy_sweep(
+                        poses, obstacle(x=1), inconsistent_fk)
+                    self.assertEqual(result["status"],
+                                     "rotary_sweep_unresolved")
+                    self.assertEqual(result["segments"][0]["status"],
+                                     "unresolved_model_or_base_mismatch")
+                    self.assertEqual(result["total_evaluations"], 0)
+
     def test_rotary_cli_status_and_provenance(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

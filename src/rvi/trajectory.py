@@ -147,6 +147,33 @@ MAX_ROTARY_NUMERIC_LENGTH_M = 1_000_000.0
 MAX_ROTARY_NUMERIC_ANGLE_RAD = 100.0
 
 
+def _same_fixed_model_base(first: dict, last: dict) -> bool:
+    """Require identical pinned URDF and fixed identity root for each FK pose."""
+    if not isinstance(first, dict) or not isinstance(last, dict):
+        return False
+    digest = first.get("model_source_sha256")
+    root = first.get("root_link")
+    if (not isinstance(digest, str) or len(digest) != 64
+            or any(c not in "0123456789abcdef" for c in digest)
+            or not isinstance(root, str) or not root):
+        return False
+    identity = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0]]
+    for pose in (first, last):
+        if (pose.get("model_source_sha256") != digest
+                or pose.get("root_link") != root):
+            return False
+        frames = pose.get("frame_poses")
+        if not isinstance(frames, dict):
+            return False
+        frame = frames.get(root)
+        if (not isinstance(frame, dict)
+                or frame.get("translation_m") != [0.0, 0.0, 0.0]
+                or frame.get("rotation_matrix") != identity):
+            return False
+    return True
+
+
 def _conservative_centre_speed(first: dict, last: dict,
                                fixture: dict) -> tuple[float, float]:
     """Global derivative bound in metres per unit interpolation parameter.
@@ -259,6 +286,14 @@ def inspect_rotary_proxy_sweep(
     budget_used = 0
     outcomes = []
     for index, (first, last) in enumerate(zip(poses, poses[1:])):
+        if not _same_fixed_model_base(first, last):
+            outcomes.append({
+                "segment_index": index,
+                "status": "unresolved_model_or_base_mismatch",
+                "evaluations": 0, "collision_fraction": None,
+                "unresolved_intervals": 1,
+            })
+            continue
         if _joint_segment_kind(first, last) == "affine_prismatic_interpolation":
             outcomes.append({"segment_index": index, "status": "affine_handled_separately",
                              "evaluations": 0, "collision_fraction": None,
@@ -279,6 +314,7 @@ def inspect_rotary_proxy_sweep(
         queue = [(0.0, 1.0, first)]
         unresolved = 0
         collision_fraction = None
+        invalid_model_base = False
         visited = 0
         while queue:
             left, right, initial = queue.pop()
@@ -316,6 +352,10 @@ def inspect_rotary_proxy_sweep(
                     or candidate.get("all_joint_origin_length_sum_m")
                     != first.get("all_joint_origin_length_sum_m")):
                 raise ValueError("intermediate FK state does not match requested joints")
+            if not _same_fixed_model_base(first, candidate):
+                unresolved += 1 + len(queue)
+                invalid_model_base = True
+                break
             midpoint = inspect_collision_proxies(candidate, fixture)
             budget_used += 1
             visited += 1
@@ -327,6 +367,8 @@ def inspect_rotary_proxy_sweep(
 
         if collision_fraction is not None:
             status = "proxy_overlap_between_waypoints"
+        elif invalid_model_base:
+            status = "unresolved_model_or_base_mismatch"
         elif unresolved:
             status = "rotary_sweep_unresolved_budget"
         else:
@@ -389,7 +431,11 @@ def inspect_waypoint_collision(poses: list[dict], fixture: dict,
     possible_self = []
     segment_kinds = []
     for index, (first, second) in enumerate(zip(evaluations, evaluations[1:])):
-        kind = _joint_segment_kind(poses[index], poses[index + 1])
+        kind = (
+            _joint_segment_kind(poses[index], poses[index + 1])
+            if _same_fixed_model_base(poses[index], poses[index + 1])
+            else "model_or_base_unresolved"
+        )
         segment_kinds.append(kind)
         for sid in sorted(ids):
             start = first["sphere_centres_world_m"][sid]
@@ -434,7 +480,8 @@ def inspect_waypoint_collision(poses: list[dict], fixture: dict,
         status = "possible_chord_obstacle_overlap"
     elif possible_self:
         status = "affine_self_proxy_overlap_candidate"
-    elif "rotary_motion_unresolved" in segment_kinds:
+    elif ("rotary_motion_unresolved" in segment_kinds
+          or "model_or_base_unresolved" in segment_kinds):
         status = "rotational_sweep_unresolved"
     else:
         status = "affine_proxy_sweep_clear_unverified_body"
