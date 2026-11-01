@@ -35,9 +35,9 @@ finished publications.
 
 `scripts/check_agent_docs.py` is a no-network, standard-library check.
 It verifies the two main `AGENTS.md` sections, eight workflow steps,
-required safety/testing instructions, local links in canonical project
-documents and agreement between `pyproject.toml` and
-`PROJECT_STATE.yaml`. Tests with intentionally broken examples live in
+required safety/testing instructions, local links in all published Markdown
+sources, full `docs/` navigation coverage and agreement between
+`pyproject.toml` and `PROJECT_STATE.yaml`. Tests with intentionally broken examples live in
 `tests/unit/test_agent_docs.py`. Other documents, external URLs, citations,
 runtime correctness and research validity require separate review.
 
