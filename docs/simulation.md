@@ -114,6 +114,23 @@ controller motion or hardware safety. Issue
 [#100](https://github.com/MatPomGit/arc-rvi/issues/100) remains open
 for the unverified cases and independent acceptance.
 
+## Fixed-model and fixed-base provenance gate (2026-11-01)
+
+The offline `rvi robot-model --trajectory` collision proxy analysis
+requires the same pinned URDF SHA-256 and root link at every waypoint,
+with the virtual root transform explicitly equal to the identity.
+A missing source identity, altered root translation or rotation, changed
+root link or changed URDF source between endpoints returns
+`rotary_sweep_unresolved`, not a clear result. Intermediate FK results
+are checked against the same invariant before they can support a
+rotary clearance decision. The waypoint-level proxy report also retains
+`rotational_sweep_unresolved` for such mismatches.
+
+This only checks **consistency of the synthetic fixed-base input**.
+It does not validate the integrity of a robot's live transforms, vendor
+controller trajectories, floating-base locomotion or physical collision
+safety. Independent broad numeric and kinematic acceptance remains #100.
+
 ## Numeric-domain and precision stress tests (2026-10-29)
 
 The rotary proxy solver now rejects geometry and model scale above

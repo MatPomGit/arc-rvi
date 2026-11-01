@@ -363,6 +363,8 @@ def inspect_urdf(
         configured, _ = _tree_poses(by_parent, root, joint_positions)
         report["configured_joint_pose"] = {
             "status": "offline_articulated_fk_only",
+            "model_source_sha256": digest,
+            "root_link": root,
             "joints": dict(sorted(joint_positions.items())),
             "movable_joint_types": dict(sorted(movable_types.items())),
             "all_joint_origin_length_sum_m": joint_origin_length_sum,
