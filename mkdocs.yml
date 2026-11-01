@@ -45,6 +45,14 @@ nav:
       - Sample-size sensitivity: docs/sample-size.md
       - Cluster Monte Carlo: docs/cluster-monte-carlo.md
       - Data interface: docs/data-interface.md
+      - G1 source references:
+          - Source index: docs/g1-reference/README.md
+          - Commands and SDK: docs/g1-reference/commands.md
+          - ROS 2 and Livox data: docs/g1-reference/data-and-configuration.md
+          - Evidence and limitations: docs/g1-reference/evidence.md
+          - Historical programs: docs/g1-reference/legacy-programs.md
+          - RoboMVP ROS interfaces: docs/g1-reference/robomvp.md
+          - G1 hardware and operator PDF: docs/g1-reference/robot-info.md
       - Scientific glossary: docs/glossary.md
   - Research integrity:
       - Literature evidence and publication gates: docs/literature.md
