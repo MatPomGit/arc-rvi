@@ -1,6 +1,6 @@
 # G1 / ROS 2 / Livox: reference intake
 
-Version: **1.1.0** | 2026-11-01 | **static reference, not deployed**.
+Version: **1.2.0** | 2026-11-01 | **static reference, not deployed**.
 
 This folder records commands, interfaces, parameters and provenance extracted from user-supplied Unitree G1 and Livox materials. It does **not** establish the actual G1 EDU variant, operating firmware, live topic graph, physical calibration, safety approval, or a working hardware adapter.
 
@@ -9,6 +9,7 @@ This folder records commands, interfaces, parameters and provenance extracted fr
 - [Evidence and safety limitations](evidence.md)
 - [Historical programs and bytecode-only archive](legacy-programs.md)
 - [RoboMVP interfaces and safety audit](robomvp.md)
+- [G1 hardware and pilot reference PDF](robot-info.md)
 - [Project data contract](../data-interface.md)
 - [Physical test safety gates](../safety.md)
 
@@ -23,6 +24,7 @@ This folder records commands, interfaces, parameters and provenance extracted fr
 | `Program5.zip` | 96 bytecode-only | `b9e264a19512cc7cf838ad56128da48eb45924554490e3a884d27c295bd778ed` |
 | `Old_program.zip` | 23 | `363d146c2f9f845c219cb4466cd6928a9f5c500efcc560546c34e2987f7e4442` |
 | `RoboMVP.zip` | 83 | `dfa76b5585e7da9dc4c94a3b2184b9153b5c01120fd1acae62c6bb32d601161c` |
+| `Robot_info.pdf` | 6 pages | `755c70d099550df38745a74b4757f6b65ba36850d1c74023c88beebc7951c0a7` |
 
 The original archive content is **not** copied to the public repository: source licensing and revisions have not been authenticated. Private network IP addresses, local paths, recordings, raw telemetry and executable motion code are intentionally excluded. Hashes identify the user-supplied bytes, not a verified upstream commit.
 
