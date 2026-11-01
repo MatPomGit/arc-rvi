@@ -52,6 +52,7 @@ nav:
           - Evidence and limitations: docs/g1-reference/evidence.md
           - Historical programs: docs/g1-reference/legacy-programs.md
           - RoboMVP ROS interfaces: docs/g1-reference/robomvp.md
+          - G1 hardware and operator PDF: docs/g1-reference/robot-info.md
       - Scientific glossary: docs/glossary.md
   - Research integrity:
       - Literature evidence and publication gates: docs/literature.md
