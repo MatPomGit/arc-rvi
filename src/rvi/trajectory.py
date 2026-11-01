@@ -295,9 +295,12 @@ def inspect_rotary_proxy_sweep(
             })
             continue
         if _joint_segment_kind(first, last) == "affine_prismatic_interpolation":
+            # This routine does not evaluate affine segment contact. The
+            # separate waypoint/chord report may do so, but a standalone
+            # rotary report must not assert that every proxy was screened.
             outcomes.append({"segment_index": index, "status": "affine_handled_separately",
                              "evaluations": 0, "collision_fraction": None,
-                             "unresolved_intervals": 0})
+                             "unresolved_intervals": 1})
             continue
 
         try:
@@ -383,7 +386,8 @@ def inspect_rotary_proxy_sweep(
 
     if any(x["status"] == "proxy_overlap_between_waypoints" for x in outcomes):
         overall = "proxy_overlap_between_waypoints"
-    elif any(x["status"].startswith(("unresolved_", "rotary_sweep_unresolved"))
+    elif any(x["status"] == "affine_handled_separately"
+             or x["status"].startswith(("unresolved_", "rotary_sweep_unresolved"))
              for x in outcomes):
         overall = "rotary_sweep_unresolved"
     else:

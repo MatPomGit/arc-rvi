@@ -1,5 +1,5 @@
 version: 1
-updated: "2026-10-30"
+updated: "2026-11-02"
 purpose: "Canonical scientific and implementation status for arc-rvi and the ARC portfolio"
 repository:
   canonical_branch: main
@@ -145,6 +145,7 @@ evidence_state:
   fk_waypoint_proxy: time_indexed_2_to_32_samples_chord_candidate_detection_not_continuous_articulated_collision
   fk_affine_proxy_sweep: prismatic_linear_interpolation_static_spheres_only_rotary_motion_unresolved
   fk_rotary_proxy_sweep: budgeted_lipschitz_declared_spheres_only_independent_reference_issue100_pending
+  fk_rotary_affine_boundary: affine_segments_unresolved_in_rotary_only_report_checked_separately_by_waypoint_analyzer
   fk_rotary_model_base_provenance: matching_sha256_and_fixed_virtual_root_required_mismatch_unresolved_fixture_only
   independent_rotary_analytic_qa: unit_radius_arc_rectangle_oracle_partial_issue100
   independent_rotary_multiaxis_qa: analytic_3D_gimbal_two_branch_self_pair_interval_fixtures_partial_issue100

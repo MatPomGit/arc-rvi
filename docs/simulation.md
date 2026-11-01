@@ -114,6 +114,24 @@ controller motion or hardware safety. Issue
 [#100](https://github.com/MatPomGit/arc-rvi/issues/100) remains open
 for the unverified cases and independent acceptance.
 
+## Rotary-only versus affine proxy reports (2026-11-02)
+
+`inspect_rotary_proxy_sweep()` checks the adaptive rotary model only. When
+joint positions are unchanged except for prismatic coordinates, the segment
+is explicitly `affine_handled_separately`. The rotary-only report now returns
+`rotary_sweep_unresolved` for that segment, with one unverified interval,
+rather than making a false aggregate claim of
+`declared_proxies_only_screened`. This is a *reporting/evidence boundary*,
+not a new kinematic collision detector.
+
+The combined `rvi robot-model --trajectory` route separately invokes
+`inspect_waypoint_collision()` for waypoint overlaps and affine sphere/AABB
+centre-chord or declared self-pair candidates. Its existing affine result
+remains distinct from the rotary-only status. An affine contact at the
+interpolation midpoint and a stationary waypoint overlap are deterministic
+negative regressions. No result establishes full-body clearance, continuous
+controller motion, or physical G1 EDU safety.
+
 ## Fixed-model and fixed-base provenance gate (2026-11-01)
 
 The offline `rvi robot-model --trajectory` collision proxy analysis
