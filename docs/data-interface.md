@@ -22,3 +22,8 @@ Require schema validation and version negotiation before integration. Do not
 include personal names, customers, registration plates or proprietary metadata.
 The current `build_image_manifest` function only records paths, sizes and
 SHA-256; it does not implement the entire proposed export contract.
+
+Historical user-supplied G1/ROS 2 SDK, LiDAR launch/configuration examples and
+April 2026 tracking logs are indexed in the [G1 source reference](g1-reference/README.md).
+These are static, unverified interface declarations, not live device inventory or
+physical-validation evidence. Do not promote any sample write API to a robot adapter.
