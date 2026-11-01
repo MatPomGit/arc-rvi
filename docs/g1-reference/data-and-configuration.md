@@ -50,3 +50,59 @@ All names in this table carry the source suffix `_joint`. The `controller.py` so
 ## Proposed neutral import contract
 
 For offline parsing retain `session_id`, source SHA-256, original timestamp and clock domain, topic, message type, native units, `frame_id`, version and calibration hash, missingness reason and device/rights status. Unknown topic schemas, missing transforms and unconfirmed hardware identity must be rejected or marked `unverified`, never inferred from example paths. Keep simulation, source-code references and recorded physical observations distinct, and keep evaluation truth separate from controller inputs. No ROS 2 or DDS bridge is enabled by this document.
+
+
+## Extracted numeric joint limits from controller.py
+
+The values below are **software constants in the supplied example**. They are not verified physical safe ranges or an authorization to actuate.
+
+| SDK index | Joint | Min (rad) | Max (rad) |
+|---:|---|---:|---:|
+| 0 | left_hip_pitch_joint | -2.5307 | 2.8798 |
+| 1 | left_hip_roll_joint | -0.5236 | 2.9671 |
+| 2 | left_hip_yaw_joint | -2.7576 | 2.7576 |
+| 3 | left_knee_joint | -0.087267 | 2.8798 |
+| 4 | left_ankle_pitch_joint | -0.87267 | 0.5236 |
+| 5 | left_ankle_roll_joint | -0.2618 | 0.2618 |
+| 6 | right_hip_pitch_joint | -2.5307 | 2.8798 |
+| 7 | right_hip_roll_joint | -2.9671 | 0.5236 |
+| 8 | right_hip_yaw_joint | -2.7576 | 2.7576 |
+| 9 | right_knee_joint | -0.087267 | 2.8798 |
+| 10 | right_ankle_pitch_joint | -0.87267 | 0.5236 |
+| 11 | right_ankle_roll_joint | -0.2618 | 0.2618 |
+| 12 | waist_yaw_joint | -2.618 | 2.618 |
+| 13 | waist_roll_joint | -0.52 | 0.52 |
+| 14 | waist_pitch_joint | -0.52 | 0.52 |
+| 15 | left_shoulder_pitch_joint | -3.0892 | 2.6704 |
+| 16 | left_shoulder_roll_joint | -1.5882 | 2.2515 |
+| 17 | left_shoulder_yaw_joint | -2.618 | 2.618 |
+| 18 | left_elbow_joint | -1.0472 | 2.0944 |
+| 19 | left_wrist_roll_joint | -1.9722 | 1.9722 |
+| 20 | left_wrist_pitch_joint | -1.6144 | 1.6144 |
+| 21 | left_wrist_yaw_joint | -1.6144 | 1.6144 |
+| 22 | right_shoulder_pitch_joint | -3.0892 | 2.6704 |
+| 23 | right_shoulder_roll_joint | -2.2515 | 1.5882 |
+| 24 | right_shoulder_yaw_joint | -2.618 | 2.618 |
+| 25 | right_elbow_joint | -1.0472 | 2.0944 |
+| 26 | right_wrist_roll_joint | -1.9722 | 1.9722 |
+| 27 | right_wrist_pitch_joint | -1.6144 | 1.6144 |
+| 28 | right_wrist_yaw_joint | -1.6144 | 1.6144 |
+
+The supplied SDK wrapper uses motor position gains `Kp=[60,60,60,100,40,40,60,60,60,100,40,40,60,40,40,40×14]` and velocity gains `Kd=[1,1,1,2,1,1,1,1,1,2,1,1,1,1,1,1×14]`, in the indicated SDK index order. These are reference code values only, not approved tuning.
+
+## Reference Livox ports (private IP addresses removed)
+
+| Sensor / profile | Channel | Device port | Host port |
+|---|---|---:|---:|
+| HAP | command | 56000 | 56000 |
+| HAP | push | 0 | 0 |
+| HAP | points | 57000 | 57000 |
+| HAP | IMU | 58000 | 58000 |
+| HAP | log | 59000 | 59000 |
+| MID360 | command | 56100 | 56101 |
+| MID360 | push | 56200 | 56201 |
+| MID360 | points | 56300 | 56301 |
+| MID360 | IMU | 56400 | 56401 |
+| MID360 | log | 56500 | 56501 |
+
+The mixed profile repeats these port assignments for both sensors. Port numbers are settings found in the provided JSON, **not** a measured physical network inventory.
