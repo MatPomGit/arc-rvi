@@ -90,6 +90,54 @@ Unitree G1 EDU. Issue [#100](https://github.com/MatPomGit/arc-rvi/issues/100)
 remains open until broader model-bound, property and numeric-domain
 validation is independently reviewed.
 
+## Bidirectional interval-oracle regression (2026-11-02)
+
+The independent P03 gimbal oracle in
+`tests/unit/test_rotary_reference_3d.py` now orders its angular
+interval endpoints before evaluating analytic sine/cosine extrema.
+Previously a **descending** joint interpolation could omit interior
+stationary extrema and incorrectly classify its enclosing reference as
+clear. A separate review also exposed a period-index defect: far-from-zero
+intervals such as 20 to 22 rad could miss the cosine minimum at 7π.
+Stationary extrema are now indexed with their correct π-radian separation,
+using a 0 or π/2 phase offset for cosine or sine respectively. Direct
+positive/negative, forward/reverse extreme-phase tests and an independently
+known narrow contact at yaw=7π, pitch=0 cover that defect in the
+test-only reference, without asserting formal interval arithmetic.
+The original reversed-direction counterexample traverses yaw/pitch
+from +1.4 to -1.4 rad
+through the analytically known point (1, 0, 0) m. A single wide
+trigonometric interval must include that point in **both** traversal
+directions. This correction changes the *test oracle*, not the
+production rotary solver.
+
+A fixed, deterministic grid tests four distinct two-axis paths,
+three interior fractions (1/4, 1/2, 3/4), both traversal directions
+and three adaptive FK budgets (0, 4, 64), totalling **72** synthetic
+sweep executions. Each declared sphere/AABB collision is witnessed
+by the independently derived formula
+`Rz(yaw) Ry(pitch) (1,0,0)`; the contact gap is -0.06 m at the
+analytic witness for a 0.06 m radius. Independently evaluated
+trigonometric enclosures with 1 and 8 interval cells must also
+retain the possibility of that contact. Tests reject any production
+`declared_proxies_only_screened` status for the witnessed contacts,
+bound evaluation counts by the declared budget and require the
+`not_performed` physical-certification marker. If the solver reports
+an overlap, its `collision_fraction` must map to a genuine contact
+with analytic sphere/AABB gap at most 1e-9 m. For known midpoint
+contacts, a budget of four or more must produce a contact witness,
+not merely `unresolved`. A zero-budget or non-midpoint unresolved
+result remains an explicit unknown, not an observed collision.
+
+This is a reproducible finite regression corpus within a fixed-base
+two-axis, unit-link synthetic URDF and declared obstacles, not a
+proof of arbitrary articulated model correctness. The trigonometric
+reference uses standard floating-point arithmetic without directed
+rounding. It does not establish formal enclosure bounds, full-body
+collision coverage, actual G1 geometry or safe real motion.
+[#100](https://github.com/MatPomGit/arc-rvi/issues/100) remains
+open for those independent acceptance gates.
+
 ## Independent three-axis synthetic reference (2026-10-30)
 
 The P03 test `tests/unit/test_rotary_reference_3axis.py` adds a
