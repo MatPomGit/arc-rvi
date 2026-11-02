@@ -132,6 +132,23 @@ interpolation midpoint and a stationary waypoint overlap are deterministic
 negative regressions. No result establishes full-body clearance, continuous
 controller motion, or physical G1 EDU safety.
 
+## Rotary waypoint contact witness (2026-11-02)
+
+For segments with varying rotary joints and valid fixed-model/bound
+metadata, `inspect_rotary_proxy_sweep()` checks **both** supplied FK
+endpoints against the declared collision proxies before adaptive
+subdivision. A detected endpoint contact is reported as
+`proxy_overlap_at_waypoint`, with `collision_fraction` 0 or 1,
+and does not consume the midpoint evaluation budget. In particular,
+`max_evaluations=0` does not conceal an already known endpoint overlap.
+
+Interior midpoint contacts remain `proxy_overlap_between_waypoints`.
+Positive contact witnesses take priority over unknown results from
+other segments. A separate affine/prismatic segment remains unresolved
+by this rotary-only routine and needs independent waypoint analysis.
+The additional endpoint checks do not validate real robot geometry,
+unknown reference frames or motion between the sampled poses.
+
 ## Fixed-model and fixed-base provenance gate (2026-11-01)
 
 The offline `rvi robot-model --trajectory` collision proxy analysis

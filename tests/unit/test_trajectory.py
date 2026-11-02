@@ -199,6 +199,76 @@ class WaypointCollisionTests(unittest.TestCase):
             self.assertEqual(sweep["full_body_or_robot_motion_certification"],
                              "not_performed")
 
+    def test_rotary_endpoint_contacts_detected_without_midpoint_budget(self):
+        # Independent analytic orbit: x=cos(q), y=sin(q), z=0.
+        # At q=±pi/2 the centre is (0,±1,0) up to FP roundoff.
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arc.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            checksum = sha256(raw).hexdigest()
+
+            def fk(state):
+                return inspect_urdf(
+                    path, checksum, joint_positions=state
+                )["configured_joint_pose"]
+
+            poses = [fk({"yaw": -pi / 2}), fk({"yaw": pi / 2})]
+            for y, expected_fraction in ((-1.0, 0.0), (1.0, 1.0)):
+                with self.subTest(y=y):
+                    fixture = obstacle(y=y)
+                    endpoint = 0 if expected_fraction == 0.0 else 1
+                    other = 1 - endpoint
+                    self.assertEqual(
+                        inspect_collision_proxies(
+                            poses[endpoint], fixture
+                        )["status"], "proxy_overlap_detected"
+                    )
+                    self.assertEqual(
+                        inspect_collision_proxies(
+                            poses[other], fixture
+                        )["status"], "no_proxy_overlap_unverified"
+                    )
+                    sweep = inspect_rotary_proxy_sweep(
+                        poses, fixture, fk, max_evaluations=0
+                    )
+                    self.assertEqual(
+                        sweep["status"], "proxy_overlap_at_waypoint"
+                    )
+                    self.assertEqual(sweep["total_evaluations"], 0)
+                    self.assertEqual(
+                        sweep["segments"][0]["collision_fraction"],
+                        expected_fraction
+                    )
+                    self.assertEqual(
+                        sweep["segments"][0]["unresolved_intervals"], 0
+                    )
+
+    def test_rotary_late_endpoint_contact_outweighs_unknown_segment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "arc.urdf"
+            raw = REVOLUTE.encode("utf-8")
+            path.write_bytes(raw)
+            checksum = sha256(raw).hexdigest()
+
+            def fk(state):
+                return inspect_urdf(
+                    path, checksum, joint_positions=state
+                )["configured_joint_pose"]
+
+            poses = [fk({"yaw": -pi / 2}), fk({"yaw": 0.0}),
+                     fk({"yaw": pi / 2})]
+            sweep = inspect_rotary_proxy_sweep(
+                poses, obstacle(y=1.0), fk, max_evaluations=0
+            )
+            self.assertEqual(
+                sweep["status"], "proxy_overlap_at_waypoint"
+            )
+            self.assertEqual(
+                sweep["segments"][1]["collision_fraction"], 1.0
+            )
+            self.assertEqual(sweep["total_evaluations"], 0)
+
     def test_rotary_far_obstacle_is_proxy_only_clear_by_global_bound(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "arc.urdf"

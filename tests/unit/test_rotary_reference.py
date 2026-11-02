@@ -141,6 +141,7 @@ class IndependentRotaryReferenceTests(unittest.TestCase):
                 self.assertNotEqual(result["status"],
                                     "declared_proxies_only_screened")
                 self.assertIn(result["status"], (
+                    "proxy_overlap_at_waypoint",
                     "proxy_overlap_between_waypoints",
                     "rotary_sweep_unresolved",
                 ))

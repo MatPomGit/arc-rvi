@@ -311,17 +311,33 @@ def inspect_rotary_proxy_sweep(
                              "unresolved_intervals": 1})
             continue
 
+        # Waypoint contacts are known without spending subdivision budget.
+        # Distinguish them from contacts strictly inside interpolation.
+        first_static = inspect_collision_proxies(first, fixture)
+        last_static = inspect_collision_proxies(last, fixture)
+        if (first_static["status"] == "proxy_overlap_detected"
+                or last_static["status"] == "proxy_overlap_detected"):
+            fraction = (
+                0.0 if first_static["status"] == "proxy_overlap_detected"
+                else 1.0
+            )
+            outcomes.append({
+                "segment_index": index, "status": "proxy_overlap_at_waypoint",
+                "evaluations": 0, "collision_fraction": fraction,
+                "unresolved_intervals": 0,
+            })
+            continue
+
         # A small positive rounding allowance prevents classifying a
         # numerical near-contact as geometrically proven clear.
         epsilon = rounding_guard + 1e-12 * speed
-        queue = [(0.0, 1.0, first)]
+        queue = [(0.0, 1.0, first, first_static)]
         unresolved = 0
         collision_fraction = None
         invalid_model_base = False
         visited = 0
         while queue:
-            left, right, initial = queue.pop()
-            static = inspect_collision_proxies(initial, fixture)
+            left, right, initial, static = queue.pop()
             if static["status"] == "proxy_overlap_detected":
                 collision_fraction = left
                 break
@@ -365,8 +381,8 @@ def inspect_rotary_proxy_sweep(
             if midpoint["status"] == "proxy_overlap_detected":
                 collision_fraction = middle
                 break
-            queue.append((middle, right, candidate))
-            queue.append((left, middle, initial))
+            queue.append((middle, right, candidate, midpoint))
+            queue.append((left, middle, initial, static))
 
         if collision_fraction is not None:
             status = "proxy_overlap_between_waypoints"
@@ -386,6 +402,8 @@ def inspect_rotary_proxy_sweep(
 
     if any(x["status"] == "proxy_overlap_between_waypoints" for x in outcomes):
         overall = "proxy_overlap_between_waypoints"
+    elif any(x["status"] == "proxy_overlap_at_waypoint" for x in outcomes):
+        overall = "proxy_overlap_at_waypoint"
     elif any(x["status"] == "affine_handled_separately"
              or x["status"].startswith(("unresolved_", "rotary_sweep_unresolved"))
              for x in outcomes):
