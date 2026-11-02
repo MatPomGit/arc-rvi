@@ -122,8 +122,12 @@ trigonometric enclosures with 1 and 8 interval cells must also
 retain the possibility of that contact. Tests reject any production
 `declared_proxies_only_screened` status for the witnessed contacts,
 bound evaluation counts by the declared budget and require the
-`not_performed` physical-certification marker. They do not interpret
-an unresolved interval as an observed collision.
+`not_performed` physical-certification marker. If the solver reports
+an overlap, its `collision_fraction` must map to a genuine contact
+with analytic sphere/AABB gap at most 1e-9 m. For known midpoint
+contacts, a budget of four or more must produce a contact witness,
+not merely `unresolved`. A zero-budget or non-midpoint unresolved
+result remains an explicit unknown, not an observed collision.
 
 This is a reproducible finite regression corpus within a fixed-base
 two-axis, unit-link synthetic URDF and declared obstacles, not a
