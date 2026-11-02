@@ -97,7 +97,15 @@ The independent P03 gimbal oracle in
 interval endpoints before evaluating analytic sine/cosine extrema.
 Previously a **descending** joint interpolation could omit interior
 stationary extrema and incorrectly classify its enclosing reference as
-clear. The new counterexample traverses yaw/pitch from +1.4 to -1.4 rad
+clear. A separate review also exposed a period-index defect: far-from-zero
+intervals such as 20 to 22 rad could miss the cosine minimum at 7π.
+Stationary extrema are now indexed with their correct π-radian separation,
+using a 0 or π/2 phase offset for cosine or sine respectively. Direct
+positive/negative, forward/reverse extreme-phase tests and an independently
+known narrow contact at yaw=7π, pitch=0 cover that defect in the
+test-only reference, without asserting formal interval arithmetic.
+The original reversed-direction counterexample traverses yaw/pitch
+from +1.4 to -1.4 rad
 through the analytically known point (1, 0, 0) m. A single wide
 trigonometric interval must include that point in **both** traversal
 directions. This correction changes the *test oracle*, not the
