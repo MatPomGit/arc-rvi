@@ -64,7 +64,12 @@ def point_box_gap(point: tuple[float, float, float], box: tuple,
 
 
 def trig_range(lo: float, hi: float, *, cosine: bool) -> tuple[float, float]:
-    """Extrema of a scalar trig function over a closed angle interval."""
+    """Extrema of a scalar trig function over a closed angle interval.
+
+    Joint interpolation can run in either direction. Normalize both
+    bounds before looking for interior stationary extrema.
+    """
+    lo, hi = sorted((lo, hi))
     func = cos if cosine else sin
     values = [func(lo), func(hi)]
     start = floor((lo - pi / 2) / (pi / 2)) - 2
@@ -309,6 +314,96 @@ class MultiAxisIndependentReferences(unittest.TestCase):
                 self.assertLessEqual(report["total_evaluations"], 64)
                 self.assertEqual(report["full_body_or_robot_motion_certification"],
                                  "not_performed")
+
+    def test_reverse_interval_oracle_keeps_interior_extrema(self):
+        # A descending yaw from +1.4 to -1.4 passes through yaw=0.
+        # With a single analytic cell, endpoint-only extrema would
+        # incorrectly exclude the x=1 midpoint of this unit gimbal.
+        self.assertAlmostEqual(
+            trig_range(1.4, -1.4, cosine=True)[1], 1.0, places=12
+        )
+        self.assertAlmostEqual(
+            trig_range(1.4, -1.4, cosine=True)[0],
+            cos(1.4), places=12,
+        )
+        center = analytic_gimbal(0.0, 0.0)
+        box = (
+            tuple(value - 0.005 for value in center),
+            tuple(value + 0.005 for value in center),
+        )
+        self.assertLess(point_box_gap(center, box, 0.01), -0.009)
+        for first, last in (
+            ((-1.4, -1.4), (1.4, 1.4)),
+            ((1.4, 1.4), (-1.4, -1.4)),
+        ):
+            for cells in (1, 3, 8, 64):
+                with self.subTest(first=first, last=last, cells=cells):
+                    self.assertFalse(independent_interval_clear(
+                        first, last, box, 0.01, cells=cells
+                    ))
+
+    def test_bidirectional_adversarial_contact_grid_never_false_clear(self):
+        # Exact contact witnesses are obtained analytically at t=1/4,
+        # 1/2 and 3/4, not by using production FK or dense sampling.
+        fk = self.model(GIMBAL)
+        paths = (
+            (-1.4, 1.4, -1.4, 1.4),
+            (-1.3, 1.1, 1.0, -1.2),
+            (0.0, 1.5, -1.5, 0.8),
+            (1.4, -0.9, -0.8, 1.2),
+        )
+        radius = 0.06
+        for y0, y1, p0, p1 in paths:
+            forward = ({"yaw": y0, "pitch": p0},
+                       {"yaw": y1, "pitch": p1})
+            for fraction in (0.25, 0.5, 0.75):
+                witness = analytic_gimbal(
+                    y0 + fraction * (y1 - y0),
+                    p0 + fraction * (p1 - p0),
+                )
+                box = (
+                    tuple(value - 0.015 for value in witness),
+                    tuple(value + 0.015 for value in witness),
+                )
+                # This exact known point lies inside the AABB; a
+                # proxy-only-clear result is therefore a counterexample.
+                self.assertAlmostEqual(
+                    point_box_gap(witness, box, radius),
+                    -radius, places=12,
+                )
+                fixture = gimbal_fixture(box, radius)
+                for a, b in (forward, forward[::-1]):
+                    for cells in (1, 8):
+                        self.assertFalse(independent_interval_clear(
+                            (a["yaw"], a["pitch"]),
+                            (b["yaw"], b["pitch"]),
+                            box, radius, cells=cells,
+                        ))
+                    poses = [fk(a), fk(b)]
+                    for budget in (0, 4, 64):
+                        with self.subTest(
+                            start=a, stop=b, fraction=fraction,
+                            evaluations=budget,
+                        ):
+                            result = inspect_rotary_proxy_sweep(
+                                poses, fixture, fk, max_evaluations=budget
+                            )
+                            self.assertNotEqual(
+                                result["status"],
+                                "declared_proxies_only_screened",
+                            )
+                            self.assertIn(result["status"], (
+                                "proxy_overlap_between_waypoints",
+                                "proxy_overlap_at_waypoint",
+                                "rotary_sweep_unresolved",
+                            ))
+                            self.assertLessEqual(
+                                result["total_evaluations"], budget
+                            )
+                            self.assertEqual(
+                                result["full_body_or_robot_motion_certification"],
+                                "not_performed",
+                            )
 
     def test_deterministic_multi_axis_interior_contact_family(self):
         fk = self.model(GIMBAL)
