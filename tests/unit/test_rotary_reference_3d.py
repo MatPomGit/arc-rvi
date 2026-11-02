@@ -66,16 +66,20 @@ def point_box_gap(point: tuple[float, float, float], box: tuple,
 def trig_range(lo: float, hi: float, *, cosine: bool) -> tuple[float, float]:
     """Extrema of a scalar trig function over a closed angle interval.
 
-    Joint interpolation can run in either direction. Normalize both
-    bounds before looking for interior stationary extrema.
+    Joint interpolation can run in either direction. Sort the
+    angular bounds ascending; do not wrap the joint coordinates.
     """
     lo, hi = sorted((lo, hi))
     func = cos if cosine else sin
     values = [func(lo), func(hi)]
-    start = floor((lo - pi / 2) / (pi / 2)) - 2
-    end = floor((hi + pi / 2) / (pi / 2)) + 2
-    for k in range(start, end + 1):
-        stationary = k * pi if cosine else pi / 2 + k * pi
+    # Successive stationary extrema of either sine or cosine are pi
+    # radians apart. Index them using the same period as the values;
+    # indexing k at pi/2 intervals skips extrema for larger phases.
+    offset = 0.0 if cosine else pi / 2
+    first = floor((lo - offset) / pi) - 1
+    last = floor((hi - offset) / pi) + 1
+    for k in range(first, last + 1):
+        stationary = offset + k * pi
         if lo <= stationary <= hi:
             values.append(func(stationary))
     return min(values), max(values)
@@ -341,6 +345,44 @@ class MultiAxisIndependentReferences(unittest.TestCase):
                     self.assertFalse(independent_interval_clear(
                         first, last, box, 0.01, cells=cells
                     ))
+
+    def test_large_phase_extrema_are_not_missed(self):
+        # 7*pi lies strictly inside 20..22, where cos is exactly -1.
+        # Likewise sin(13*pi/2) = +1 occurs within that interval.
+        # A pi/2-based *index* formerly skipped these extrema.
+        for lo, hi in (
+            (20.0, 22.0), (22.0, 20.0),
+            (-22.0, -20.0), (-20.0, -22.0),
+        ):
+            with self.subTest(lo=lo, hi=hi):
+                self.assertAlmostEqual(
+                    trig_range(lo, hi, cosine=True)[0],
+                    -1.0, places=12,
+                )
+                sine = trig_range(lo, hi, cosine=False)
+                self.assertAlmostEqual(
+                    sine[1] if min(lo, hi) > 0 else sine[0],
+                    1.0 if min(lo, hi) > 0 else -1.0,
+                    places=12,
+                )
+
+        # Narrow analytic contact at yaw=7*pi, pitch=0. Use a
+        # single enclosing interval, not a point-sampling grid.
+        center = analytic_gimbal(7 * pi, 0.0)
+        halfwidth = 1e-6
+        box = (
+            tuple(value - halfwidth for value in center),
+            tuple(value + halfwidth for value in center),
+        )
+        self.assertLess(point_box_gap(center, box, 1e-6), 0)
+        for a, b in (
+            ((20.0, 0.0), (22.0, 0.0)),
+            ((22.0, 0.0), (20.0, 0.0)),
+        ):
+            with self.subTest(start=a, stop=b):
+                self.assertFalse(independent_interval_clear(
+                    a, b, box, 1e-6, cells=1,
+                ))
 
     def test_bidirectional_adversarial_contact_grid_never_false_clear(self):
         # Exact contact witnesses are obtained analytically at t=1/4,
