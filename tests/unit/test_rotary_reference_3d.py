@@ -442,6 +442,43 @@ class MultiAxisIndependentReferences(unittest.TestCase):
                             self.assertLessEqual(
                                 result["total_evaluations"], budget
                             )
+                            if fraction == 0.5 and budget >= 4:
+                                # The first adaptive midpoint has an
+                                # analytically certain contact.
+                                self.assertNotEqual(
+                                    result["status"],
+                                    "rotary_sweep_unresolved",
+                                )
+                            if result["status"] in (
+                                "proxy_overlap_between_waypoints",
+                                "proxy_overlap_at_waypoint",
+                            ):
+                                observed = result["segments"][0][
+                                    "collision_fraction"
+                                ]
+                                self.assertIsNotNone(observed)
+                                self.assertGreaterEqual(observed, 0.0)
+                                self.assertLessEqual(observed, 1.0)
+                                # Verify the *reported* contact instant
+                                # against independent analytic geometry,
+                                # not against the production FK callback.
+                                tip = analytic_gimbal(
+                                    a["yaw"] + observed * (
+                                        b["yaw"] - a["yaw"]
+                                    ),
+                                    a["pitch"] + observed * (
+                                        b["pitch"] - a["pitch"]
+                                    ),
+                                )
+                                self.assertLessEqual(
+                                    point_box_gap(tip, box, radius), 1e-9
+                                )
+                            else:
+                                self.assertIsNone(
+                                    result["segments"][0][
+                                        "collision_fraction"
+                                    ]
+                                )
                             self.assertEqual(
                                 result["full_body_or_robot_motion_certification"],
                                 "not_performed",
