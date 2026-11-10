@@ -194,5 +194,68 @@ class IndependentRotaryReferenceTests(unittest.TestCase):
                          "linear_interpolation_fixed_virtual_base")
 
 
+    def test_full_rotation_with_identical_endpoints_never_uses_clear_chord(self):
+        """The chord degenerates to a point, but the circular arc hits a box."""
+        continuous = UNIT_ARM.replace(
+            'type="revolute"', 'type="continuous"'
+        ).replace('<limit lower="-2" upper="2"/>', "")
+        path = Path(self.workspace.name) / "full_turn.urdf"
+        raw = continuous.encode("utf-8")
+        path.write_bytes(raw)
+        digest = sha256(raw).hexdigest()
+
+        def fk(positions: dict) -> dict:
+            return inspect_urdf(
+                path, digest, joint_positions=positions
+            )["configured_joint_pose"]
+
+        box = (-1.05, -0.95, -0.05, 0.05)
+        fixture = _fixture(box)
+        for start, stop in ((0.0, 2 * pi), (2 * pi, 0.0), (0.0, -2 * pi)):
+            with self.subTest(start=start, stop=stop):
+                first, last = fk({"q": start}), fk({"q": stop})
+                centre_a = first["frame_poses"]["tip"]["translation_m"]
+                centre_b = last["frame_poses"]["tip"]["translation_m"]
+                self.assertAlmostEqual(centre_a[0], centre_b[0], places=12)
+                self.assertAlmostEqual(centre_a[1], centre_b[1], places=12)
+                # Independent analytic midpoint of the complete orbit is (-1, 0).
+                self.assertLess(box[0], -1.0)
+                self.assertGreater(box[1], -1.0)
+                self.assertLess(box[2], 0.0)
+                self.assertGreater(box[3], 0.0)
+                unresolved = inspect_rotary_proxy_sweep(
+                    [first, last], fixture, fk, max_evaluations=0
+                )
+                self.assertEqual(unresolved["status"], "rotary_sweep_unresolved")
+                checked = inspect_rotary_proxy_sweep(
+                    [first, last], fixture, fk, max_evaluations=64
+                )
+                self.assertEqual(
+                    checked["status"], "proxy_overlap_between_waypoints"
+                )
+                fraction = checked["segments"][0]["collision_fraction"]
+                self.assertAlmostEqual(fraction, 0.5)
+                # Independent circle kinematics verify the reported contact.
+                witness = start + fraction * (stop - start)
+                self.assertAlmostEqual(cos(witness), -1.0, places=12)
+                self.assertAlmostEqual(sin(witness), 0.0, places=12)
+                self.assertEqual(
+                    checked["full_body_or_robot_motion_certification"],
+                    "not_performed",
+                )
+
+                # With no declared contact anywhere on the full circle,
+                # a sufficiently distant box admits a conservative exclusion
+                # even when the subdivision budget is zero.
+                distant = _fixture((10.0, 11.0, -0.05, 0.05))
+                clear = inspect_rotary_proxy_sweep(
+                    [first, last], distant, fk, max_evaluations=0
+                )
+                self.assertEqual(
+                    clear["status"], "declared_proxies_only_screened"
+                )
+                self.assertEqual(clear["total_evaluations"], 0)
+
+
 if __name__ == "__main__":
     unittest.main()
