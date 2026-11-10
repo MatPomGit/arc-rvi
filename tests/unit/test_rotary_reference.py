@@ -218,9 +218,11 @@ class IndependentRotaryReferenceTests(unittest.TestCase):
                 centre_b = last["frame_poses"]["tip"]["translation_m"]
                 self.assertAlmostEqual(centre_a[0], centre_b[0], places=12)
                 self.assertAlmostEqual(centre_a[1], centre_b[1], places=12)
-                self.assertLess(
-                    _arc_box_gap(-pi / 2, pi / 2, box, 0.1), 0
-                )
+                # Independent analytic midpoint of the complete orbit is (-1, 0).
+                self.assertLess(box[0], -1.0)
+                self.assertGreater(box[1], -1.0)
+                self.assertLess(box[2], 0.0)
+                self.assertGreater(box[3], 0.0)
                 unresolved = inspect_rotary_proxy_sweep(
                     [first, last], fixture, fk, max_evaluations=0
                 )
