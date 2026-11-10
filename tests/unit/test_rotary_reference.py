@@ -211,7 +211,7 @@ class IndependentRotaryReferenceTests(unittest.TestCase):
 
         box = (-1.05, -0.95, -0.05, 0.05)
         fixture = _fixture(box)
-        for start, stop in ((0.0, 2 * pi), (2 * pi, 0.0)):
+        for start, stop in ((0.0, 2 * pi), (2 * pi, 0.0), (0.0, -2 * pi)):
             with self.subTest(start=start, stop=stop):
                 first, last = fk({"q": start}), fk({"q": stop})
                 centre_a = first["frame_poses"]["tip"]["translation_m"]
@@ -233,13 +233,28 @@ class IndependentRotaryReferenceTests(unittest.TestCase):
                 self.assertEqual(
                     checked["status"], "proxy_overlap_between_waypoints"
                 )
-                self.assertAlmostEqual(
-                    checked["segments"][0]["collision_fraction"], 0.5
-                )
+                fraction = checked["segments"][0]["collision_fraction"]
+                self.assertAlmostEqual(fraction, 0.5)
+                # Independent circle kinematics verify the reported contact.
+                witness = start + fraction * (stop - start)
+                self.assertAlmostEqual(cos(witness), -1.0, places=12)
+                self.assertAlmostEqual(sin(witness), 0.0, places=12)
                 self.assertEqual(
                     checked["full_body_or_robot_motion_certification"],
                     "not_performed",
                 )
+
+                # With no declared contact anywhere on the full circle,
+                # a sufficiently distant box admits a conservative exclusion
+                # even when the subdivision budget is zero.
+                distant = _fixture((10.0, 11.0, -0.05, 0.05))
+                clear = inspect_rotary_proxy_sweep(
+                    [first, last], distant, fk, max_evaluations=0
+                )
+                self.assertEqual(
+                    clear["status"], "declared_proxies_only_screened"
+                )
+                self.assertEqual(clear["total_evaluations"], 0)
 
 
 if __name__ == "__main__":
