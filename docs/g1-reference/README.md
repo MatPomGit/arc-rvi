@@ -13,6 +13,28 @@ This folder records commands, interfaces, parameters and provenance extracted fr
 - [Project data contract](../data-interface.md)
 - [Physical test safety gates](../safety.md)
 
+## Historical footage and camera calibration from G1 EDU
+
+The project owner identifies [`MatPomGit/alf-luca`](https://github.com/MatPomGit/alf-luca)
+as a **program actually run on a Unitree G1 EDU**. Unlike the static archived
+SDK references below, this repository contains candidate historical image
+and calibration material from that deployment:
+
+| Source | Verified repository content | Interpretation |
+|---|---|---|
+| [`video/`](https://github.com/MatPomGit/alf-luca/tree/main/video) | Nine MP4/MKV recordings, including `kalibracja`, `sledzenie_plamki` and `apriltags_approach` | Candidate historical recordings; the repository alone does not establish per-file camera identity or unmodified acquisition |
+| [`images_calib/`](https://github.com/MatPomGit/alf-luca/tree/main/images_calib) | 39 PNG chessboard-frame images | Selected/extracted calibration frames, **not** unmodified raw video; filenames and content hashes should be retained when imported |
+| [`camera_calib.npz`](https://github.com/MatPomGit/alf-luca/blob/main/camera_calib.npz) | Calibration artifact in the repository root | Calibration candidate; its intrinsic parameters, reprojection error and device association need verification |
+| [`tools/extract_calibration_images.py`](https://github.com/MatPomGit/alf-luca/blob/main/tools/extract_calibration_images.py) | Script selecting chessboard frames from MP4/MKV | Provides an inspectable extraction method, not proof of camera-model validity |
+
+The G1 EDU execution history is **owner-confirmed**; the provenance of each
+individual video, sensor serial, firmware version, extrinsic transforms and
+capture clock have **not** been independently established. Source files stay
+in `alf-luca`, not in ARC-RVI or its public documentation build. Reuse is
+subject to image rights, calibration checks and session-level separation for
+any evaluation dataset. This historical material does not demonstrate
+physical ARC-RVI inspection, a functioning robot adapter or validated safety.
+
 ## Source archive identity
 
 | Archive | Files | SHA-256 |
