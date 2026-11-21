@@ -22,6 +22,18 @@ can check versioned link/joint topology and zero-pose camera frames without
 connecting to a robot; see `config/robot.yaml`
 and [physical test safety gates](docs/safety.md).
 
+**Historical G1 EDU source material:** The separate
+[`alf-luca` repository](https://github.com/MatPomGit/alf-luca) contains
+recordings, source code and camera-calibration material from a program the
+project owner confirms was run on a **Unitree G1 EDU**. In particular, see
+[recorded videos](https://github.com/MatPomGit/alf-luca/tree/main/video),
+[calibration chessboard frames](https://github.com/MatPomGit/alf-luca/tree/main/images_calib)
+and the repository's `camera_calib.npz` file. This is a source for retrospective
+sensor-data and calibration assessment, **not** evidence of an operational
+ARC-RVI adapter, validated calibration or completed RVI field experiment.
+See the [G1 source inventory](docs/g1-reference/README.md) for provenance and
+reuse limitations.
+
 ## Repository map
 
 - `src/rvi/`: shared research library; hardware adapters are separate.
