@@ -35,6 +35,38 @@ subject to image rights, calibration checks and session-level separation for
 any evaluation dataset. This historical material does not demonstrate
 physical ARC-RVI inspection, a functioning robot adapter or validated safety.
 
+## Additional public ALF software and source evidence
+
+Three additional projects support traceability of the historical G1
+research environment, but none proves that a current ARC-RVI hardware
+adapter is active:
+
+| Project | Primary reference | Appropriate evidence level |
+| --- | --- | --- |
+| [`alf-light-tracking`](https://github.com/MatPomGit/alf-light-tracking) | [2026-04-14 log](https://github.com/MatPomGit/alf-light-tracking/blob/main/ros2_ws/g1_light_tracking/logs/running_log_g1_20260414.log), [video](https://github.com/MatPomGit/alf-light-tracking/blob/main/ros2_ws/g1_light_tracking/tools/video.mp4), [2026-04-17 perception calibration report](https://github.com/MatPomGit/alf-light-tracking/blob/main/ros2_ws/g1_light_tracking/config/perception_calibration_report.md) | Historical software traces and one-video detector threshold fitting, **not** validated physical motion or camera intrinsics |
+| [`alf-vis`](https://github.com/MatPomGit/alf-vis) | [RGB-D camera wrapper](https://github.com/MatPomGit/alf-vis/blob/main/src/image_analysis/camera.py) and image-analysis examples | G1 EDU-oriented code and experimental pipelines; network defaults **not validated** |
+| [`alf-ros`](https://github.com/MatPomGit/alf-ros) | [ROS 2 parameters](https://github.com/MatPomGit/alf-ros/blob/main/alf_ros/config/params.yaml) and [GUI controller](https://github.com/MatPomGit/alf-ros/blob/main/alf_ros/alf_ros/nodes/robot_controller_node.py) | ROS 2 GUI, status and motion-command declarations, **not** a certified G1 adapter or hardware emergency stop |
+
+The owner has recalled historical direct network access to the G1 EDU
+research robot, but the original connection protocol, identity of the
+endpoint and present connectivity have not been independently verified.
+The `alf-vis` camera wrapper contains a network-address default and a
+candidate camera port, neither of which demonstrates an active camera
+service; it currently uses OpenCV capture and labels SDK2 transport as
+future work. The `alf-ros` SSH command is explicitly an example and not
+an authenticated device record. Model-specific IP details and connection
+history are maintained in the private equipment inventory rather than
+published here.
+
+The `alf-light-tracking` calibration report has 734 input frames,
+245 analyzed frames and 25 detections (10.2% of analyzed frames).
+These measurements describe threshold selection from one video and
+must not be conflated with the `alf-luca` chessboard images or
+`camera_calib.npz` intrinsic-calibration artifact. The logged bridge
+traffic does not independently demonstrate successful robot actuation;
+later source comments cannot establish the configuration active
+during the earlier log. Retain the [evidence limits](evidence.md).
+
 ## Source archive identity
 
 | Archive | Files | SHA-256 |
