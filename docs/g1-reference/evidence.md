@@ -2,6 +2,17 @@
 
 Version 1.0.0 | 2026-11-01 | No live connection, SDK compilation or physical test.
 
+The separately accessible [`alf-luca` program](https://github.com/MatPomGit/alf-luca)
+was run on a Unitree G1 EDU according to the project owner. It includes
+[MP4/MKV recordings](https://github.com/MatPomGit/alf-luca/tree/main/video),
+[extracted chessboard calibration images](https://github.com/MatPomGit/alf-luca/tree/main/images_calib)
+and `camera_calib.npz`. These are candidate **historical physical-source data**,
+not completed ARC-RVI experimental observations. The exact source camera,
+calibration validity, per-file chain of custody, capture metadata, licensing
+and independence of image frames remain to be audited. See the
+[source inventory](README.md); do not treat extracted frames or fitted
+intrinsics as a validated G1 camera calibration.
+
 The 2026-04-14 log and the video are historical material. The log contains **299 logged Unitree TX entries**, **231 detection entries** and **197 logged zero transitions** for lost/invalid detections. These are counts of **logged entries**, not a census of every DDS/API packet or proof of physical motion. A separate calibration report dated 2026-04-17 lists 734 input video frames, 245 analyzed frames and 25 detections (10.2%); it has no independently labeled ground truth or verified synchronization with the log. The video is 1280×720, but one logged camera node reports 640×480.
 
 Safety and integrity findings:
