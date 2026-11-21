@@ -16,6 +16,16 @@ reference_platform:
     visible: humanoid_body_upright_feet_on_floor_hand_end_effector_straps_adjacent_rolling_frame
     unverified: mode_machine_dof_sensors_harness_function_safety_checks_firmware
     evidence_level: visual_reference_only_not_physical_trial
+  historical_application:
+    name: alf-luca
+    repository: https://github.com/MatPomGit/alf-luca
+    source_commit: 2d99775d0edae59dacd50e4678567cdc71437f0a
+    deployment: owner_confirmed_program_run_on_G1_EDU
+    media_sources: video_and_extracted_images_calib
+    calibration_artifact: camera_calib.npz
+    individual_robot_identity: not_verified
+    camera_model_and_calibration: not_verified
+    evidence_level: historical_source_material_not_ARC_RVI_physical_trial
   # Candidate attributes cited by two user-supplied descriptions, NOT a device inventory.
   provisional_user_document_claims:
     source: G1_EDU_description_and_teaching_manual_v1_8
