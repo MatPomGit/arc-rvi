@@ -47,13 +47,16 @@ adapter is active:
 | [`alf-vis`](https://github.com/MatPomGit/alf-vis) | [RGB-D camera wrapper](https://github.com/MatPomGit/alf-vis/blob/main/src/image_analysis/camera.py) and image-analysis examples | G1 EDU-oriented code and experimental pipelines; network defaults **not validated** |
 | [`alf-ros`](https://github.com/MatPomGit/alf-ros) | [ROS 2 parameters](https://github.com/MatPomGit/alf-ros/blob/main/alf_ros/config/params.yaml) and [GUI controller](https://github.com/MatPomGit/alf-ros/blob/main/alf_ros/alf_ros/nodes/robot_controller_node.py) | ROS 2 GUI, status and motion-command declarations, **not** a certified G1 adapter or hardware emergency stop |
 
-In particular, `alf-vis` includes default `192.168.123.161:9871`
-in camera code and `alf-ros` shows `unitree@192.168.123.2`
-as an **example to replace**, not as proven G1 EDU access.
-`192.168.123.161` is also identified in a separate Go2 quickstart as
-a motion-controller address. Neither source authorizes claiming that it
-is the G1 EDU camera endpoint. The `alf-vis` camera wrapper currently
-uses OpenCV capture and labels SDK2 transport as future work.
+The owner has recalled historical direct network access to the G1 EDU
+research robot, but the original connection protocol, identity of the
+endpoint and present connectivity have not been independently verified.
+The `alf-vis` camera wrapper contains a network-address default and a
+candidate camera port, neither of which demonstrates an active camera
+service; it currently uses OpenCV capture and labels SDK2 transport as
+future work. The `alf-ros` SSH command is explicitly an example and not
+an authenticated device record. Model-specific IP details and connection
+history are maintained in the private equipment inventory rather than
+published here.
 
 The `alf-light-tracking` calibration report has 734 input frames,
 245 analyzed frames and 25 detections (10.2% of analyzed frames).
