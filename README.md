@@ -13,9 +13,11 @@ Independent research software for reproducible robotic visual inspection: target
 - Repeatable simulation and physical experiments, statistical analysis and publications.
 - Export of neutral images and metadata to external analytical systems. Defect classification is **out of scope**.
 
-**Reference test robot:** Unitree G1 EDU. This is a declared research-platform
-choice, not an implemented robot integration or confirmation of available
-hardware. The exact EDU variant, sensor payload and firmware must be verified
+**Reference test robot:** Unitree G1 EDU. Its historical use with the LUCA
+program is owner-confirmed and supported by separately archived source
+material. This does not mean that a live ARC-RVI robot integration exists or
+that the current hardware configuration and availability have been verified.
+The exact EDU variant, sensor payload and firmware must be verified
 before importing a robot model or conducting physical tests. Shared algorithms
 remain hardware-independent. An [offline URDF preflight](docs/architecture.md)
 can check versioned link/joint topology and zero-pose camera frames without

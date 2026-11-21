@@ -4,6 +4,25 @@ Version: **1.0.0** | Intake date: 2026-11-01 | Source class: **user-supplied sec
 
 **Source:** `Robot_info.pdf`, *Analiza robota Unitree G1 i oprogramowania*, 6 pages; SHA-256: `755c70d099550df38745a74b4757f6b65ba36850d1c74023c88beebc7951c0a7`. File is not committed, reproduced or distributed here. No publisher, exact manufacturer document revision, date or per-claim primary citation is supplied. The following retains the PDF's terminology and page numbers. **A source assertion is not a verified physical measurement or confirmation of the installed G1 EDU payload.**
 
+## Reconciliation with historical G1 EDU usage (2026-11-21)
+
+The project owner confirms that the separate
+[`MatPomGit/alf-luca`](https://github.com/MatPomGit/alf-luca) application was
+run on a **Unitree G1 EDU**. Its source repository at revision
+`2d99775d0edae59dacd50e4678567cdc71437f0a` contains nine videos,
+39 extracted chessboard-calibration PNGs, a `camera_calib.npz` artifact and
+an inspectable frame-extraction script. This provides a concrete historical
+sensor-data provenance lead rather than only a hypothetical platform choice.
+The [source index](README.md) provides the individual links.
+
+This confirmation establishes the **model used by the historical program**,
+not the serial-numbered identity, EDU option, installed camera/LiDAR/microphone
+models, firmware or safety configuration of the specific robot. The secondary
+PDF specifications below remain unverified as an inventory of that unit.
+Similarly, an archived calibration file is not evidence of valid intrinsic
+parameters for the presently installed camera or of camera-to-robot extrinsics.
+ARC-RVI still has no implemented physical integration or validated field trial.
+
 ## Source claims: mechanical platform (pp. 1-2)
 
 | Property | Value reported in PDF | Verification state |
