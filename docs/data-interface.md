@@ -23,6 +23,12 @@ include personal names, customers, registration plates or proprietary metadata.
 The current `build_image_manifest` function only records paths, sizes and
 SHA-256; it does not implement the entire proposed export contract.
 
+A separate [historical G1 EDU recording source](g1-reference/README.md)
+exists in `MatPomGit/alf-luca`, including videos, extracted calibration frames
+and a calibration artifact. Import only after verifying source version,
+rights, capture device, intrinsic validity, timebase and session grouping;
+never classify extracted frames as independent raw acquisitions.
+
 Historical user-supplied G1/ROS 2 SDK, LiDAR launch/configuration examples and
 April 2026 tracking logs are indexed in the [G1 source reference](g1-reference/README.md).
 These are static, unverified interface declarations, not live device inventory or
