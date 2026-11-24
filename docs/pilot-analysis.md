@@ -235,3 +235,13 @@ failures, 13 at 1.05 times optimum, and mean coverage gap 1.67 percentage
 points over all 192 cases. These are descriptive development results,
 not independent trials or a confirmatory comparison. The strong baseline
 and residual failure analysis should precede any new fuzzy contribution.
+
+
+## Retention of independent exploratory audits
+
+Preserve independent audit scripts and their result files in versioned
+stage-specific directories under `research/evidence/p01/`, alongside
+SHA-256 checksums and source provenance. The RVI-R03 through RVI-R06
+historical files are in `research/evidence/p01/rvi-r03-r06/`. Keep raw
+archives out of the generated website and never publish holdout or private
+information. Do not overwrite historical evidence with a new run.
