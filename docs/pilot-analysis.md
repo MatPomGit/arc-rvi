@@ -95,3 +95,25 @@ This grid is exploratory and does not select a winner or freeze a parameter.
 Inspect floor and ceiling effects and family heterogeneity independently of
 which method benefits. Do not use the grid to choose a favorable contrast.
 The current model remains a known-geometry planar simulation.
+
+
+## Decision-level mechanism diagnostics
+
+The calibration artifact now retains each fuzzy decision's candidate gain,
+normalized cost, predicted duration, urgency, score derivative, adaptive and
+fixed rankings and winner margins. Both rankings are computed on the same
+state, without changing the executed policy. Counts across both trajectories
+are descriptive state visits, not independent observations.
+
+For a higher-gain, higher-cost candidate, the score crossing is
+u = 2 - 2.5 * delta_cost / (delta_gain + delta_cost).
+A crossing in the open unit interval requires the gain/cost difference ratio
+to lie strictly between 0.25 and 1.5. A crossing does not imply a winner
+change in the presence of other candidates.
+
+The artifact also contains separate hand-built mechanism fixtures with
+budgets 2.5, 5 and 16 seconds. The near view covers one patch, the farther
+view covers two; the tight budget produces a deliberately constructed
+rank reversal. These fixtures are software checks, not sampled evidence
+of comparative effectiveness, and are excluded from calibration denominators.
+No holdout or frozen protocol change is involved.
