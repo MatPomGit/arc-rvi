@@ -15,7 +15,8 @@ from .localization import run_localization_fixture, run_sensor_localization
 from .image_dataset import evaluate_image_manifest
 from .localization_population import (generate_localization_population,
                                       analyze_localization_population)
-from .pilot import analyze_factorial_pilot, analyze_pilot
+from .pilot import (analyze_factorial_pilot, analyze_pilot,
+                    calibrate_factorial_pilot)
 from .planning import plan_family_sample
 from .power_mc import analyze_cluster_monte_carlo
 from .robot_model import inspect_urdf, load_joint_state
@@ -65,7 +66,10 @@ def make_parser() -> argparse.ArgumentParser:
     pilot.add_argument("--reference", default="fixed_order", choices=("fixed_order", "greedy_coverage", "greedy_distance"))
     pilot.add_argument("--comparator", default="greedy_distance", choices=("fixed_order", "greedy_coverage", "greedy_distance"))
     pilot.add_argument("--seed", type=int, default=20261026)
-    pilot.add_argument("--factorial-fuzzy", action="store_true",
+    modes = pilot.add_mutually_exclusive_group()
+    modes.add_argument("--calibrate-factorial", action="store_true",
+                       help="sweep pilot-only time budgets and camera fields of view")
+    modes.add_argument("--factorial-fuzzy", action="store_true",
                        help="run six-cell five-method exploratory pilot")
     population = sub.add_parser("population", help="sample exploratory geometry families for study01")
     population.add_argument("--spec", required=True, type=Path)
@@ -222,7 +226,9 @@ def main(argv: list[str] | None = None) -> int:
                         proxies["source_sha256"] = fixture_sha
                         payload["configured_joint_pose"]["collision_proxies"] = proxies
             elif arguments.command == "pilot":
-                payload = (analyze_factorial_pilot(arguments.manifest)
+                payload = (calibrate_factorial_pilot(arguments.manifest)
+                           if arguments.calibrate_factorial else
+                           analyze_factorial_pilot(arguments.manifest)
                            if arguments.factorial_fuzzy else
                            analyze_pilot(arguments.manifest, arguments.reference,
                                          arguments.comparator, seed=arguments.seed))
