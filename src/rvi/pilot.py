@@ -513,6 +513,7 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
         "trial_count": sum(c["trial_count"] for c in configurations),
         "selection": "none_report_full_grid",
         "configurations": configurations,
+        "mechanism_fixtures": fuzzy_tradeoff_fixtures(),
     }
 
 
