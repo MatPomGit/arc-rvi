@@ -11,39 +11,39 @@ from scripts import build_docs
 
 
 class DocsBuildTests(unittest.TestCase):
-    def test_stages_canonical_markdown_and_theme(self):
+    def test_stages_only_manifest_sources(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            (root / "website" / "content").mkdir(parents=True)
+            (root / "website" / "content" / "index.md").write_text("# Home", encoding="utf-8")
             (root / "docs" / "assets").mkdir(parents=True)
-            (root / "index.md").write_text("# Welcome\n", encoding="utf-8")
-            (root / "README.md").write_text("# Full README\n", encoding="utf-8")
-            (root / "AUTOPILOT_PLAN.md").write_text("# Plan\n", encoding="utf-8")
-            (root / "PROJECT_STATE.yaml").write_text("version: 1\n", encoding="utf-8")
-            (root / "docs" / "guide.md").write_text("# Guide\n", encoding="utf-8")
-            css = "body { color: var(--text-primary); }\n"
-            (root / "docs" / "assets" / "theme.css").write_text(
-                css, encoding="utf-8"
+            (root / "docs" / "guide.md").write_text("# Guide", encoding="utf-8")
+            (root / "docs" / "unlisted.md").write_text("internal agent instructions", encoding="utf-8")
+            (root / "docs" / "assets" / "theme.css").write_text("body {}", encoding="utf-8")
+            manifest = root / "website" / "public-sources.txt"
+            manifest.write_text(
+                "website/content/index.md | index.md\n"
+                "docs/guide.md | docs/guide.md\n"
+                "docs/assets/theme.css | docs/assets/theme.css\n", encoding="utf-8"
             )
             destination = root / ".build" / "mkdocs-src"
-            with patch.object(build_docs, "ROOT", root):
-                with patch.object(build_docs, "DEST", destination):
+            destination.mkdir(parents=True)
+            (destination / "stale.md").write_text("old content", encoding="utf-8")
+            with patch.object(build_docs, "ROOT", root), patch.object(build_docs, "DEST", destination):
+                build_docs.main()
+                self.assertEqual(
+                    {p.relative_to(destination).as_posix() for p in destination.rglob("*") if p.is_file()},
+                    {"index.md", "docs/guide.md", "docs/assets/theme.css"},
+                )
+                manifest.write_text(manifest.read_text() + "docs/unlisted.md | docs/unlisted.md\n")
+                with self.assertRaisesRegex(ValueError, "Non-public operational"):
                     build_docs.main()
-            self.assertEqual(
-                (destination / "index.md").read_text(encoding="utf-8"),
-                "# Welcome\n",
-            )
-            self.assertEqual(
-                (destination / "project-readme.md").read_text(encoding="utf-8"),
-                "# Full README\n",
-            )
-            self.assertFalse((destination / "README.md").exists())
-            self.assertTrue((destination / "docs" / "guide.md").exists())
-            self.assertEqual(
-                (destination / "docs" / "assets" / "theme.css").read_text(
-                    encoding="utf-8"
-                ),
-                css,
-            )
+                self.assertFalse(destination.exists())
+
+    def test_rejects_path_escape_and_internal_paths(self):
+        for name in ("../outside.md", "docs/AGENTS.md", "docs/agent-workflow.md"):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                build_docs.safe_relative(name)
 
     def test_native_colour_modes_do_not_conflict_with_legacy_css(self):
         root = Path(__file__).resolve().parents[2]

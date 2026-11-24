@@ -1,43 +1,85 @@
-"""Prepare the public MkDocs source tree from canonical repository files.
-
-The staging tree is disposable; scientific protocols remain in experiments/.
-No source files are rewritten, downloaded, or interpreted as code.
-"""
+"""Stage only explicitly authorized publication sources."""
 from __future__ import annotations
 
-from pathlib import Path
+import re
 import shutil
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / ".build" / "mkdocs-src"
+MANIFEST = "website/public-sources.txt"
+INTERNAL = re.compile(
+    r"\b(?:agents?|agenta|agentom|agentach|agentami|agentów|agentow|autopilot\w*|"
+    r"homeserver|andromeda|codex|chatgpt|github approval|exact.sha|commented|"
+    r"DoR|DoD)\b|AGENTS\.md|agent-workflow|AUTOPILOT_PLAN|"
+    r"docs/development/|PROJECT_STATE\.yaml",
+    re.IGNORECASE,
+)
+ALLOWED_SUFFIXES = {".md", ".css", ".tex"}
+
+
+def safe_relative(value: str) -> PurePosixPath:
+    path = PurePosixPath(value)
+    if (not value or path.is_absolute() or ".." in path.parts
+            or "\\" in value or path.as_posix() != value
+            or path.suffix not in ALLOWED_SUFFIXES):
+        raise ValueError(f"Invalid publication path: {value}")
+    if INTERNAL.search(value):
+        raise ValueError(f"Non-public publication path: {value}")
+    return path
+
+
+def publication_sources(root: Path) -> dict[str, str]:
+    """Return destination-to-source mapping, rejecting unsafe or duplicate paths."""
+    result = {}
+    for raw in (root / MANIFEST).read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        source, separator, destination = line.partition("|")
+        if not separator:
+            raise ValueError("Malformed publication manifest")
+        source_path = safe_relative(source.strip())
+        dest_path = safe_relative(destination.strip())
+        if not (source_path.parts[0] in {"docs", "experiments", "papers"}
+                or source_path.parts[:2] == ("website", "content")):
+            raise ValueError(f"Non-public source directory: {source_path}")
+        if (source_path.parts[:2] == ("docs", "development")
+                or str(source_path) in {"docs/website.md", "docs/teaching-standards.md",
+                                        "docs/project-state.md", "docs/research/reproducibility.md"}):
+            raise ValueError(f"Non-public source: {source_path}")
+        if str(dest_path) in result:
+            raise ValueError(f"Duplicate publication destination: {dest_path}")
+        result[str(dest_path)] = str(source_path)
+    if "index.md" not in result:
+        raise ValueError("Publication manifest has no homepage")
+    return result
+
+
+def checked_content(root: Path, name: str) -> str:
+    path = root / name
+    if not path.is_file() or any((root.joinpath(*PurePosixPath(name).parts[:i])).is_symlink()
+                                 for i in range(1, len(PurePosixPath(name).parts) + 1)):
+        raise ValueError(f"Invalid publication source: {name}")
+    content = path.read_text(encoding="utf-8")
+    if INTERNAL.search(content):
+        raise ValueError(f"Non-public operational content in {name}")
+    return content
 
 
 def main() -> None:
+    if DEST.is_symlink():
+        raise ValueError("Publication destination is a symlink")
     if DEST.exists():
         shutil.rmtree(DEST)
+    sources = publication_sources(ROOT)
+    contents = {dest: checked_content(ROOT, source) for dest, source in sources.items()}
     DEST.mkdir(parents=True)
-    sources: list[Path] = [
-        ROOT / "index.md",
-        ROOT / "README.md",
-        ROOT / "AUTOPILOT_PLAN.md",
-        ROOT / "PROJECT_STATE.yaml",
-        *sorted((ROOT / "docs").rglob("*.md")),
-        *sorted((ROOT / "docs").rglob("*.css")),
-        *sorted((ROOT / "experiments").rglob("*.md")),
-        *sorted((ROOT / "papers").glob("paper*/manuscript.tex")),
-    ]
-    for path in sources:
-        if not path.is_file() or path.is_symlink():
-            raise ValueError(f"invalid documentation source: {path}")
-        relative = path.relative_to(ROOT)
-        # MkDocs reserves README.md as an alternative index.md.
-        # Preserve the full README under a distinct published page name.
-        target_name = ("project-readme.md" if relative.as_posix() == "README.md"
-                       else relative.as_posix())
-        target = DEST / target_name
+    for dest, content in contents.items():
+        target = DEST / dest
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(path, target)
-    print(f"Staged {len(sources)} canonical public documentation files")
+        target.write_text(content, encoding="utf-8")
+    print(f"Staged {len(sources)} authorized publication files")
 
 
 if __name__ == "__main__":
