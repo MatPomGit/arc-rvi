@@ -189,6 +189,8 @@ product rule strengths and eight singleton consequents define a zero-order
 Sugeno model. At binary rule vertices the consequent is
 w*g + (1-w)*(1-c), where w = 0.8 for low urgency and 0.4 for high urgency.
 The exact interpolated score is (0.8-0.4*u)*g + (0.2+0.4*u)*(1-c).
+This specific Sugeno model is exactly a dynamic weighted sum; it does not
+establish additional fuzzy-model expressiveness or superiority.
 The fixed-weight ablation sets u = 0.5, retaining the same inputs and tie
 rules (higher gain, shorter distance, stable candidate order).
 No uncertainty or sensor calibration is claimed. Both methods skip zero-gain
@@ -196,8 +198,8 @@ candidates and retain the existing first-rejected-action failure semantics;
 they do not guarantee feasible or optimal routes.
 
 The opt-in is incompatible with fixture and sensor modes and rejects explicitly
-named holdout/confirmation suites and paths; this name check is not a sealed
-partition gate. Rule values are illustrative development choices, not tuned,
+named holdout/confirmation suite IDs, suite paths and scene paths, including
+resolved symlink targets; this name check is not a sealed partition gate. Rule values are illustrative development choices, not tuned,
 validated or locked. Reports label the mode exploratory and retain all trials.
 Smoke outcomes are not scientific evidence. See the existing P01 protocol for
 the independent-family pilot and confirmation requirements.

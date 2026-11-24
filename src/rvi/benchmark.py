@@ -38,9 +38,19 @@ def fuzzy_view_score(gain: float, cost: float, urgency: float, *,
 
 
 
+def _reject_held_out_path(path: Path) -> None:
+    """Reject named held-out paths, including resolved symlink targets."""
+    for candidate in (path, path.resolve(strict=True)):
+        if any("holdout" in part.lower() or "confirm" in part.lower()
+               for part in candidate.parts):
+            raise ValueError("exploratory mode refuses held-out paths")
+
+
 def run_benchmark(suite_path: Path, sensor_path: Path | None = None, *,
                   fuzzy_pilot: bool = False) -> dict:
     """Evaluate every method on a paired fixture or geometric simulation suite."""
+    if fuzzy_pilot or sensor_path is not None:
+        _reject_held_out_path(suite_path)
     suite, raw = read_json(suite_path)
     if fuzzy_pilot and (sensor_path is not None or suite.get("evidence_type") != "simulation"):
         raise ValueError("fuzzy pilot requires known-geometry simulation")
@@ -341,6 +351,8 @@ def _simulation_suite(path: Path, suite: dict, raw: bytes,
                 for part in relative.parts):
             raise ValueError("exploratory mode refuses held-out paths")
         scene_path = (path.parent / relative).resolve(strict=True)
+        if sensor is not None or fuzzy_pilot:
+            _reject_held_out_path(scene_path)
         scene, scene_raw = load_scene(scene_path)
         if scene_path in seen_paths or scene.identifier in seen_ids:
             raise ValueError("duplicate scene file or scene_id")

@@ -1,5 +1,6 @@
 """Independent arithmetic and failure accounting for paired fixture evaluation."""
 
+from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
@@ -8,7 +9,11 @@ import tomllib
 import unittest
 from unittest.mock import patch
 
-from rvi.benchmark import fuzzy_view_score, run_benchmark, software_provenance
+from rvi.adapters.simulator import CameraModel, MotionModel, PlanarScene, SurfacePatch
+from rvi.benchmark import (
+    evaluate_simulation_policy, fuzzy_view_score, run_benchmark, software_provenance,
+)
+from rvi.interfaces import CameraPose
 from rvi.models import Viewpoint
 from rvi.scenarios import load_scenario
 from rvi.viewpoints import evaluate_viewpoints
@@ -222,3 +227,74 @@ class FuzzyPilotTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             run_benchmark(ROOT / "simulation/suites/geometric_smoke.json",
                           Path("unused.json"), fuzzy_pilot=True)
+
+
+    @staticmethod
+    def ranking_scene():
+        return PlanarScene(
+            "ranking_fixture", CameraPose(0, 0, 0),
+            CameraModel(3.14, 0, 20, 1.5),
+            MotionModel(1, 1, 0, 0, 10), (),
+            tuple(SurfacePatch(str(i), 10, i, 0, 1) for i in range(4)),
+            (CameraPose(7, 0, 0), CameraPose(1, 0, 0)),
+        )
+
+    @staticmethod
+    def fixture_visibility(pose):
+        # Controlled analytic visibility; real simulator motion and accounting.
+        return ("0", "1", "2", "3") if pose.x == 7 else ("0", "1", "2")
+
+    def test_adaptive_policy_changes_first_action(self):
+        scene = self.ranking_scene()
+        with patch("rvi.benchmark.PlanarSimulator.visible_patches",
+                   side_effect=self.fixture_visibility):
+            adaptive = evaluate_simulation_policy(scene, "fuzzy_budget")
+            fixed = evaluate_simulation_policy(scene, "fixed_weight")
+        self.assertEqual(adaptive["observations"][0]["candidate_id"], "view_000001")
+        self.assertEqual(fixed["observations"][0]["candidate_id"], "view_000002")
+        self.assertEqual(adaptive["status"], "completed")
+        self.assertEqual(fixed["status"], "completed")
+
+    def test_zero_budget_and_rejected_action(self):
+        scene = self.ranking_scene()
+        scene = replace(scene, motion=replace(scene.motion, max_time_s=0))
+        for method in ("fuzzy_budget", "fixed_weight"):
+            with self.subTest(method=method), patch(
+                    "rvi.benchmark.PlanarSimulator.visible_patches",
+                    side_effect=self.fixture_visibility):
+                result = evaluate_simulation_policy(scene, method)
+                self.assertEqual(result["status"], "algorithm_failure")
+                self.assertEqual(result["failure_reason"], "time_budget_exceeded")
+                self.assertEqual(result["elapsed_time_s"], 0)
+                self.assertEqual(result["covered_patch_ids"], [])
+                self.assertEqual(len(result["observations"]), 1)
+                stationary = replace(scene, route=(scene.start,))
+                result = evaluate_simulation_policy(stationary, method)
+                self.assertEqual(result["elapsed_time_s"], 0)
+                self.assertEqual(result["covered_patch_ids"], ["0", "1", "2"])
+                self.assertEqual(result["failure_reason"], "unreachable_regions")
+
+    def test_reject_named_and_resolved_holdout_paths(self):
+        with tempfile.TemporaryDirectory(prefix="rvi-pilot-") as temp:
+            root = Path(temp)
+            held = root / "holdout"
+            held.mkdir()
+            suite = held / "suite.json"
+            suite.write_text("{}")
+            alias = root / "pilot.json"
+            alias.symlink_to(suite)
+            for path in (suite, alias):
+                with self.subTest(path=path), self.assertRaisesRegex(
+                        ValueError, "held-out paths"):
+                    run_benchmark(path, fuzzy_pilot=True)
+            scene = held / "scene.json"
+            scene.write_text("{}")
+            scene_alias = root / "scene.json"
+            scene_alias.symlink_to(scene)
+            pilot = root / "suite.json"
+            pilot.write_text(json.dumps({
+                "schema_version": "1.0.0", "suite_id": "pilot",
+                "evidence_type": "simulation", "scenes": ["scene.json"],
+            }))
+            with self.assertRaisesRegex(ValueError, "held-out paths"):
+                run_benchmark(pilot, fuzzy_pilot=True)
