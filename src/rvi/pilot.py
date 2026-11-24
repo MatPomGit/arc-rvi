@@ -514,6 +514,7 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
         "selection": "none_report_full_grid",
         "configurations": configurations,
         "mechanism_fixtures": fuzzy_tradeoff_fixtures(),
+        "tradeoff_population": exploratory_tradeoff_population(),
     }
 
 
@@ -547,3 +548,79 @@ def fuzzy_tradeoff_fixtures() -> dict:
         })
     return {"evidence_type": "fixture", "stage": "exploratory_not_confirmatory",
             "cases": cases}
+
+
+def exploratory_tradeoff_population() -> dict:
+    """Seeded, balanced stress-test families, separate from the factorial pilot."""
+    from dataclasses import asdict, replace
+
+    from .adapters.simulator import CameraModel, MotionModel, PlanarScene, SurfacePatch
+    from .benchmark import evaluate_simulation_policy
+    from .interfaces import CameraPose
+
+    seed = 20261124
+    rng = random.Random(seed)
+    families = []
+    # Cross geometry scale, capture overhead and relative movement budget.
+    # No selection or rejection based on a policy outcome.
+    for index in range(12):
+        scale = rng.uniform(0.85, 1.15)
+        area_a, area_b = rng.uniform(0.75, 1.25), rng.uniform(0.75, 1.25)
+        family = f"tradeoff_dev_{index + 1:03d}"
+        cases = []
+        for capture_ratio in (0.05, 0.2):
+            for budget_ratio in (1.0, 1.1, 1.5, 3.0):
+                for order in ("near_first", "far_first"):
+                    near = CameraPose(0, 0, 0)
+                    far = CameraPose(0, 2 * scale, 0)
+                    distance = 2 * scale
+                    scene = PlanarScene(
+                        f"{family}_{capture_ratio}_{budget_ratio}_{order}",
+                        near, CameraModel(math.pi / 2, 0.1, 5 * scale, math.pi / 2),
+                        MotionModel(1, 1, 0.1, capture_ratio * distance,
+                                    budget_ratio * distance),
+                        (),
+                        (SurfacePatch("a", 3 * scale, 0, math.pi, area_a),
+                         SurfacePatch("b", 3 * scale, 4 * scale, math.pi, area_b)),
+                        (near, far) if order == "near_first" else (far, near),
+                    )
+                    trials = [evaluate_simulation_policy(
+                        scene, method, trace_decisions=method in FUZZY_METHODS)
+                        for method in FACTORIAL_METHODS]
+                    cases.append({"capture_ratio": capture_ratio,
+                                  "budget_ratio": budget_ratio, "order": order,
+                                  "scene": asdict(scene), "trials": trials})
+        families.append({"family": family, "cases": cases})
+    cases = [case for family in families for case in family["cases"]]
+    trials = [row for case in cases for row in case["trials"]]
+    decisions = [d for row in trials for d in row.get("decisions", [])]
+    pairs = []
+    for case in cases:
+        by_method = {row["method"]: row for row in case["trials"]}
+        a, b = (by_method[m] for m in FUZZY_METHODS)
+        pairs.append({
+            "sequence_differs": [e["candidate_id"] for e in a["observations"]]
+            != [e["candidate_id"] for e in b["observations"]],
+            "adaptive_success": a["status"] == "completed",
+            "fixed_success": b["status"] == "completed",
+        })
+    return {
+        "schema_version": "1.0.0", "evidence_type": "simulation",
+        "stage": "exploratory_not_confirmatory", "partition": "development_stress",
+        "design": "scaled_two_view_tradeoff_v1", "seed": seed,
+        "independent_unit": "synthetic_geometry_family",
+        "family_count": len(families), "case_count": len(cases),
+        "trial_count": len(trials),
+        "decision_states": len(decisions),
+        "competitive_states": sum(len(d["candidates"]) > 1 for d in decisions),
+        "winner_disagreements": sum(d["adaptive_winner"] != d["fixed_winner"]
+                                    for d in decisions),
+        "sequence_disagreements": sum(p["sequence_differs"] for p in pairs),
+        "paired_success_counts": {
+            "both": sum(p["adaptive_success"] and p["fixed_success"] for p in pairs),
+            "adaptive_only": sum(p["adaptive_success"] and not p["fixed_success"] for p in pairs),
+            "fixed_only": sum(p["fixed_success"] and not p["adaptive_success"] for p in pairs),
+            "neither": sum(not p["adaptive_success"] and not p["fixed_success"] for p in pairs),
+        },
+        "families": families,
+    }
