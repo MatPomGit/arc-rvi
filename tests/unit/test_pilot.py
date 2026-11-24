@@ -152,3 +152,41 @@ class PilotAnalysisTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FactorialFuzzyPilotTests(unittest.TestCase):
+    def test_complete_matrix_and_no_holdout_access(self):
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_factorial_pilot
+        import shutil
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            shutil.rmtree(root / "scenes" / "holdout")
+            shutil.rmtree(root / "suites" / "holdout")
+            result = analyze_factorial_pilot(root / "manifest.json")
+            self.assertEqual(result["trial_count"], 180)
+            self.assertEqual(result["families"], 6)
+            self.assertEqual(len(result["method_cells"]), 30)
+            self.assertEqual(len(result["family_results"]), 30)
+            self.assertEqual(len(result["reports"]), 6)
+            self.assertEqual(len(result["contrasts"]), 4)
+            self.assertEqual(result["uncertainty"], "descriptive_only")
+            self.assertEqual(sum(len(r["trials"]) for r in result["reports"].values()), 180)
+
+    def test_missing_cell_rejected(self):
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_factorial_pilot
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            path = root / "manifest.json"
+            manifest = json.loads(path.read_text())
+            manifest["scenes"] = [row for row in manifest["scenes"]
+                                  if row["partition"] != "pilot"
+                                  or row["cell_id"] != "o_none__i_reference__c_none"]
+            path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, "incomplete factorial scene"):
+                analyze_factorial_pilot(path)

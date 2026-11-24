@@ -9,7 +9,7 @@ import math
 from pathlib import Path
 import random
 
-from .benchmark import run_benchmark
+from .benchmark import FUZZY_METHODS, run_benchmark
 from .viewpoints import METHODS
 
 CONDITIONS = ("nominal", "occluded")
@@ -221,3 +221,162 @@ def analyze_pilot(manifest_path: Path, reference: str = "fixed_order",
         "source": report["source"],
     }
     return summary
+
+
+FACTORIAL_CELLS = tuple(
+    f"o_{occlusion}__i_reference__c_{clutter}"
+    for occlusion in ("none", "moderate", "strong")
+    for clutter in ("none", "dense")
+)
+FACTORIAL_METHODS = METHODS + FUZZY_METHODS
+
+
+def analyze_factorial_pilot(manifest_path: Path) -> dict:
+    """Run only the reference-brightness pilot and retain all benchmark reports."""
+    raw = manifest_path.read_bytes()
+    manifest = json.loads(raw, object_pairs_hook=_strict_pairs)
+    if (manifest.get("design"), manifest.get("study_id"),
+            manifest.get("stage"), manifest.get("evidence_type")) != (
+            "sampled_factorial_v1", "01", "exploratory_not_confirmatory",
+            "simulation"):
+        raise ValueError("expected exploratory study01 factorial manifest")
+    root = manifest_path.resolve().parent
+    partitions = manifest["partitions"]
+    if set(partitions) != {"development", "pilot", "holdout"}:
+        raise ValueError("invalid partitions")
+    families = partitions["pilot"]
+    all_families = [f for split in partitions.values() for f in split]
+    if not families or len(set(all_families)) != len(all_families):
+        raise ValueError("duplicate or missing partition families")
+    repeats = manifest["replicates_per_family"]
+    if type(repeats) is not int or not 1 <= repeats <= 4:
+        raise ValueError("invalid replicate count")
+    expected = {(f, r, c) for f in families for r in range(repeats)
+                for c in FACTORIAL_CELLS}
+    records = {}
+    ids = set()
+    for row in manifest["scenes"]:
+        if row["partition"] != "pilot":
+            if row["family"] in families:
+                raise ValueError("pilot family appears outside pilot partition")
+            continue
+        if row["cell_id"] not in FACTORIAL_CELLS:
+            continue
+        key = (row["family"], row["replicate"], row["cell_id"])
+        if key not in expected or key in records or row["scene_id"] in ids:
+            raise ValueError("duplicate or unexpected factorial scene")
+        expected_factors = dict(zip(
+            ("occlusion", "illumination", "clutter"),
+            (row["cell_id"].split("__")[0][2:], "reference",
+             row["cell_id"].split("__")[2][2:])))
+        if row["factors"] != expected_factors:
+            raise ValueError("factor metadata mismatch")
+        path = _check_hash(root, row)
+        if not path.is_relative_to(root / "scenes" / "pilot"):
+            raise ValueError("scene outside pilot directory")
+        records[key] = row
+        ids.add(row["scene_id"])
+    if set(records) != expected:
+        raise ValueError("incomplete factorial scene matrix")
+    for f in families:
+        for r in range(repeats):
+            block = [records[f, r, c] for c in FACTORIAL_CELLS]
+            for field in ("pair_id", "paired_seed", "geometry_patch_count"):
+                if len({row[field] for row in block}) != 1:
+                    raise ValueError("inconsistent paired scene metadata")
+    reports = {}
+    observed = {}
+    for cell in FACTORIAL_CELLS:
+        suite_record = manifest["suites"]["pilot"][cell]
+        suite = _check_hash(root, suite_record)
+        if not suite.is_relative_to(root / "suites" / "pilot"):
+            raise ValueError("suite outside pilot directory")
+        # Validate suite membership before running any policy.
+        declared = {row["scene_id"]: row for key, row in records.items()
+                    if key[2] == cell}
+        suite_data = json.loads(suite.read_bytes(), object_pairs_hook=_strict_pairs)
+        paths = [(suite.parent / entry).resolve() for entry in suite_data["scenes"]]
+        expected_paths = {_file(root, row["path"]) for row in declared.values()}
+        if len(paths) != len(expected_paths) or set(paths) != expected_paths:
+            raise ValueError("suite membership differs from pilot manifest")
+        report = run_benchmark(suite, fuzzy_pilot=True)
+        if (report["suite_sha256"] != suite_record["sha256"]
+                or report["visibility_access"] != "known_geometry_oracle"
+                or report["stage"] != "exploratory_not_confirmatory"
+                or tuple(report["methods"]) != FACTORIAL_METHODS):
+            raise ValueError("incompatible factorial benchmark report")
+        if len(report["scenes"]) != len(declared) or {
+            row["scene_id"]: row["sha256"] for row in report["scenes"]
+        } != {k: v["sha256"] for k, v in declared.items()}:
+            raise ValueError("report scene provenance mismatch")
+        for row in report["trials"]:
+            meta = declared.get(row["scene_id"])
+            if meta is None or row["scene_sha256"] != meta["sha256"]:
+                raise ValueError("trial provenance mismatch")
+            key = (meta["family"], meta["replicate"], cell, row["method"])
+            if key in observed or row["method"] not in FACTORIAL_METHODS:
+                raise ValueError("duplicate or unexpected factorial trial")
+            coverage = _number(row["sampled_surface_coverage"], "coverage")
+            elapsed = _number(row["elapsed_time_s"], "elapsed")
+            distance = _number(row["travel_distance_m"], "distance")
+            status, reason = row["status"], row["failure_reason"]
+            if not 0 <= coverage <= 1 or min(elapsed, distance) < 0:
+                raise ValueError("invalid factorial trial metrics")
+            if not ((status == "completed" and reason is None
+                     and math.isclose(coverage, 1.0, abs_tol=1e-8))
+                    or (status == "algorithm_failure"
+                        and isinstance(reason, str) and reason)):
+                raise ValueError("invalid factorial trial outcome")
+            observed[key] = row
+        reports[cell] = report
+    if set(observed) != {(*key, m) for key in expected
+                         for m in FACTORIAL_METHODS}:
+        raise ValueError("incomplete factorial trial matrix")
+
+    def mean(values):
+        values = list(values)
+        return math.fsum(values) / len(values)
+
+    method_cells = []
+    family_results = []
+    for method in FACTORIAL_METHODS:
+        for cell in FACTORIAL_CELLS:
+            rows = [observed[f, r, cell, method] for f in families
+                    for r in range(repeats)]
+            method_cells.append({
+                "method": method, "cell": cell, "trials": len(rows),
+                "success_fraction": mean(row["status"] == "completed" for row in rows),
+                "mean_coverage": mean(row["sampled_surface_coverage"] for row in rows),
+                "mean_elapsed_time_s": mean(row["elapsed_time_s"] for row in rows),
+                "mean_distance_m": mean(row["travel_distance_m"] for row in rows),
+                "failures": dict(Counter(row["failure_reason"] for row in rows
+                                         if row["failure_reason"] is not None)),
+            })
+        for f in families:
+            successes = [mean(observed[f, r, cell, method]["status"] == "completed"
+                              for r in range(repeats)) for cell in FACTORIAL_CELLS]
+            challenge = mean(successes[1:])
+            family_results.append({"family": f, "method": method,
+                                   "nominal_success": successes[0],
+                                   "challenge_success": challenge,
+                                   "loss": successes[0] - challenge})
+    by_key = {(row["family"], row["method"]): row for row in family_results}
+    contrasts = []
+    for reference in FACTORIAL_METHODS:
+        if reference == "fuzzy_budget":
+            continue
+        effects = [by_key[f, reference]["loss"] - by_key[f, "fuzzy_budget"]["loss"]
+                   for f in families]
+        contrasts.append({"reference": reference, "candidate": "fuzzy_budget",
+                          "mean_loss_difference": mean(effects),
+                          "family_effects": dict(zip(families, effects))})
+    return {"schema_version": "1.0.0", "study_id": "01",
+            "stage": "exploratory_not_confirmatory", "partition": "pilot",
+            "evidence_type": "simulation", "visibility_access": "known_geometry_oracle",
+            "independent_unit": "geometry_family", "families": len(families),
+            "trial_count": len(observed), "illumination": "reference_only",
+            "effect_direction": "reference_loss_minus_candidate_loss",
+            "uncertainty": "descriptive_only",
+            "method_cells": method_cells, "family_results": family_results,
+            "contrasts": contrasts, "manifest_sha256": _sha(raw),
+            "reports": reports}

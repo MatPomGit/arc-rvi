@@ -60,3 +60,22 @@ family level and retains paired method/condition comparisons.
 
 See experiments/exp01_benchmark/protocol.md and
 experiments/analysis/README.md for the prospective scientific plan.
+
+
+## Six-cell fuzzy planning pilot
+
+Use the existing population generator and pilot CLI:
+
+    rvi population --spec simulation/conditions/study01_factorial_pilot.json --output-dir results/p01_factorial
+    rvi pilot --manifest results/p01_factorial/manifest.json --factorial-fuzzy --output results/p01_factorial_pilot.json
+
+This opt-in mode evaluates the six reference-brightness occlusion/clutter cells,
+five planning methods and six pilot families in the example (180 trials).
+It verifies pilot membership and hashes, retains complete reports, and refuses
+incomplete matrices rather than silently dropping failures. Holdout scene
+files are not read. All four fuzzy-versus-reference comparisons are descriptive
+and use reference loss minus candidate loss, unlike the legacy pilot sign.
+Absolute nominal and challenge success are reported per family. No confidence
+interval or confirmatory inference is produced by this mode. The existing
+reference/comparator and seed options apply to the legacy pilot only.
+The output is a simulation diagnostic, not physical or confirmatory evidence.
