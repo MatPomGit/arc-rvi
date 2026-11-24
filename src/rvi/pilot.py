@@ -29,10 +29,12 @@ def _file(root: Path, relative: str) -> Path:
     return path
 
 
-def _check_hash(root: Path, record: dict) -> Path:
+def _check_hash(root: Path, record: dict, *, directory: Path | None = None) -> Path:
     if not isinstance(record, dict) or not isinstance(record.get("sha256"), str):
         raise ValueError("invalid manifest hash record")
     path = _file(root, record.get("path"))
+    if directory is not None and not path.is_relative_to(directory):
+        raise ValueError("manifest path outside pilot directory")
     if _sha(path.read_bytes()) != record["sha256"]:
         raise ValueError("manifest SHA-256 mismatch")
     return path
@@ -231,10 +233,24 @@ FACTORIAL_CELLS = tuple(
 FACTORIAL_METHODS = METHODS + FUZZY_METHODS
 
 
+def _reject_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON: {value}")
+
+
+def _finite_float(value: str) -> float:
+    result = float(value)
+    if not math.isfinite(result):
+        _reject_constant(value)
+    return result
+
+
 def analyze_factorial_pilot(manifest_path: Path) -> dict:
     """Run only the reference-brightness pilot and retain all benchmark reports."""
     raw = manifest_path.read_bytes()
-    manifest = json.loads(raw, object_pairs_hook=_strict_pairs)
+    manifest = json.loads(raw, object_pairs_hook=_strict_pairs,
+                          parse_constant=_reject_constant, parse_float=_finite_float)
+    if not isinstance(manifest, dict):
+        raise ValueError("invalid factorial manifest")
     if (manifest.get("design"), manifest.get("study_id"),
             manifest.get("stage"), manifest.get("evidence_type")) != (
             "sampled_factorial_v1", "01", "exploratory_not_confirmatory",
@@ -242,7 +258,11 @@ def analyze_factorial_pilot(manifest_path: Path) -> dict:
         raise ValueError("expected exploratory study01 factorial manifest")
     root = manifest_path.resolve().parent
     partitions = manifest["partitions"]
-    if set(partitions) != {"development", "pilot", "holdout"}:
+    if (not isinstance(partitions, dict)
+            or set(partitions) != {"development", "pilot", "holdout"}
+            or any(not isinstance(split, list) or not split
+                   or any(not isinstance(f, str) or not f.strip() for f in split)
+                   for split in partitions.values())):
         raise ValueError("invalid partitions")
     families = partitions["pilot"]
     all_families = [f for split in partitions.values() for f in split]
@@ -255,7 +275,14 @@ def analyze_factorial_pilot(manifest_path: Path) -> dict:
                 for c in FACTORIAL_CELLS}
     records = {}
     ids = set()
+    if not isinstance(manifest.get("scenes"), list):
+        raise ValueError("invalid factorial scenes")
     for row in manifest["scenes"]:
+        if (not isinstance(row, dict)
+                or any(not isinstance(row.get(field), str) or not row[field].strip()
+                       for field in ("family", "scene_id", "pair_id", "cell_id", "partition"))
+                or type(row.get("replicate")) is not int):
+            raise ValueError("invalid factorial scene identifiers")
         if row["partition"] != "pilot":
             if row["family"] in families:
                 raise ValueError("pilot family appears outside pilot partition")
@@ -271,9 +298,7 @@ def analyze_factorial_pilot(manifest_path: Path) -> dict:
              row["cell_id"].split("__")[2][2:])))
         if row["factors"] != expected_factors:
             raise ValueError("factor metadata mismatch")
-        path = _check_hash(root, row)
-        if not path.is_relative_to(root / "scenes" / "pilot"):
-            raise ValueError("scene outside pilot directory")
+        _check_hash(root, row, directory=root / "scenes" / "pilot")
         records[key] = row
         ids.add(row["scene_id"])
     if set(records) != expected:
@@ -288,13 +313,12 @@ def analyze_factorial_pilot(manifest_path: Path) -> dict:
     observed = {}
     for cell in FACTORIAL_CELLS:
         suite_record = manifest["suites"]["pilot"][cell]
-        suite = _check_hash(root, suite_record)
-        if not suite.is_relative_to(root / "suites" / "pilot"):
-            raise ValueError("suite outside pilot directory")
+        suite = _check_hash(root, suite_record, directory=root / "suites" / "pilot")
         # Validate suite membership before running any policy.
         declared = {row["scene_id"]: row for key, row in records.items()
                     if key[2] == cell}
-        suite_data = json.loads(suite.read_bytes(), object_pairs_hook=_strict_pairs)
+        suite_data = json.loads(suite.read_bytes(), object_pairs_hook=_strict_pairs,
+                                parse_constant=_reject_constant, parse_float=_finite_float)
         paths = [(suite.parent / entry).resolve() for entry in suite_data["scenes"]]
         expected_paths = {_file(root, row["path"]) for row in declared.values()}
         if len(paths) != len(expected_paths) or set(paths) != expected_paths:
