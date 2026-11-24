@@ -291,8 +291,22 @@ class FuzzyMechanismTests(unittest.TestCase):
         self.assertEqual(fixed["selected"], "view_000001")
         self.assertEqual(adaptive["candidates"], fixed["candidates"])
         self.assertEqual(trials["fuzzy_budget"]["status"], "completed")
-        self.assertEqual(trials["fixed_weight"]["failure_reason"],
-                         "time_budget_exceeded")
+        self.assertEqual(trials["fixed_weight"]["status"], "completed")
+        self.assertAlmostEqual(trials["fixed_weight"]["elapsed_time_s"], 2.4)
+        self.assertAlmostEqual(trials["fuzzy_budget"]["elapsed_time_s"], 2.2)
+
+    def test_balanced_tradeoff_population(self):
+        from rvi.pilot import exploratory_tradeoff_population
+        result = exploratory_tradeoff_population()
+        self.assertEqual(result["family_count"], 12)
+        self.assertEqual(result["case_count"], 192)
+        self.assertEqual(result["trial_count"], 960)
+        self.assertEqual(sum(result["paired_success_counts"].values()), 192)
+        self.assertGreater(result["sequence_disagreements"], 0)
+        for family in result["families"]:
+            self.assertEqual(len(family["cases"]), 16)
+            self.assertEqual(len({(c["capture_ratio"], c["budget_ratio"], c["order"])
+                                  for c in family["cases"]}), 16)
 
     def test_sugeno_sensitivity_and_crossing(self):
         from rvi.benchmark import fuzzy_view_score
