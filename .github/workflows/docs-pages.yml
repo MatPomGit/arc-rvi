@@ -69,6 +69,8 @@ jobs:
           python -m rvi.cli decision-population --output results/p01-pilot/decision-population.json
           python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/decision-population.json").read_text()); assert r["summary"]["instances"] == 192 and r["family_count"] == 8 and r["policy_evaluations"] == 0 and r["selection"] == "none_retain_all"'
           python scripts/verify_decision_population.py results/p01-pilot/decision-population.json
+          python -m rvi.cli decision-compare --population results/p01-pilot/decision-population.json --output results/p01-pilot/decision-comparison.json
+          python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/decision-comparison.json").read_text()); assert r["trial_count"] == 1728 and r["summary"]["feasible_instances"] == 84 and len(r["methods"]) == 9; s=r["summary"]["methods"]; assert [s[m]["success"] for m in ("feasible_greedy","gain_per_cost","receding_horizon_2","receding_horizon_3")] == [17,70,41,56]'
           date -u +%FT%TZ > results/p01-pilot/end-utc.txt
       - name: Exclude non-pilot scene and suite files
         if: always()
