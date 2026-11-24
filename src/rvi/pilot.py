@@ -404,3 +404,103 @@ def analyze_factorial_pilot(manifest_path: Path) -> dict:
             "method_cells": method_cells, "family_results": family_results,
             "contrasts": contrasts, "manifest_sha256": _sha(raw),
             "reports": reports}
+
+
+CALIBRATION_BUDGETS_S = (2, 3, 4, 6, 8, 16)
+CALIBRATION_FOV_DEG = (30, 45, 60, 90)
+
+
+def calibrate_factorial_pilot(manifest_path: Path) -> dict:
+    """Sweep common settings on verified pilot scenes, never select a winner."""
+    from dataclasses import replace
+
+    from .adapters.simulator import load_scene
+    from .benchmark import evaluate_simulation_policy
+
+    raw = manifest_path.read_bytes()
+    baseline = analyze_factorial_pilot(manifest_path)
+    if _sha(raw) != baseline["manifest_sha256"]:
+        raise ValueError("manifest changed during calibration")
+    manifest = json.loads(raw, object_pairs_hook=_strict_pairs)
+    root = manifest_path.resolve().parent
+    scenes = []
+    for record in manifest["scenes"]:
+        if (record["partition"] != "pilot"
+                or record["cell_id"] not in FACTORIAL_CELLS):
+            continue
+        path = _check_hash(root, record, directory=root / "scenes" / "pilot")
+        scene, scene_raw = load_scene(path)
+        if _sha(scene_raw) != record["sha256"]:
+            raise ValueError("scene changed during calibration")
+        scenes.append((record, scene))
+    if len(scenes) * len(FACTORIAL_METHODS) != baseline["trial_count"]:
+        raise ValueError("incomplete calibration matrix")
+
+    configurations = []
+    for budget in CALIBRATION_BUDGETS_S:
+        for fov in CALIBRATION_FOV_DEG:
+            trials = []
+            for meta, original in scenes:
+                scene = replace(
+                    original,
+                    camera=replace(original.camera,
+                                   horizontal_fov_rad=math.radians(fov)),
+                    motion=replace(original.motion, max_time_s=float(budget)),
+                )
+                for method in FACTORIAL_METHODS:
+                    trial = evaluate_simulation_policy(scene, method)
+                    trials.append(dict(trial, family=meta["family"],
+                                       replicate=meta["replicate"],
+                                       cell=meta["cell_id"],
+                                       scene_sha256=meta["sha256"]))
+            success = lambda row: row["status"] == "completed"
+            fraction = lambda rows: sum(map(success, rows)) / len(rows)
+            cells = []
+            for method in FACTORIAL_METHODS:
+                for cell in FACTORIAL_CELLS:
+                    rows = [r for r in trials if r["method"] == method
+                            and r["cell"] == cell]
+                    cells.append({"method": method, "cell": cell,
+                                  "trials": len(rows),
+                                  "success_fraction": fraction(rows)})
+            families = {}
+            for family in manifest["partitions"]["pilot"]:
+                families[family] = fraction(
+                    [r for r in trials if r["family"] == family])
+            paired = {}
+            for row in trials:
+                if row["method"] in FUZZY_METHODS:
+                    paired.setdefault(row["scene_id"], {})[row["method"]] = row
+            divergent = sum(
+                [e["candidate_id"] for e in pair["fuzzy_budget"]["observations"]]
+                != [e["candidate_id"] for e in pair["fixed_weight"]["observations"]]
+                for pair in paired.values()
+            )
+            configurations.append({
+                "budget_s": budget, "fov_deg": fov,
+                "trial_count": len(trials), "success_fraction": fraction(trials),
+                "nominal_success": fraction([r for r in trials
+                                             if r["cell"] == FACTORIAL_CELLS[0]]),
+                "challenge_success": fraction([r for r in trials
+                                               if r["cell"] != FACTORIAL_CELLS[0]]),
+                "family_success": families,
+                "family_success_sd": math.sqrt(math.fsum(
+                    (v - math.fsum(families.values()) / len(families)) ** 2
+                    for v in families.values()) / len(families)),
+                "method_cells": cells,
+                "failures": dict(Counter(r["failure_reason"] for r in trials
+                                         if r["failure_reason"] is not None)),
+                "fuzzy_sequence_disagreements": divergent,
+                "fuzzy_pairs": len(paired), "trials": trials,
+            })
+    return {
+        "schema_version": "1.0.0", "study_id": "01",
+        "stage": "exploratory_not_confirmatory", "partition": "pilot",
+        "evidence_type": "simulation", "visibility_access": "known_geometry_oracle",
+        "independent_unit": "geometry_family",
+        "manifest_sha256": baseline["manifest_sha256"],
+        "families": baseline["families"],
+        "trial_count": sum(c["trial_count"] for c in configurations),
+        "selection": "none_report_full_grid",
+        "configurations": configurations,
+    }
