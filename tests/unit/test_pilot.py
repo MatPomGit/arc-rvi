@@ -254,6 +254,28 @@ class FactorialFuzzyPilotTests(unittest.TestCase):
                         with self.assertRaisesRegex(ValueError, "outside pilot"):
                             analyze_factorial_pilot(path)
 
+    def test_calibration_grid_without_holdout(self):
+        from rvi.population import generate_population
+        from rvi.pilot import calibrate_factorial_pilot
+        import shutil
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            for partition in ("development", "holdout"):
+                shutil.rmtree(root / "scenes" / partition)
+                shutil.rmtree(root / "suites" / partition)
+            result = calibrate_factorial_pilot(root / "manifest.json")
+            self.assertEqual(result["trial_count"], 4320)
+            self.assertEqual(len(result["configurations"]), 24)
+            self.assertEqual(result["selection"], "none_report_full_grid")
+            for config in result["configurations"]:
+                self.assertEqual(config["trial_count"], 180)
+                self.assertEqual(config["fuzzy_pairs"], 36)
+                self.assertEqual(len(config["method_cells"]), 30)
+                self.assertEqual(len(config["family_success"]), 6)
+            self.assertEqual(result["configurations"][-1]["success_fraction"], 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()
