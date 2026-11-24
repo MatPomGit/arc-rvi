@@ -79,3 +79,19 @@ Absolute nominal and challenge success are reported per family. No confidence
 interval or confirmatory inference is produced by this mode. The existing
 reference/comparator and seed options apply to the legacy pilot only.
 The output is a simulation diagnostic, not physical or confirmatory evidence.
+
+## Exploratory difficulty calibration
+
+    rvi pilot --manifest results/p01_factorial/manifest.json --calibrate-factorial --output results/p01_calibration.json
+
+The fixed grid crosses time budgets 2, 3, 4, 6, 8 and 16 seconds with
+horizontal camera fields of view 30, 45, 60 and 90 degrees. All five methods
+receive identical scene transformations. Only verified reference-brightness
+pilot scenes are loaded; original scene files and holdout inputs are unchanged.
+The output retains all trials, method-cell success, pooled nominal and challenge
+success, family success dispersion, failure counts and paired fuzzy route
+sequence disagreements. The original 16 s / 90 degree condition is a control.
+This grid is exploratory and does not select a winner or freeze a parameter.
+Inspect floor and ceiling effects and family heterogeneity independently of
+which method benefits. Do not use the grid to choose a favorable contrast.
+The current model remains a known-geometry planar simulation.
