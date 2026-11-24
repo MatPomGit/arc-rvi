@@ -8,7 +8,7 @@ import tomllib
 import unittest
 from unittest.mock import patch
 
-from rvi.benchmark import run_benchmark, software_provenance
+from rvi.benchmark import fuzzy_view_score, run_benchmark, software_provenance
 from rvi.models import Viewpoint
 from rvi.scenarios import load_scenario
 from rvi.viewpoints import evaluate_viewpoints
@@ -179,3 +179,46 @@ class PartialPlanningTests(unittest.TestCase):
                        {"max_travel_distance_m": float("inf")}):
             with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
                 evaluate_viewpoints([], ["front"], **kwargs)
+
+
+class FuzzyPilotTests(unittest.TestCase):
+    def test_rule_corners_and_fixed_weight(self):
+        self.assertAlmostEqual(fuzzy_view_score(1, 1, 0), 0.8)
+        self.assertAlmostEqual(fuzzy_view_score(1, 1, 1), 0.4)
+        self.assertAlmostEqual(fuzzy_view_score(0, 0, 1), 0.6)
+        for urgency in (0, 0.5, 1):
+            self.assertAlmostEqual(
+                fuzzy_view_score(1, 1, urgency, adaptive=False), 0.6)
+
+    def test_rule_interpolation(self):
+        self.assertAlmostEqual(fuzzy_view_score(0.8, 0.6, 0.25), 0.68)
+
+    def test_invalid_inputs(self):
+        for value in (True, -0.1, 1.1, float("nan"), float("inf"), "0.5"):
+            for i in range(3):
+                args = [0.5, 0.5, 0.5]
+                args[i] = value
+                with self.subTest(value=value, i=i), self.assertRaises(ValueError):
+                    fuzzy_view_score(*args)
+
+    def test_opt_in_keeps_original_trials(self):
+        suite = ROOT / "simulation/suites/geometric_smoke.json"
+        old = run_benchmark(suite)
+        new = run_benchmark(suite, fuzzy_pilot=True)
+        self.assertEqual(new["methods"], old["methods"] + ["fuzzy_budget", "fixed_weight"])
+        self.assertEqual(new["stage"], "exploratory_not_confirmatory")
+        self.assertEqual(new["visibility_access"], "known_geometry_oracle")
+        baseline = [row for row in new["trials"] if row["method"] in old["methods"]]
+        strip = lambda row: {k: v for k, v in row.items() if k != "trial_id"}
+        self.assertEqual(list(map(strip, baseline)), list(map(strip, old["trials"])))
+        for method in ("fuzzy_budget", "fixed_weight"):
+            self.assertEqual(sum(row["method"] == method for row in new["trials"]),
+                             len(old["scenes"]))
+        self.assertEqual(new, run_benchmark(suite, fuzzy_pilot=True))
+
+    def test_reject_fixture_and_sensor_modes(self):
+        with self.assertRaises(ValueError):
+            run_benchmark(SUITE, fuzzy_pilot=True)
+        with self.assertRaises(ValueError):
+            run_benchmark(ROOT / "simulation/suites/geometric_smoke.json",
+                          Path("unused.json"), fuzzy_pilot=True)

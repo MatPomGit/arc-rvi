@@ -38,6 +38,8 @@ def make_parser() -> argparse.ArgumentParser:
     benchmark.add_argument("--suite", required=True, type=Path)
     benchmark.add_argument("--sensor", type=Path,
                            help="exploratory simulation only; hides geometry truth from policies")
+    benchmark.add_argument("--fuzzy-pilot", action="store_true",
+                           help="add developmental fuzzy and fixed-weight planners")
     benchmark.add_argument("--output", required=True, type=Path)
     simulate = sub.add_parser("simulate", help="evaluate a route in a planar geometric scene")
     simulate.add_argument("--scene", required=True, type=Path)
@@ -225,7 +227,8 @@ def main(argv: list[str] | None = None) -> int:
             elif arguments.command == "power-mc":
                 payload = analyze_cluster_monte_carlo(arguments.spec)
             else:
-                payload = (run_benchmark(arguments.suite, arguments.sensor)
+                payload = (run_benchmark(arguments.suite, arguments.sensor,
+                                         fuzzy_pilot=arguments.fuzzy_pilot)
                            if arguments.command == "benchmark"
                            else run_simulation(arguments.scene))
             serialized = json.dumps(payload, ensure_ascii=False, sort_keys=True,

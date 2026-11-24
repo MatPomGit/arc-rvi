@@ -168,3 +168,36 @@ The [seeded condition generator](conditions.md) now emits exploratory geometry
 families, matched nominal/occluded conditions and disjoint development/pilot/holdout
 suites with SHA-256 manifests. It provides no inferential analysis or frozen
 confirmation dataset.
+
+
+## Developmental fuzzy planning pilot (known geometry)
+
+Opt in using the existing benchmark command:
+
+```bash
+rvi benchmark --suite simulation/suites/geometric_smoke.json --fuzzy-pilot --output results/fuzzy_smoke.json
+```
+
+The three historical methods are unchanged. Two additional methods share the
+same candidate geometry, simulator, action rejection and executed-coverage
+evaluator. The fuzzy score uses normalized marginal patch-count gain g,
+predicted translation + rotation + capture time divided by mission budget
+(cost c, clipped to one), and elapsed budget fraction u. All are in [0, 1].
+Zero budget uses urgency one and cost zero for a zero-duration action, one
+otherwise. Complementary linear memberships (low = 1-x, high = x) with
+product rule strengths and eight singleton consequents define a zero-order
+Sugeno model. At binary rule vertices the consequent is
+w*g + (1-w)*(1-c), where w = 0.8 for low urgency and 0.4 for high urgency.
+The exact interpolated score is (0.8-0.4*u)*g + (0.2+0.4*u)*(1-c).
+The fixed-weight ablation sets u = 0.5, retaining the same inputs and tie
+rules (higher gain, shorter distance, stable candidate order).
+No uncertainty or sensor calibration is claimed. Both methods skip zero-gain
+candidates and retain the existing first-rejected-action failure semantics;
+they do not guarantee feasible or optimal routes.
+
+The opt-in is incompatible with fixture and sensor modes and rejects explicitly
+named holdout/confirmation suites and paths; this name check is not a sealed
+partition gate. Rule values are illustrative development choices, not tuned,
+validated or locked. Reports label the mode exploratory and retain all trials.
+Smoke outcomes are not scientific evidence. See the existing P01 protocol for
+the independent-family pilot and confirmation requirements.

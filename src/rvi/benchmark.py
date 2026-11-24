@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 import json
-from math import atan2, cos, fsum, hypot, sin
+from math import atan2, cos, fsum, hypot, isfinite, sin
 from pathlib import Path
 
 from .adapters.simulator import PlanarScene, PlanarSimulator, exact_fields, load_scene
@@ -16,17 +16,40 @@ from .scenarios import load_scenario, name, number, read_json
 from .viewpoints import METHODS, evaluate_viewpoints
 
 SENSOR_METHODS = ("fixed_order", "nearest_pose", "sensor_parallax")
+FUZZY_METHODS = ("fuzzy_budget", "fixed_weight")
 
 
-def run_benchmark(suite_path: Path, sensor_path: Path | None = None) -> dict:
+def fuzzy_view_score(gain: float, cost: float, urgency: float, *,
+                     adaptive: bool = True) -> float:
+    """Zero-order Sugeno score with complementary linear memberships.
+
+    Inputs are normalized to [0, 1]. Eight product rules interpolate
+    singleton consequents; the fixed-weight ablation holds urgency at 0.5.
+    The rule parameters are developmental, not fitted or frozen.
+    """
+    for value in (gain, cost, urgency):
+        if (type(value) not in (int, float) or not 0 <= value <= 1):
+            raise ValueError("fuzzy inputs must be finite numbers in [0, 1]")
+    urgency = urgency if adaptive else 0.5
+    # Closed form of the eight-rule Sugeno weighted average:
+    # gain weight is 0.8 when ample, 0.4 when tight.
+    weight = 0.8 - 0.4 * urgency
+    return weight * gain + (1.0 - weight) * (1.0 - cost)
+
+
+
+def run_benchmark(suite_path: Path, sensor_path: Path | None = None, *,
+                  fuzzy_pilot: bool = False) -> dict:
     """Evaluate every method on a paired fixture or geometric simulation suite."""
     suite, raw = read_json(suite_path)
+    if fuzzy_pilot and (sensor_path is not None or suite.get("evidence_type") != "simulation"):
+        raise ValueError("fuzzy pilot requires known-geometry simulation")
     if suite.get("evidence_type") == "simulation":
         if sensor_path is not None:
             sensor, sensor_raw = load_sensor_config(sensor_path)
             return _simulation_suite(suite_path, suite, raw, sensor,
                                      digest(sensor_raw))
-        return _simulation_suite(suite_path, suite, raw)
+        return _simulation_suite(suite_path, suite, raw, fuzzy_pilot=fuzzy_pilot)
     if sensor_path is not None:
         raise ValueError("sensor observations require a simulation suite")
     required = {"schema_version", "suite_id", "evidence_type", "scenarios",
@@ -106,7 +129,7 @@ def run_benchmark(suite_path: Path, sensor_path: Path | None = None) -> dict:
 
 def evaluate_simulation_policy(scene: PlanarScene, method: str) -> dict:
     """Compare known-geometry policies; score only observations actually acquired."""
-    if method not in METHODS:
+    if method not in METHODS + FUZZY_METHODS:
         raise ValueError("unknown planning method")
     simulator = PlanarSimulator(scene)
     candidates = [(f"view_{index:06d}", pose, set(simulator.visible_patches(pose)))
@@ -125,6 +148,21 @@ def evaluate_simulation_policy(scene: PlanarScene, method: str) -> dict:
         def rank(entry):
             gain = len(entry[2] - covered)
             distance = hypot(entry[1].x - simulator.pose.x, entry[1].y - simulator.pose.y)
+            if method in FUZZY_METHODS:
+                motion = scene.motion
+                duration = (distance / motion.linear_speed_m_s
+                            + angular_distance(entry[1].yaw_rad, simulator.pose.yaw_rad)
+                            / motion.angular_speed_rad_s
+                            + motion.capture_duration_s)
+                if not isfinite(duration):
+                    raise ValueError("non-finite predicted action duration")
+                budget = motion.max_time_s
+                cost = min(1.0, duration / budget) if budget else float(duration > 0)
+                urgency = min(1.0, simulator.elapsed_time_s / budget) if budget else 1.0
+                score = fuzzy_view_score(
+                    gain / len(required - covered), cost, urgency,
+                    adaptive=method == "fuzzy_budget")
+                return score, gain, -distance
             return (gain,) if method == "greedy_coverage" else (gain / (1 + distance), gain, -distance)
 
         # Stable candidate IDs preserve the same tie rule and pairing across methods.
@@ -279,27 +317,29 @@ def evaluate_observation_policy(
 
 def _simulation_suite(path: Path, suite: dict, raw: bytes,
                       sensor: SensorConfig | None = None,
-                      sensor_sha256: str | None = None) -> dict:
+                      sensor_sha256: str | None = None, *,
+                      fuzzy_pilot: bool = False) -> dict:
     exact_fields(suite, {"schema_version", "suite_id", "evidence_type", "scenes"}, "simulation suite")
     if suite["schema_version"] != "1.0.0":
         raise ValueError("only version 1.0.0 simulation suites are supported")
     suite_id = name(suite["suite_id"], "suite_id")
-    if sensor is not None and ("holdout" in suite_id.lower()
+    if (sensor is not None or fuzzy_pilot) and ("holdout" in suite_id.lower()
                                or "confirm" in suite_id.lower()):
-        raise ValueError("observation-only exploratory mode refuses held-out suites")
+        raise ValueError("exploratory mode refuses held-out suites")
     if not isinstance(suite["scenes"], list) or not suite["scenes"]:
         raise ValueError("scenes must be a nonempty list of relative paths")
     trials, manifests = [], []
-    methods = SENSOR_METHODS if sensor is not None else METHODS
+    methods = SENSOR_METHODS if sensor is not None else (
+        METHODS + FUZZY_METHODS if fuzzy_pilot else METHODS)
     seen_paths, seen_ids = set(), set()
     for entry in suite["scenes"]:
         relative = Path(name(entry, "scene path"))
         if relative.is_absolute():
             raise ValueError("scene paths must be relative to the suite")
-        if sensor is not None and any(
+        if (sensor is not None or fuzzy_pilot) and any(
                 "holdout" in part.lower() or "confirm" in part.lower()
                 for part in relative.parts):
-            raise ValueError("observation-only exploratory mode refuses held-out paths")
+            raise ValueError("exploratory mode refuses held-out paths")
         scene_path = (path.parent / relative).resolve(strict=True)
         scene, scene_raw = load_scene(scene_path)
         if scene_path in seen_paths or scene.identifier in seen_ids:
@@ -345,6 +385,10 @@ def _simulation_suite(path: Path, suite: dict, raw: bytes,
         "scenes": manifests, "methods": list(methods),
         "trials": trials, "summary": summary,
     }
+    if fuzzy_pilot:
+        result.update(stage="exploratory_not_confirmatory",
+                      fuzzy_rule_version="budget_sugeno_v1",
+                      sampling_unit="declared_scene_not_validated_population")
     if sensor is not None:
         result.update(
             stage="exploratory_not_confirmatory",
