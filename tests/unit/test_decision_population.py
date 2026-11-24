@@ -1,6 +1,8 @@
 """Structural population contracts, without evaluating any policy."""
 
 from collections import Counter
+from dataclasses import replace
+from hashlib import sha256
 import json
 from pathlib import Path
 import tempfile
@@ -54,7 +56,18 @@ class DecisionPopulationTests(unittest.TestCase):
                 path = Path(root) / "scene.json"
                 path.write_text(json.dumps(case["scene"]))
                 loaded, _ = load_scene(path)
-                self.assertEqual(loaded.identifier, case["scene"]["scene_id"])
+                ratio = case["budget_ratio"]
+                expected = replace(
+                    scene,
+                    identifier=f"{scene.identifier}_r{round(ratio * 100):03d}",
+                    motion=replace(scene.motion, max_time_s=(
+                        result["reference_oracle"]["full_min_time_s"] * ratio)),
+                )
+                self.assertEqual(loaded, expected)
+                canonical = json.dumps(case["scene"], sort_keys=True,
+                                       separators=(",", ":"), allow_nan=False)
+                self.assertEqual(sha256(canonical.encode("utf-8")).hexdigest(),
+                                 case["scene_sha256"])
 
     def test_retain_structurally_impossible_base(self):
         scene = next(s for _, n, f, o, s in base_scenes()
