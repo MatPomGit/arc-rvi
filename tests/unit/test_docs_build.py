@@ -45,6 +45,41 @@ class DocsBuildTests(unittest.TestCase):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 build_docs.safe_relative(name)
 
+    def test_polish_operational_terms_rejected_in_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            page = root / "guide.md"
+            for term in ("agent", "agentem", "agenci", "agencie", "agentów",
+                         "agentkami", "AGENTEM", "agents"):
+                with self.subTest(term=term):
+                    page.write_text(f"Współpraca z {term}.", encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "Non-public operational"):
+                        build_docs.checked_content(root, "guide.md")
+            page.write_text("Research on reagents and reagent mixtures.", encoding="utf-8")
+            self.assertIn("reagents", build_docs.checked_content(root, "guide.md"))
+
+    def test_public_reproducibility_uses_editorial_source(self):
+        root = Path(__file__).resolve().parents[2]
+        sources = build_docs.publication_sources(root)
+        self.assertEqual(sources["docs/reproducibility.md"],
+                         "website/content/docs/reproducibility.md")
+        public = build_docs.checked_content(root, sources["docs/reproducibility.md"])
+        self.assertIn("## Research artifact retention", public)
+        self.assertIn("SHA-256", public)
+        self.assertIn("negative findings", public)
+        for marker in ("external analysis environment or chat", "research/evidence/",
+                       "CI/review/merge", "relevant Issue"):
+            self.assertNotIn(marker, public)
+        with tempfile.TemporaryDirectory() as directory:
+            fake = Path(directory)
+            manifest = fake / build_docs.MANIFEST
+            manifest.parent.mkdir()
+            manifest.write_text("website/content/index.md | index.md\n"
+                                "docs/reproducibility.md | docs/reproducibility.md\n",
+                                encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Non-public source"):
+                build_docs.publication_sources(fake)
+
     def test_native_colour_modes_do_not_conflict_with_legacy_css(self):
         root = Path(__file__).resolve().parents[2]
         configuration = (root / "mkdocs.yml").read_text(encoding="utf-8")

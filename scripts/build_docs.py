@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / ".build" / "mkdocs-src"
 MANIFEST = "website/public-sources.txt"
 INTERNAL = re.compile(
-    r"\b(?:agents?|agenta|agentom|agentowi|agentach|agentami|agentów|agentow|agentow\w*|agentow[ąęó]|autopilot\w*|"
+    r"\b(?:agent(?:s|a|em|owi|om|ach|ami|ów|ow\w*)?|agenci|agencie|agentk(?:a|i|ę|ą|o|om|ami|ach)|agentek|autopilot\w*|"
     r"homeserver|andromeda|codex|chatgpt|github approval|exact.sha|commented|"
     r"DoR|DoD)\b|AGENTS\.md|agent-workflow|AUTOPILOT_PLAN|"
     r"docs/development/|PROJECT_STATE\.yaml",
@@ -46,7 +46,8 @@ def publication_sources(root: Path) -> dict[str, str]:
             raise ValueError(f"Non-public source directory: {source_path}")
         if (source_path.parts[:2] == ("docs", "development")
                 or str(source_path) in {"docs/website.md", "docs/teaching-standards.md",
-                                        "docs/project-state.md", "docs/research/reproducibility.md"}):
+                                        "docs/project-state.md", "docs/research/reproducibility.md",
+                                        "docs/reproducibility.md"}):
             raise ValueError(f"Non-public source: {source_path}")
         if str(dest_path) in result:
             raise ValueError(f"Duplicate publication destination: {dest_path}")

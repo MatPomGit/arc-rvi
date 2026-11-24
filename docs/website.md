@@ -25,7 +25,9 @@ python -m mkdocs serve
 
 The staging source and built site live under ignored `.build/`. Do not edit
 generated files. The public homepage, software overview, scientific status
-and public evidence guidance live in `website/content/`. The manifest
+and public evidence guidance live in `website/content/`. Both public
+reproducibility pages use editorial versions that retain scientific provenance
+and archival requirements without internal operational procedures. The manifest
 selects these pages and individually approved canonical scientific documents,
 stylesheets and manuscript scaffolds. It never recursively imports repository
 directories. The internal documentation audit remains separate from publication.
@@ -34,6 +36,9 @@ A rejected source must be reviewed and corrected before publishing. The
 rendered HTML, search index and text assets undergo an additional boundary
 check before upload. These lexical checks complement editorial review;
 they are not a proof of confidentiality or a classifier of all operational prose.
+The rendered audit preserves inline text adjacency and separates structural
+blocks, references and search records. Test common Polish inflections and
+formatted terms as negative cases.
 
 ## Agent documentation contract and PR gates
 

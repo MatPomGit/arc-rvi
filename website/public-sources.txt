@@ -38,7 +38,7 @@ docs/glossary.md | docs/glossary.md
 docs/literature.md | docs/literature.md
 docs/prior-art-critical.md | docs/prior-art-critical.md
 docs/methodology.md | docs/methodology.md
-docs/reproducibility.md | docs/reproducibility.md
+website/content/docs/reproducibility.md | docs/reproducibility.md
 docs/safety.md | docs/safety.md
 docs/assets/theme.css | docs/assets/theme.css
 papers/paper01/manuscript.tex | papers/paper01/manuscript.tex
