@@ -448,7 +448,8 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
                     motion=replace(original.motion, max_time_s=float(budget)),
                 )
                 for method in FACTORIAL_METHODS:
-                    trial = evaluate_simulation_policy(scene, method)
+                    trial = evaluate_simulation_policy(
+                        scene, method, trace_decisions=method in FUZZY_METHODS)
                     trials.append(dict(trial, family=meta["family"],
                                        replicate=meta["replicate"],
                                        cell=meta["cell_id"],
@@ -476,7 +477,16 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
                 != [e["candidate_id"] for e in pair["fixed_weight"]["observations"]]
                 for pair in paired.values()
             )
+            decisions = [d for row in trials for d in row.get("decisions", [])]
             configurations.append({
+                "decision_diagnostics": {
+                    "states": len(decisions),
+                    "competitive_states": sum(len(d["candidates"]) > 1 for d in decisions),
+                    "winner_disagreements": sum(d["adaptive_winner"] != d["fixed_winner"]
+                                                for d in decisions),
+                    "rank_disagreements": sum(d["adaptive_rank"] != d["fixed_rank"]
+                                              for d in decisions),
+                },
                 "budget_s": budget, "fov_deg": fov,
                 "trial_count": len(trials), "success_fraction": fraction(trials),
                 "nominal_success": fraction([r for r in trials
@@ -504,3 +514,35 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
         "selection": "none_report_full_grid",
         "configurations": configurations,
     }
+
+
+def fuzzy_tradeoff_fixtures() -> dict:
+    """Hand-constructed mechanism checks, not sampled population evidence."""
+    from dataclasses import asdict, replace
+
+    from .adapters.simulator import CameraModel, MotionModel, PlanarScene, SurfacePatch
+    from .benchmark import evaluate_simulation_policy
+    from .interfaces import CameraPose
+
+    # Near view sees a only; distant view sees both a and b.
+    # At budget 2.5 s, delta gain=0.5, delta cost=0.8.
+    scene = PlanarScene(
+        "fuzzy_tradeoff_fixture",
+        CameraPose(0, 0, 0),
+        CameraModel(math.pi / 2, 0.1, 5, math.pi / 2),
+        MotionModel(1, 1, 0.1, 0.2, 2.5),
+        (),
+        (SurfacePatch("a", 3, 0, math.pi, 1),
+         SurfacePatch("b", 3, 4, math.pi, 1)),
+        (CameraPose(0, 0, 0), CameraPose(0, 2, 0)),
+    )
+    cases = []
+    for budget in (2.5, 5.0, 16.0):
+        case = replace(scene, motion=replace(scene.motion, max_time_s=budget))
+        cases.append({
+            "budget_s": budget, "scene": asdict(case),
+            "trials": [evaluate_simulation_policy(case, method, trace_decisions=True)
+                       for method in FACTORIAL_METHODS],
+        })
+    return {"evidence_type": "fixture", "stage": "exploratory_not_confirmatory",
+            "cases": cases}
