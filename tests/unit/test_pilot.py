@@ -275,6 +275,15 @@ class FactorialFuzzyPilotTests(unittest.TestCase):
                 self.assertEqual(len(config["method_cells"]), 30)
                 self.assertEqual(len(config["family_success"]), 6)
             self.assertEqual(result["configurations"][-1]["success_fraction"], 1.0)
+            oracle = result["oracle_summary"]
+            self.assertEqual(oracle["instances"], 864)
+            self.assertEqual(oracle["feasible_instances"], 547)
+            self.assertEqual(oracle["all"]["avoidable"], 188)
+            self.assertEqual(oracle["all"]["infeasible"], 1585)
+            self.assertEqual(oracle["methods"]["fixed_weight"]["avoidable"], 2)
+            self.assertEqual(oracle["methods"]["fuzzy_budget"]["avoidable"], 2)
+            self.assertEqual(result["tradeoff_population"]["oracle_summary"]
+                             ["all"]["avoidable"], 0)
 
 
 class FuzzyMechanismTests(unittest.TestCase):
@@ -301,6 +310,10 @@ class FuzzyMechanismTests(unittest.TestCase):
         self.assertEqual(result["family_count"], 12)
         self.assertEqual(result["case_count"], 192)
         self.assertEqual(result["trial_count"], 960)
+        self.assertEqual(result["oracle_summary"]["feasible_instances"], 120)
+        self.assertEqual(result["oracle_summary"]["all"]["infeasible"], 360)
+        self.assertAlmostEqual(result["oracle_summary"]["methods"]
+                               ["fixed_weight"]["mean_coverage_gap"], 0.0)
         self.assertEqual(sum(result["paired_success_counts"].values()), 192)
         self.assertGreater(result["sequence_disagreements"], 0)
         for family in result["families"]:

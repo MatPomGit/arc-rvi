@@ -436,10 +436,13 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
     if len(scenes) * len(FACTORIAL_METHODS) != baseline["trial_count"]:
         raise ValueError("incomplete calibration matrix")
 
+    from .oracle import diagnose_trials, summarize_oracle
+
     configurations = []
     for budget in CALIBRATION_BUDGETS_S:
         for fov in CALIBRATION_FOV_DEG:
             trials = []
+            oracle_cases = []
             for meta, original in scenes:
                 scene = replace(
                     original,
@@ -454,6 +457,10 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
                                        replicate=meta["replicate"],
                                        cell=meta["cell_id"],
                                        scene_sha256=meta["sha256"]))
+                oracle_cases.append(dict(
+                    diagnose_trials(scene, trials[-len(FACTORIAL_METHODS):]),
+                    family=meta["family"], replicate=meta["replicate"],
+                    cell=meta["cell_id"], scene_sha256=meta["sha256"]))
             success = lambda row: row["status"] == "completed"
             fraction = lambda rows: sum(map(success, rows)) / len(rows)
             cells = []
@@ -488,6 +495,8 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
                                               for d in decisions),
                 },
                 "budget_s": budget, "fov_deg": fov,
+                "oracle_cases": oracle_cases,
+                "oracle_summary": summarize_oracle(oracle_cases),
                 "trial_count": len(trials), "success_fraction": fraction(trials),
                 "nominal_success": fraction([r for r in trials
                                              if r["cell"] == FACTORIAL_CELLS[0]]),
@@ -513,6 +522,8 @@ def calibrate_factorial_pilot(manifest_path: Path) -> dict:
         "trial_count": sum(c["trial_count"] for c in configurations),
         "selection": "none_report_full_grid",
         "configurations": configurations,
+        "oracle_summary": summarize_oracle([case for c in configurations
+                                            for case in c["oracle_cases"]]),
         "mechanism_fixtures": fuzzy_tradeoff_fixtures(),
         "tradeoff_population": exploratory_tradeoff_population(),
     }
@@ -558,6 +569,8 @@ def exploratory_tradeoff_population() -> dict:
     from .benchmark import evaluate_simulation_policy
     from .interfaces import CameraPose
 
+    from .oracle import diagnose_trials, summarize_oracle
+
     seed = 20261124
     rng = random.Random(seed)
     families = []
@@ -589,7 +602,8 @@ def exploratory_tradeoff_population() -> dict:
                         for method in FACTORIAL_METHODS]
                     cases.append({"capture_ratio": capture_ratio,
                                   "budget_ratio": budget_ratio, "order": order,
-                                  "scene": asdict(scene), "trials": trials})
+                                  "scene": asdict(scene), "trials": trials,
+                                  "oracle": diagnose_trials(scene, trials)})
         families.append({"family": family, "cases": cases})
     cases = [case for family in families for case in family["cases"]]
     trials = [row for case in cases for row in case["trials"]]
@@ -623,4 +637,5 @@ def exploratory_tradeoff_population() -> dict:
             "neither": sum(not p["adaptive_success"] and not p["fixed_success"] for p in pairs),
         },
         "families": families,
+        "oracle_summary": summarize_oracle([c["oracle"] for c in cases]),
     }

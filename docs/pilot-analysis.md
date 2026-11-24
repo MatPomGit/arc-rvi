@@ -133,3 +133,34 @@ their predicted elapsed times are 2.2 and 2.4 seconds. A decision reversal
 does not itself imply a success difference. Report paired success categories,
 including fixed-only and neither, and all raw traces. The stress population
 does not change any existing partition or confirmation protocol.
+
+
+## Exact small-instance oracle and avoidable failure audit
+
+The calibration output includes an evaluator-only exhaustive oracle over all
+feasible ordered subsets of at most nine distinct candidate indices. It
+uses the same simulator acquisition semantics, including collision, time
+budget, rotation and capture cost. Zero-gain transit views are permitted.
+A full route witnesses feasibility; absence of any full route proves
+infeasibility only within this finite model, not for arbitrary continuous
+paths, revisits, real robots or additional candidate poses.
+
+Each case retains the optimal area coverage, elapsed time, ordered view
+indices (one-based), minimum full-completion time, and method-level coverage
+gaps. Each method failure is classified as avoidable (a full feasible
+sequence exists) or infeasible (none exists). AFR divides avoidable failures
+by feasible instances; the share among failures has a different denominator.
+Empty denominators are null. Factorial and stress populations remain separate.
+
+Retrospective independent audit of artifact 14929105602 (CI 45412033425,
+merge checkout 62004a720b76a167a3c48fc76b5aafadce10b584) replayed 7567
+recorded acquisition events and checked 97 archive checksums. Of 864
+factorial instances, 547 were feasible. Across 4320 policy trials, 188
+failures were avoidable and 1585 were infeasible. Both fuzzy and fixed
+weight had two avoidable failures, belonging to the same geometry family.
+Of 192 stress instances, 120 were feasible; all five policies completed
+those 120 and failed the remaining 72. The stress population therefore
+has zero avoidable completion failures but nonzero partial-coverage gaps
+for some policies. These are exploratory finite-model diagnostics, not
+confirmatory inference. No protocol, policy parameters or holdout is changed.
+The new implementation requires fresh CI and separate technical review.
