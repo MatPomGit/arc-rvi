@@ -137,7 +137,8 @@ def run_benchmark(suite_path: Path, sensor_path: Path | None = None, *,
             "trials": trials, "summary": summary}
 
 
-def evaluate_simulation_policy(scene: PlanarScene, method: str) -> dict:
+def evaluate_simulation_policy(scene: PlanarScene, method: str, *,
+                               trace_decisions: bool = False) -> dict:
     """Compare known-geometry policies; score only observations actually acquired."""
     if method not in METHODS + FUZZY_METHODS:
         raise ValueError("unknown planning method")
@@ -147,6 +148,7 @@ def evaluate_simulation_policy(scene: PlanarScene, method: str) -> dict:
     required = {patch.identifier for patch in scene.patches}
     covered = set()
     events = []
+    decisions = []
     reason = None
     while covered != required:
         eligible = candidates if method == "fixed_order" else [
@@ -177,6 +179,51 @@ def evaluate_simulation_policy(scene: PlanarScene, method: str) -> dict:
 
         # Stable candidate IDs preserve the same tie rule and pairing across methods.
         chosen = eligible[0] if method == "fixed_order" else max(eligible, key=rank)
+        if trace_decisions and method in FUZZY_METHODS:
+            motion = scene.motion
+            budget = motion.max_time_s
+            urgency = min(1.0, simulator.elapsed_time_s / budget) if budget else 1.0
+            scores = []
+            for entry in eligible:
+                gain = len(entry[2] - covered)
+                distance = hypot(entry[1].x - simulator.pose.x,
+                                 entry[1].y - simulator.pose.y)
+                duration = (distance / motion.linear_speed_m_s
+                            + angular_distance(entry[1].yaw_rad, simulator.pose.yaw_rad)
+                            / motion.angular_speed_rad_s
+                            + motion.capture_duration_s)
+                cost = min(1.0, duration / budget) if budget else float(duration > 0)
+                g = gain / len(required - covered)
+                scores.append({
+                    "candidate_id": entry[0], "gain": g, "gain_count": gain,
+                    "distance_m": distance, "duration_s": duration, "cost": cost,
+                    "adaptive_score": fuzzy_view_score(g, cost, urgency),
+                    "fixed_score": fuzzy_view_score(g, cost, urgency, adaptive=False),
+                    "score_u0": fuzzy_view_score(g, cost, 0),
+                    "score_u1": fuzzy_view_score(g, cost, 1),
+                    "score_derivative": 0.4 * (1 - cost - g),
+                })
+            def ranking(field):
+                return sorted(scores, key=lambda r: (
+                    r[field], r["gain_count"], -r["distance_m"]), reverse=True)
+
+            adaptive = ranking("adaptive_score")
+            fixed = ranking("fixed_score")
+            actual = adaptive if method == "fuzzy_budget" else fixed
+            if actual[0]["candidate_id"] != chosen[0]:
+                raise RuntimeError("trace disagrees with policy selection")
+            decisions.append({
+                "urgency": urgency, "remaining_budget_s": budget - simulator.elapsed_time_s,
+                "selected": chosen[0], "adaptive_winner": adaptive[0]["candidate_id"],
+                "fixed_winner": fixed[0]["candidate_id"],
+                "adaptive_rank": [r["candidate_id"] for r in adaptive],
+                "fixed_rank": [r["candidate_id"] for r in fixed],
+                "adaptive_margin": adaptive[0]["adaptive_score"] - adaptive[1]["adaptive_score"]
+                if len(adaptive) > 1 else None,
+                "fixed_margin": fixed[0]["fixed_score"] - fixed[1]["fixed_score"]
+                if len(fixed) > 1 else None,
+                "candidates": scores,
+            })
         identifier, pose, _ = chosen
         observation = simulator.acquire(pose)
         events.append({"candidate_id": identifier, "requested_pose": asdict(pose),
@@ -188,13 +235,16 @@ def evaluate_simulation_policy(scene: PlanarScene, method: str) -> dict:
             break
     total = fsum(patch.area_m2 for patch in scene.patches)
     area = fsum(patch.area_m2 for patch in scene.patches if patch.identifier in covered)
-    return {"method": method, "scene_id": scene.identifier, "evidence_type": "simulation",
+    result = {"method": method, "scene_id": scene.identifier, "evidence_type": "simulation",
             "status": "completed" if reason is None else "algorithm_failure",
             "failure_reason": reason, "observations": events,
             "covered_patch_ids": sorted(covered), "missing_patch_ids": sorted(required - covered),
             "sampled_surface_coverage": area / total,
             "travel_distance_m": simulator.travel_distance_m,
             "elapsed_time_s": simulator.elapsed_time_s}
+    if trace_decisions:
+        result["decisions"] = decisions
+    return result
 
 
 
