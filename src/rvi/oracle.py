@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import copy
-from math import fsum, isclose
+from math import fsum, isclose, isfinite
 
 from .adapters.simulator import PlanarScene, PlanarSimulator
 
@@ -71,6 +71,9 @@ def exact_oracle(scene: PlanarScene) -> dict:
 def diagnose_trials(scene: PlanarScene, trials: list[dict]) -> dict:
     """Compare each completed or failed policy with the exact evaluator."""
     result = exact_oracle(scene)
+    areas = {p.identifier: p.area_m2 for p in scene.patches}
+    required = set(areas)
+    total = fsum(areas.values())
     rows = []
     methods = set()
     for trial in trials:
@@ -82,7 +85,20 @@ def diagnose_trials(scene: PlanarScene, trials: list[dict]) -> dict:
         if status not in ("completed", "algorithm_failure"):
             raise ValueError("unsupported oracle trial status")
         success = status == "completed"
-        gap = result["optimal_coverage"] - trial["sampled_surface_coverage"]
+        ids = trial["covered_patch_ids"]
+        covered = set(ids)
+        missing = trial["missing_patch_ids"]
+        coverage = trial["sampled_surface_coverage"]
+        if (len(covered) != len(ids) or not covered <= required
+                or len(set(missing)) != len(missing)
+                or set(missing) != required - covered
+                or success != (covered == required)
+                or success != (trial["failure_reason"] is None)
+                or not isfinite(coverage) or not 0 <= coverage <= 1
+                or not isclose(coverage, fsum(areas[k] for k in covered) / total,
+                               rel_tol=0, abs_tol=1e-12)):
+            raise ValueError("inconsistent policy coverage or status")
+        gap = result["optimal_coverage"] - coverage
         if ((success and not result["full_feasible"])
                 or (gap < 0 and not isclose(gap, 0, abs_tol=1e-12))):
             raise ValueError("policy outcome exceeds exact oracle")

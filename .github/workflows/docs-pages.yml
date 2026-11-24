@@ -68,6 +68,7 @@ jobs:
           python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/calibration.json").read_text()); assert r["trial_count"] == 4320 and len(r["configurations"]) == 24'
           python -m rvi.cli decision-population --output results/p01-pilot/decision-population.json
           python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/decision-population.json").read_text()); assert r["summary"]["instances"] == 192 and r["family_count"] == 8 and r["policy_evaluations"] == 0 and r["selection"] == "none_retain_all"'
+          python scripts/verify_decision_population.py results/p01-pilot/decision-population.json
           date -u +%FT%TZ > results/p01-pilot/end-utc.txt
       - name: Exclude non-pilot scene and suite files
         if: always()
@@ -76,6 +77,7 @@ jobs:
           if [ -d results/p01-pilot ]; then
             cd results/p01-pilot
             find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS
+            sha256sum --check SHA256SUMS
           fi
       - name: Upload exploratory research artifacts
         if: always()
