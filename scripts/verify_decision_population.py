@@ -1,14 +1,18 @@
 """Audit the serialized development population before publishing evidence."""
 
+from dataclasses import replace
 import json
 import sys
 from hashlib import sha256
-from math import fsum, isclose
+from math import fsum, isclose, isfinite
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from rvi.adapters.simulator import PlanarSimulator, load_scene
-from rvi.decision_population import BUDGET_RATIOS, _summarize, base_scenes
+from rvi.decision_population import (
+    BUDGET_RATIOS, FAMILY_COUNT, REFERENCE_BUDGET_S, SEED,
+    _summarize, base_scenes, structural_features,
+)
 from rvi.oracle import exact_oracle
 
 
@@ -31,6 +35,18 @@ def replay(scene, route):
 
 
 def verify(report):
+    metadata = {
+        "schema_version": "1.0.0", "study_id": "01",
+        "evidence_type": "simulation", "stage": "exploratory_not_confirmatory",
+        "partition": "development_decision", "independent_unit": "geometry_family",
+        "design": "radial_decision_structure_v1", "seed": SEED,
+        "family_count": FAMILY_COUNT, "selection": "none_retain_all",
+        "policy_evaluations": 0, "reference_budget_s": REFERENCE_BUDGET_S,
+        "scene_hash_encoding": "sorted compact UTF-8 JSON",
+    }
+    for key, value in metadata.items():
+        require(type(report[key]) is type(value) and report[key] == value,
+                f"metadata mismatch: {key}")
     expected = {s.identifier: (f, n, v, o, s)
                 for f, n, v, o, s in base_scenes()}
     rows = report["rows"]
@@ -47,7 +63,15 @@ def verify(report):
             require((row["family"], row["candidate_count"], row["fov_deg"],
                      row["central_obstacle"]) == (family, n, fov, obstacle),
                     "factor mismatch")
+            features = structural_features(base)
+            require(row["features"] == features, "structural features mismatch")
             reference = exact_oracle(base)
+            minimum = reference["full_min_time_s"]
+            budget = (minimum if minimum is not None else len(base.route) *
+                      (features["max_accepted_edge_time_s"] or 1.0))
+            reference_type = ("minimum_full_time" if minimum is not None else
+                              "fallback_max_edge_times_candidate_count")
+            require(isfinite(budget) and budget > 0, "invalid derived budget")
             require(row["reference_oracle"] == reference,
                     "reference oracle mismatch")
             require([c["budget_ratio"] for c in row["cases"]]
@@ -60,16 +84,19 @@ def verify(report):
                         == case["scene_sha256"], "scene hash mismatch")
                 path.write_text(raw, encoding="utf-8")
                 scene, _ = load_scene(path)
-                require(scene.identifier == (
-                    f"{identifier}_r{round(case['budget_ratio'] * 100):03d}"),
-                    "case identifier mismatch")
-                require((scene.start, scene.camera, scene.obstacles,
-                         scene.patches, scene.route) ==
-                        (base.start, base.camera, base.obstacles,
-                         base.patches, base.route), "case geometry mismatch")
-                require(isclose(scene.motion.max_time_s,
-                                case["budget_reference_s"] * case["budget_ratio"],
-                                rel_tol=0, abs_tol=1e-12), "budget mismatch")
+                require(payload.get("schema_version") == "1.0.0"
+                        and payload.get("evidence_type") == "simulation",
+                        "scene provenance mismatch")
+                ratio = case["budget_ratio"]
+                require(case["budget_reference_type"] == reference_type
+                        and type(case["budget_reference_s"]) in (int, float)
+                        and case["budget_reference_s"] == budget,
+                        "budget reference mismatch")
+                expected_scene = replace(
+                    base, identifier=f"{identifier}_r{round(ratio * 100):03d}",
+                    motion=replace(base.motion, max_time_s=budget * ratio),
+                )
+                require(scene == expected_scene, "complete scene mismatch")
                 result = case["oracle"]
                 require(result == exact_oracle(scene), "oracle result mismatch")
                 covered, elapsed = replay(scene, result["optimal_route"])
