@@ -52,6 +52,7 @@ Przed zadaniem przeczytaj ten plik i właściwe lokalne `AGENTS.md`, jeśli istn
 - W tekstach użytkowych nie stosuj pauzy U+2014 i półpauzy U+2013; zachowaj obcy cytat i identyfikator bez fałszowania.
 - Przed tworzeniem materiałów dydaktycznych przeczytaj [standard dydaktyczny](docs/teaching-standards.md); nie generuj ich bez zadania.
 - Aktualizuj istniejące dokumenty zamiast tworzyć równoległe; nie modyfikuj wygenerowanego `.build/`.
+- Witryna publiczna ma własny katalog `website/` i jawny manifest `website/public-sources.txt`. Publikuj wyłącznie treści naukowe; nie publikuj instrukcji agentów, automatyzacji ani procedur wewnętrznych. Przed publikacją sprawdź także `python scripts/audit_public_site.py`.
 
 ### GitHub, walidacja i integracja
 - Wybieraj zadania z aktualnych Issues; sprawdzaj rozpoczęte PR i zależności. M0-M5 P03: [Issue #6](https://github.com/MatPomGit/arc-rvi/issues/6).

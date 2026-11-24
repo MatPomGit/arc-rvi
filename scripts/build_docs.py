@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / ".build" / "mkdocs-src"
 MANIFEST = "website/public-sources.txt"
 INTERNAL = re.compile(
-    r"\b(?:agents?|agenta|agentom|agentach|agentami|agentów|agentow|autopilot\w*|"
+    r"\b(?:agents?|agenta|agentom|agentowi|agentach|agentami|agentów|agentow|agentow\w*|agentow[ąęó]|autopilot\w*|"
     r"homeserver|andromeda|codex|chatgpt|github approval|exact.sha|commented|"
     r"DoR|DoD)\b|AGENTS\.md|agent-workflow|AUTOPILOT_PLAN|"
     r"docs/development/|PROJECT_STATE\.yaml",
@@ -68,7 +68,7 @@ def checked_content(root: Path, name: str) -> str:
 
 
 def main() -> None:
-    if DEST.is_symlink():
+    if DEST.is_symlink() or DEST.parent.is_symlink():
         raise ValueError("Publication destination is a symlink")
     if DEST.exists():
         shutil.rmtree(DEST)

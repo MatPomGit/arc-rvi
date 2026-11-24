@@ -61,5 +61,5 @@ nav:
       - Reproducibility: docs/reproducibility.md
       - Safety: docs/safety.md
   - Project:
-      - Repository README: project-readme.md
+      - Research software: project-readme.md
       - Current state: docs/project-state.md

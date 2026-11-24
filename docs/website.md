@@ -19,6 +19,7 @@ python scripts/validate.py
 python scripts/check_agent_docs.py
 python scripts/build_docs.py
 python -m mkdocs build --strict
+python scripts/audit_public_site.py
 python -m mkdocs serve
 ```
 
@@ -29,13 +30,16 @@ selects these pages and individually approved canonical scientific documents,
 stylesheets and manuscript scaffolds. It never recursively imports repository
 directories. The internal documentation audit remains separate from publication.
 The staging check rejects internal operational terminology and unsafe paths.
-A rejected source must be reviewed and corrected before publishing.
+A rejected source must be reviewed and corrected before publishing. The
+rendered HTML, search index and text assets undergo an additional boundary
+check before upload. These lexical checks complement editorial review;
+they are not a proof of confidentiality or a classifier of all operational prose.
 
 ## Agent documentation contract and PR gates
 
 `scripts/check_agent_docs.py` is a no-network, standard-library check.
 It verifies the two main `AGENTS.md` sections, eight workflow steps,
-required safety/testing instructions, local links in all published Markdown
+required safety/testing instructions, local links in canonical repository Markdown
 sources, explicit publication-manifest navigation coverage and agreement between
 `pyproject.toml` and `PROJECT_STATE.yaml`. Negative regressions live in
 `tests/unit/test_agent_docs.py`; workflow release gates are covered by
@@ -48,7 +52,7 @@ both jobs to pass and is restricted to `main`.
 The existing [GitHub workflow](https://github.com/MatPomGit/arc-rvi/blob/main/.github/workflows/docs-pages.yml)
 runs offline regression on Python 3.11, 3.12 and 3.13. After tests,
 its `Validate and build documentation` job runs this audit and MkDocs
-strict. Require those four check names on the final PR SHA; do not use
+strict and the rendered publication audit. Require those four check names on the final PR SHA; do not use
 an earlier green run. A skipped publishing job on PRs is expected.
 
 GitHub settings are **not** configured by this Markdown or the workflow.

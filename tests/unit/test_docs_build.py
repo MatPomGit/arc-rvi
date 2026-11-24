@@ -54,7 +54,7 @@ class DocsBuildTests(unittest.TestCase):
         self.assertIn("  color_mode: auto", configuration)
         self.assertIn("  user_color_mode_toggle: true", configuration)
         self.assertIn("  nav_style: dark", configuration)
-        self.assertIn("      - Repository README: project-readme.md", configuration)
+        self.assertIn("      - Research software: project-readme.md", configuration)
         self.assertNotIn("prefers-color-scheme", css)
         self.assertNotIn(".navbar-default", css)
         self.assertIn("var(--bs-body-color)", css)
@@ -72,6 +72,8 @@ class DocsBuildTests(unittest.TestCase):
         )
         self.assertEqual(workflow.count(release_gate), 3)
         self.assertIn("needs: [tests, build]", workflow)
+        self.assertLess(workflow.index("python scripts/audit_public_site.py"),
+                        workflow.index("actions/upload-pages-artifact@"))
         self.assertEqual(workflow.count("uses: actions/checkout@"), 3)
         self.assertEqual(workflow.count("persist-credentials: false"), 3)
         pilot = workflow.split("\n  pilot:\n", 1)[1].split("\n  build:\n", 1)[0]
