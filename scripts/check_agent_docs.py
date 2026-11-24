@@ -12,6 +12,11 @@ import tomllib
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+try:
+    from scripts.build_docs import publication_sources, checked_content
+except ModuleNotFoundError:
+    from build_docs import publication_sources, checked_content
+
 ROOT = Path(__file__).resolve().parents[1]
 
 DOCUMENTS = (
@@ -59,7 +64,7 @@ VERSION = re.compile(r"(?m)^  software_version:\s*['\"]?([^'\"\s#]+)")
 
 
 def published_markdown(root: Path) -> tuple[str, ...]:
-    """Discover Markdown sources published by the canonical documentation build."""
+    """Discover canonical repository Markdown for the internal audit."""
     paths = (
         path
         for directory in ("docs", "experiments")
@@ -70,23 +75,29 @@ def published_markdown(root: Path) -> tuple[str, ...]:
 
 
 def inspect_nav_coverage(root: Path) -> list[str]:
-    """Require a navigation entry for every public docs/ page."""
+    """Require navigation to match the explicit publication manifest."""
     config = root / "mkdocs.yml"
     if not config.is_file():
         return ["mkdocs.yml: missing site configuration"]
     content = "\n" + config.read_text(encoding="utf-8")
     if "\nnav:\n" not in content:
         return ["mkdocs.yml: missing nav section"]
-    nav = content.split("\nnav:\n", 1)[1]
     entries = set(re.findall(
-        r"(?m)^[ \t]*-[ \t]+(?:[^:\n]+:[ \t]*)?(docs/[^\s#]+\.md)[ \t]*(?:#.*)?$",
-        nav,
+        r"(?m)^[ \t]*-[ \t]+(?:[^:\n]+:[ \t]*)?([^\s#]+\.md)[ \t]*(?:#.*)?$",
+        content.split("\nnav:\n", 1)[1],
     ))
-    return [
-        f"mkdocs.yml: public page missing from nav: {name}"
-        for name in published_markdown(root)
-        if name.startswith("docs/") and name not in entries
-    ]
+    try:
+        sources = publication_sources(root)
+        for source in sources.values():
+            checked_content(root, source)
+    except (OSError, ValueError) as error:
+        return [f"Publication manifest: {error}"]
+    expected = {name for name in sources if name.endswith(".md")}
+    return [f"mkdocs.yml: public page missing from nav: {name}"
+            for name in sorted(expected - entries)] + [
+        f"mkdocs.yml: navigation target not authorized: {name}"
+        for name in sorted(entries - expected)]
+
 
 
 def inspect_agent_structure(content: str) -> list[str]:

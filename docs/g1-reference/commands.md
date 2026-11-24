@@ -46,7 +46,7 @@ The arm example says action execution needs FSM ID 500, 501 or 801 (with additio
 
 ## Environment commands present in source
 
-The historical setup notes mention `vcs import` for ROS 2 Humble, `rosdep install`, `colcon build --symlink-install --executor sequential`, `ros2 run demo_nodes_cpp talker`, `ros2 run demo_nodes_py listener`, Git clones of `unitree_mujoco`, `unitree_sdk2`, `unitree_sdk2_python`, and `unitree_ros2`, followed by package installation. Their dependency graph, license versions and system package commands were **not verified**. The SDK note mixes `ros-foxy-*` packages with Humble. Do not reuse its `sudo`, `curl` or cleanup commands in an agent without a fresh review.
+The historical setup notes mention `vcs import` for ROS 2 Humble, `rosdep install`, `colcon build --symlink-install --executor sequential`, `ros2 run demo_nodes_cpp talker`, `ros2 run demo_nodes_py listener`, Git clones of `unitree_mujoco`, `unitree_sdk2`, `unitree_sdk2_python`, and `unitree_ros2`, followed by package installation. Their dependency graph, license versions and system package commands were **not verified**. The SDK note mixes `ros-foxy-*` packages with Humble. Do not reuse its `sudo`, `curl` or cleanup commands without a fresh safety and compatibility review.
 
 ## Historical locomotion bridge
 

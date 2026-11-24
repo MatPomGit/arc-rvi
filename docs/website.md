@@ -1,7 +1,9 @@
 # Building and publishing this documentation
 
-The canonical files remain in the repository root, `docs/`, and
-`experiments/`. MkDocs never maintains duplicate research protocols.
+The dedicated `website/` directory contains publication-specific content and
+`public-sources.txt`, the explicit source-to-destination manifest. Canonical
+scientific protocols remain in `docs/` and `experiments/`; only individually
+listed sources may enter the disposable MkDocs tree.
 
 ## Local verification
 
@@ -17,26 +19,33 @@ python scripts/validate.py
 python scripts/check_agent_docs.py
 python scripts/build_docs.py
 python -m mkdocs build --strict
+python scripts/audit_public_site.py
 python -m mkdocs serve
 ```
 
 The staging source and built site live under ignored `.build/`. Do not edit
-generated files. The root `AGENTS.md` is a repository instruction, not a
-published MkDocs page; its local Markdown links are checked against the
-repository filesystem. The site homepage comes from the concise root
-`index.md`; the complete root `README.md` is staged as
-`project-readme.md` and appears separately in the Project navigation.
-This distinct name avoids MkDocs treating README as a second homepage.
-Experiment pages come from their canonical protocols.
-Manuscript `.tex` files are provided as source links, not interpreted as
-finished publications.
+generated files. The public homepage, software overview, scientific status
+and public evidence guidance live in `website/content/`. Both public
+reproducibility pages use editorial versions that retain scientific provenance
+and archival requirements without internal operational procedures. The manifest
+selects these pages and individually approved canonical scientific documents,
+stylesheets and manuscript scaffolds. It never recursively imports repository
+directories. The internal documentation audit remains separate from publication.
+The staging check rejects internal operational terminology and unsafe paths.
+A rejected source must be reviewed and corrected before publishing. The
+rendered HTML, search index and text assets undergo an additional boundary
+check before upload. These lexical checks complement editorial review;
+they are not a proof of confidentiality or a classifier of all operational prose.
+The rendered audit preserves inline text adjacency and separates structural
+blocks, references and search records. Test common Polish inflections and
+formatted terms as negative cases.
 
 ## Agent documentation contract and PR gates
 
 `scripts/check_agent_docs.py` is a no-network, standard-library check.
 It verifies the two main `AGENTS.md` sections, eight workflow steps,
-required safety/testing instructions, local links in all published Markdown
-sources, full `docs/` navigation coverage and agreement between
+required safety/testing instructions, local links in canonical repository Markdown
+sources, explicit publication-manifest navigation coverage and agreement between
 `pyproject.toml` and `PROJECT_STATE.yaml`. Negative regressions live in
 `tests/unit/test_agent_docs.py`; workflow release gates are covered by
 `tests/unit/test_docs_build.py`. Other documents, external URLs, citations,
@@ -48,7 +57,7 @@ both jobs to pass and is restricted to `main`.
 The existing [GitHub workflow](https://github.com/MatPomGit/arc-rvi/blob/main/.github/workflows/docs-pages.yml)
 runs offline regression on Python 3.11, 3.12 and 3.13. After tests,
 its `Validate and build documentation` job runs this audit and MkDocs
-strict. Require those four check names on the final PR SHA; do not use
+strict and the rendered publication audit. Require those four check names on the final PR SHA; do not use
 an earlier green run. A skipped publishing job on PRs is expected.
 
 GitHub settings are **not** configured by this Markdown or the workflow.
@@ -87,10 +96,11 @@ not evidence of completed studies or physical safety certification.
 
 ## Published guidance and appearance
 
-The public navigation includes agent operating guidance, coding and testing
-standards, writing rules, the optional teaching standard and the bilingual
-terminology glossary. The root `AGENTS.md` remains a repository instruction;
-the website displays linked supporting documents without replacing it.
+The public navigation contains scientific and software documentation only.
+Internal development, contribution and automation material is excluded.
+Add a public page by reviewing its content and adding its exact source and
+destination to `website/public-sources.txt` and the corresponding navigation
+entry. Never publish a whole repository directory.
 
 MkDocs 1.6.1 provides native Bootstrap 5 colour schemes. The site uses
 `color_mode: auto`, an explicit light/dark/auto menu and a dark high-contrast
@@ -98,8 +108,7 @@ navigation bar. The CSS in `docs/assets/theme.css` changes only layout,
 reading width and code-block scrolling; it uses native Bootstrap colour
 variables rather than overriding light/dark backgrounds globally. The
 stylesheet is copied into the MkDocs staging tree by
-`scripts/build_docs.py`. The short homepage avoids placing the complete
-CLI reference above the fold; full commands remain in the README.
+`scripts/build_docs.py`. The short homepage links to the public software overview; detailed commands remain in canonical scientific documentation.
 Validate dark and light appearances at desktop and mobile widths when
 browsers are available. A strict build does not measure WCAG contrast,
 keyboard usability or actual rendered layout.

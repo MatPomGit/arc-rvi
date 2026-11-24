@@ -83,13 +83,22 @@ class AgentDocsAuditTests(unittest.TestCase):
             directory = root / "docs" / "g1-reference"
             directory.mkdir(parents=True)
             (directory / "legacy-programs.md").write_text("# Legacy", encoding="utf-8")
+            (root / "website").mkdir()
+            (root / "website" / "content").mkdir()
+            (root / "website" / "content" / "index.md").write_text("# Home", encoding="utf-8")
+            (directory / "legacy-programs.md").write_text("# Legacy", encoding="utf-8")
+            (root / "website" / "public-sources.txt").write_text(
+                "website/content/index.md | index.md\n"
+                "docs/g1-reference/legacy-programs.md | docs/g1-reference/legacy-programs.md\n",
+                encoding="utf-8",
+            )
             config = root / "mkdocs.yml"
             config.write_text("nav:\n  - Home: index.md\n", encoding="utf-8")
             issues = inspect_nav_coverage(root)
             self.assertEqual(len(issues), 1)
             self.assertIn("legacy-programs.md", issues[0])
             config.write_text(
-                "nav:\n  - Legacy: docs/g1-reference/legacy-programs.md\n",
+                "nav:\n  - Home: index.md\n  - Legacy: docs/g1-reference/legacy-programs.md\n",
                 encoding="utf-8",
             )
             self.assertEqual(inspect_nav_coverage(root), [])

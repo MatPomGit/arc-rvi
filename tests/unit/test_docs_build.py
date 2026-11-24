@@ -11,39 +11,74 @@ from scripts import build_docs
 
 
 class DocsBuildTests(unittest.TestCase):
-    def test_stages_canonical_markdown_and_theme(self):
+    def test_stages_only_manifest_sources(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            (root / "website" / "content").mkdir(parents=True)
+            (root / "website" / "content" / "index.md").write_text("# Home", encoding="utf-8")
             (root / "docs" / "assets").mkdir(parents=True)
-            (root / "index.md").write_text("# Welcome\n", encoding="utf-8")
-            (root / "README.md").write_text("# Full README\n", encoding="utf-8")
-            (root / "AUTOPILOT_PLAN.md").write_text("# Plan\n", encoding="utf-8")
-            (root / "PROJECT_STATE.yaml").write_text("version: 1\n", encoding="utf-8")
-            (root / "docs" / "guide.md").write_text("# Guide\n", encoding="utf-8")
-            css = "body { color: var(--text-primary); }\n"
-            (root / "docs" / "assets" / "theme.css").write_text(
-                css, encoding="utf-8"
+            (root / "docs" / "guide.md").write_text("# Guide", encoding="utf-8")
+            (root / "docs" / "unlisted.md").write_text("internal agent instructions", encoding="utf-8")
+            (root / "docs" / "assets" / "theme.css").write_text("body {}", encoding="utf-8")
+            manifest = root / "website" / "public-sources.txt"
+            manifest.write_text(
+                "website/content/index.md | index.md\n"
+                "docs/guide.md | docs/guide.md\n"
+                "docs/assets/theme.css | docs/assets/theme.css\n", encoding="utf-8"
             )
             destination = root / ".build" / "mkdocs-src"
-            with patch.object(build_docs, "ROOT", root):
-                with patch.object(build_docs, "DEST", destination):
+            destination.mkdir(parents=True)
+            (destination / "stale.md").write_text("old content", encoding="utf-8")
+            with patch.object(build_docs, "ROOT", root), patch.object(build_docs, "DEST", destination):
+                build_docs.main()
+                self.assertEqual(
+                    {p.relative_to(destination).as_posix() for p in destination.rglob("*") if p.is_file()},
+                    {"index.md", "docs/guide.md", "docs/assets/theme.css"},
+                )
+                manifest.write_text(manifest.read_text() + "docs/unlisted.md | docs/unlisted.md\n")
+                with self.assertRaisesRegex(ValueError, "Non-public operational"):
                     build_docs.main()
-            self.assertEqual(
-                (destination / "index.md").read_text(encoding="utf-8"),
-                "# Welcome\n",
-            )
-            self.assertEqual(
-                (destination / "project-readme.md").read_text(encoding="utf-8"),
-                "# Full README\n",
-            )
-            self.assertFalse((destination / "README.md").exists())
-            self.assertTrue((destination / "docs" / "guide.md").exists())
-            self.assertEqual(
-                (destination / "docs" / "assets" / "theme.css").read_text(
-                    encoding="utf-8"
-                ),
-                css,
-            )
+                self.assertFalse(destination.exists())
+
+    def test_rejects_path_escape_and_internal_paths(self):
+        for name in ("../outside.md", "docs/AGENTS.md", "docs/agent-workflow.md"):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                build_docs.safe_relative(name)
+
+    def test_polish_operational_terms_rejected_in_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            page = root / "guide.md"
+            for term in ("agent", "agentem", "agenci", "agencie", "agentów",
+                         "agentkami", "AGENTEM", "agents"):
+                with self.subTest(term=term):
+                    page.write_text(f"Współpraca z {term}.", encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "Non-public operational"):
+                        build_docs.checked_content(root, "guide.md")
+            page.write_text("Research on reagents and reagent mixtures.", encoding="utf-8")
+            self.assertIn("reagents", build_docs.checked_content(root, "guide.md"))
+
+    def test_public_reproducibility_uses_editorial_source(self):
+        root = Path(__file__).resolve().parents[2]
+        sources = build_docs.publication_sources(root)
+        self.assertEqual(sources["docs/reproducibility.md"],
+                         "website/content/docs/reproducibility.md")
+        public = build_docs.checked_content(root, sources["docs/reproducibility.md"])
+        self.assertIn("## Research artifact retention", public)
+        self.assertIn("SHA-256", public)
+        self.assertIn("negative findings", public)
+        for marker in ("external analysis environment or chat", "research/evidence/",
+                       "CI/review/merge", "relevant Issue"):
+            self.assertNotIn(marker, public)
+        with tempfile.TemporaryDirectory() as directory:
+            fake = Path(directory)
+            manifest = fake / build_docs.MANIFEST
+            manifest.parent.mkdir()
+            manifest.write_text("website/content/index.md | index.md\n"
+                                "docs/reproducibility.md | docs/reproducibility.md\n",
+                                encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Non-public source"):
+                build_docs.publication_sources(fake)
 
     def test_native_colour_modes_do_not_conflict_with_legacy_css(self):
         root = Path(__file__).resolve().parents[2]
@@ -54,7 +89,7 @@ class DocsBuildTests(unittest.TestCase):
         self.assertIn("  color_mode: auto", configuration)
         self.assertIn("  user_color_mode_toggle: true", configuration)
         self.assertIn("  nav_style: dark", configuration)
-        self.assertIn("      - Repository README: project-readme.md", configuration)
+        self.assertIn("      - Research software: project-readme.md", configuration)
         self.assertNotIn("prefers-color-scheme", css)
         self.assertNotIn(".navbar-default", css)
         self.assertIn("var(--bs-body-color)", css)
@@ -72,6 +107,8 @@ class DocsBuildTests(unittest.TestCase):
         )
         self.assertEqual(workflow.count(release_gate), 3)
         self.assertIn("needs: [tests, build]", workflow)
+        self.assertLess(workflow.index("python scripts/audit_public_site.py"),
+                        workflow.index("actions/upload-pages-artifact@"))
         self.assertEqual(workflow.count("uses: actions/checkout@"), 3)
         self.assertEqual(workflow.count("persist-credentials: false"), 3)
         pilot = workflow.split("\n  pilot:\n", 1)[1].split("\n  build:\n", 1)[0]

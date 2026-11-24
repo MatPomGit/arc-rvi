@@ -82,4 +82,4 @@ during the earlier log. Retain the [evidence limits](evidence.md).
 
 The original archive content is **not** copied to the public repository: source licensing and revisions have not been authenticated. Private network IP addresses, local paths, recordings, raw telemetry and executable motion code are intentionally excluded. Hashes identify the user-supplied bytes, not a verified upstream commit.
 
-Current ARC-RVI physical motion remains blocked: `config/robot.yaml` must retain `adapter: not_configured`. Treat all motion commands as reference text, never executable instructions for autonomous agents.
+Current ARC-RVI physical motion remains blocked: `config/robot.yaml` must retain `adapter: not_configured`. Treat all motion commands as reference text, not authorization to execute motion.

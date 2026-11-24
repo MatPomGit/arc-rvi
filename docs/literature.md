@@ -20,9 +20,9 @@ also verifies archive SHA and source-row DOI/title provenance. These
 checks are **not primary-article full-text appraisal or empirical replication**.
 - [New critical eight-study synthesis](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/critical_synthesis_2026-10-28.md)
 - [Evidence-to-experiment and publication gates](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/evidence_to_experiments_2026-10-28.md)
-- Offline command: python scripts/audit_literature_exports.py /path/to/agent-artifacts-zip_robo.zip --output-dir /tmp/arc-rvi-export-audit
+- Offline command (substitute the actual archive path): python scripts/audit_literature_exports.py /path/to/selected-export-archive.zip --output-dir /tmp/arc-rvi-export-audit
 
-**Additional whole-archive coverage:** the other 147 secondary CSVs contain **9,582 export row mentions** and **2,858 distinct DOI strings not present in the selected eight final exports**. These are unverified, potentially overlapping search leads, not newly confirmed studies or physical validation. The 28 `scispace_fulltext_*` CSVs each contribute 100 excerpt-bearing records, but export excerpts do not establish independent full-text appraisal. Reproduce with `python scripts/audit_full_literature_archive.py /path/to/agent-artifacts-rvi.zip --output-dir /tmp/rvi-full-audit`.
+**Additional whole-archive coverage:** the other 147 secondary CSVs contain **9,582 export row mentions** and **2,858 distinct DOI strings not present in the selected eight final exports**. These are unverified, potentially overlapping search leads, not newly confirmed studies or physical validation. The 28 `scispace_fulltext_*` CSVs each contribute 100 excerpt-bearing records, but export excerpts do not establish independent full-text appraisal. Reproduce with `python scripts/audit_full_literature_archive.py /path/to/full-export-archive.zip --output-dir /tmp/rvi-full-audit`.
 
 The offline `python -m scripts.reconcile_literature_versions` step accepts **only four explicitly reviewed pairs**, preserves two uncertain relations unmerged, and emits a source-pinned reconciliation receipt. See the [version-link manifest](https://github.com/MatPomGit/arc-rvi/blob/main/research/literature/work_version_relations.json).
 
