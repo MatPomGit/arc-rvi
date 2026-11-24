@@ -150,5 +150,187 @@ class PilotAnalysisTests(unittest.TestCase):
             self.assertEqual(output.read_bytes(), previous)
 
 
+class FactorialFuzzyPilotTests(unittest.TestCase):
+    def test_complete_matrix_and_no_holdout_access(self):
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_factorial_pilot
+        import shutil
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            shutil.rmtree(root / "scenes" / "holdout")
+            shutil.rmtree(root / "suites" / "holdout")
+            result = analyze_factorial_pilot(root / "manifest.json")
+            self.assertEqual(result["trial_count"], 180)
+            self.assertEqual(result["families"], 6)
+            self.assertEqual(len(result["method_cells"]), 30)
+            self.assertEqual(len(result["family_results"]), 30)
+            self.assertEqual(len(result["reports"]), 6)
+            self.assertEqual(len(result["contrasts"]), 4)
+            self.assertEqual(result["uncertainty"], "descriptive_only")
+            self.assertEqual(sum(len(r["trials"]) for r in result["reports"].values()), 180)
+
+    def test_missing_cell_rejected(self):
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_factorial_pilot
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            path = root / "manifest.json"
+            manifest = json.loads(path.read_text())
+            manifest["scenes"] = [row for row in manifest["scenes"]
+                                  if row["partition"] != "pilot"
+                                  or row["cell_id"] != "o_none__i_reference__c_none"]
+            path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, "incomplete factorial scene"):
+                analyze_factorial_pilot(path)
+
+
+    def test_malformed_factorial_identifiers_and_nonfinite_json(self):
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_factorial_pilot
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            path = root / "manifest.json"
+            raw = path.read_text()
+            for value in (True, 0.0, "0"):
+                with self.subTest(replicate=value):
+                    manifest = json.loads(raw)
+                    row = next(r for r in manifest["scenes"]
+                               if r["partition"] == "pilot")
+                    row["replicate"] = value
+                    path.write_text(json.dumps(manifest))
+                    with self.assertRaisesRegex(ValueError, "identifiers"):
+                        analyze_factorial_pilot(path)
+            manifest = json.loads(raw)
+            manifest["partitions"]["pilot"][0] = 123
+            path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, "partitions"):
+                analyze_factorial_pilot(path)
+            for token in ("NaN", "Infinity", "-Infinity", "1e999"):
+                with self.subTest(token=token):
+                    path.write_text('{"invalid":' + token + "," + raw.lstrip()[1:])
+                    with self.assertRaisesRegex(ValueError, "non-finite JSON"):
+                        analyze_factorial_pilot(path)
+
+    def test_partition_path_rejected_before_read(self):
+        from unittest.mock import patch
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_factorial_pilot
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            path = root / "manifest.json"
+            raw = path.read_text()
+            for kind in ("scenes", "suites"):
+                with self.subTest(kind=kind):
+                    manifest = json.loads(raw)
+                    if kind == "scenes":
+                        record = next(r for r in manifest["scenes"]
+                                      if r["partition"] == "pilot"
+                                      and r["factors"]["illumination"] == "reference")
+                        holdout = next(r for r in manifest["scenes"]
+                                       if r["partition"] == "holdout")
+                    else:
+                        cell = "o_none__i_reference__c_none"
+                        record = manifest["suites"]["pilot"][cell]
+                        holdout = manifest["suites"]["holdout"][cell]
+                    record.update(path=holdout["path"], sha256=holdout["sha256"])
+                    path.write_text(json.dumps(manifest))
+                    forbidden = (root / holdout["path"]).resolve()
+                    original = Path.read_bytes
+
+                    def guarded_read(target):
+                        if target.resolve() == forbidden:
+                            self.fail("holdout bytes were read")
+                        return original(target)
+
+                    with patch.object(Path, "read_bytes", guarded_read):
+                        with self.assertRaisesRegex(ValueError, "outside pilot"):
+                            analyze_factorial_pilot(path)
+
+    def test_calibration_grid_without_holdout(self):
+        from rvi.population import generate_population
+        from rvi.pilot import calibrate_factorial_pilot
+        import shutil
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            for partition in ("development", "holdout"):
+                shutil.rmtree(root / "scenes" / partition)
+                shutil.rmtree(root / "suites" / partition)
+            result = calibrate_factorial_pilot(root / "manifest.json")
+            self.assertEqual(result["trial_count"], 4320)
+            self.assertEqual(len(result["configurations"]), 24)
+            self.assertEqual(result["selection"], "none_report_full_grid")
+            for config in result["configurations"]:
+                self.assertEqual(config["trial_count"], 180)
+                self.assertEqual(config["fuzzy_pairs"], 36)
+                self.assertEqual(len(config["method_cells"]), 30)
+                self.assertEqual(len(config["family_success"]), 6)
+            self.assertEqual(result["configurations"][-1]["success_fraction"], 1.0)
+            oracle = result["oracle_summary"]
+            self.assertEqual(oracle["instances"], 864)
+            self.assertEqual(oracle["feasible_instances"], 547)
+            self.assertEqual(oracle["all"]["avoidable"], 188)
+            self.assertEqual(oracle["all"]["infeasible"], 1585)
+            self.assertEqual(oracle["methods"]["fixed_weight"]["avoidable"], 2)
+            self.assertEqual(oracle["methods"]["fuzzy_budget"]["avoidable"], 2)
+            self.assertEqual(result["tradeoff_population"]["oracle_summary"]
+                             ["all"]["avoidable"], 0)
+
+
+class FuzzyMechanismTests(unittest.TestCase):
+    def test_tradeoff_fixture_and_trace_parity(self):
+        from rvi.pilot import fuzzy_tradeoff_fixtures
+        result = fuzzy_tradeoff_fixtures()
+        self.assertEqual(result["evidence_type"], "fixture")
+        trials = {r["method"]: r for r in result["cases"][0]["trials"]}
+        adaptive = trials["fuzzy_budget"]["decisions"][0]
+        fixed = trials["fixed_weight"]["decisions"][0]
+        self.assertEqual(adaptive["adaptive_winner"], "view_000002")
+        self.assertEqual(adaptive["fixed_winner"], "view_000001")
+        self.assertEqual(adaptive["selected"], "view_000002")
+        self.assertEqual(fixed["selected"], "view_000001")
+        self.assertEqual(adaptive["candidates"], fixed["candidates"])
+        self.assertEqual(trials["fuzzy_budget"]["status"], "completed")
+        self.assertEqual(trials["fixed_weight"]["status"], "completed")
+        self.assertAlmostEqual(trials["fixed_weight"]["elapsed_time_s"], 2.4)
+        self.assertAlmostEqual(trials["fuzzy_budget"]["elapsed_time_s"], 2.2)
+
+    def test_balanced_tradeoff_population(self):
+        from rvi.pilot import exploratory_tradeoff_population
+        result = exploratory_tradeoff_population()
+        self.assertEqual(result["family_count"], 12)
+        self.assertEqual(result["case_count"], 192)
+        self.assertEqual(result["trial_count"], 960)
+        self.assertEqual(result["oracle_summary"]["feasible_instances"], 120)
+        self.assertEqual(result["oracle_summary"]["all"]["infeasible"], 360)
+        self.assertAlmostEqual(result["oracle_summary"]["methods"]
+                               ["fixed_weight"]["mean_coverage_gap"], 0.0)
+        self.assertEqual(sum(result["paired_success_counts"].values()), 192)
+        self.assertGreater(result["sequence_disagreements"], 0)
+        for family in result["families"]:
+            self.assertEqual(len(family["cases"]), 16)
+            self.assertEqual(len({(c["capture_ratio"], c["budget_ratio"], c["order"])
+                                  for c in family["cases"]}), 16)
+
+    def test_sugeno_sensitivity_and_crossing(self):
+        from rvi.benchmark import fuzzy_view_score
+        for u in (0.0, 0.25, 0.5, 0.75, 1.0):
+            self.assertAlmostEqual(
+                fuzzy_view_score(0.5, 0.08, u),
+                0.8 * 0.5 + 0.2 * 0.92 + 0.4 * u * (0.92 - 0.5))
+        crossing = 2 - 2.5 * 0.8 / 1.3
+        self.assertAlmostEqual(fuzzy_view_score(1, 0.88, crossing),
+                               fuzzy_view_score(0.5, 0.08, crossing))
+
+
 if __name__ == "__main__":
     unittest.main()

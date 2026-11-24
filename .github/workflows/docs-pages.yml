@@ -35,6 +35,57 @@ jobs:
       - name: Offline software regression tests
         run: python scripts/validate.py
 
+  pilot:
+    name: P01 exploratory simulation pilot
+    needs: [tests]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Generate and analyze exploratory pilot
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          mkdir -p results/p01-pilot
+          git rev-parse HEAD > results/p01-pilot/source-sha.txt
+          git status --porcelain --untracked-files=no > results/p01-pilot/tracked-tree-status.txt
+          python --version > results/p01-pilot/python-version.txt
+          python -m pip freeze > results/p01-pilot/dependencies.txt
+          uname -a > results/p01-pilot/environment.txt
+          date -u +%FT%TZ > results/p01-pilot/start-utc.txt
+          cp simulation/conditions/study01_factorial_pilot.json results/p01-pilot/spec.json
+          python -m rvi.cli population --spec results/p01-pilot/spec.json --output-dir results/p01-pilot/population
+          python -m rvi.cli pilot --manifest results/p01-pilot/population/manifest.json --factorial-fuzzy --output results/p01-pilot/report.json
+          python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/report.json").read_text()); assert r["trial_count"] == 180 and r["families"] == 6 and r["stage"] == "exploratory_not_confirmatory" and r["partition"] == "pilot"'
+          rm -rf results/p01-pilot/population/scenes/{development,holdout} results/p01-pilot/population/suites/{development,holdout}
+          python -m rvi.cli pilot --manifest results/p01-pilot/population/manifest.json --calibrate-factorial --output results/p01-pilot/calibration.json
+          python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/calibration.json").read_text()); assert r["trial_count"] == 4320 and len(r["configurations"]) == 24'
+          python -m rvi.cli decision-population --output results/p01-pilot/decision-population.json
+          python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/decision-population.json").read_text()); assert r["summary"]["instances"] == 192 and r["family_count"] == 8 and r["policy_evaluations"] == 0 and r["selection"] == "none_retain_all"'
+          date -u +%FT%TZ > results/p01-pilot/end-utc.txt
+      - name: Exclude non-pilot scene and suite files
+        if: always()
+        run: |
+          rm -rf results/p01-pilot/population/scenes/{development,holdout} results/p01-pilot/population/suites/{development,holdout}
+          if [ -d results/p01-pilot ]; then
+            cd results/p01-pilot
+            find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > SHA256SUMS
+          fi
+      - name: Upload exploratory research artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p01-exploratory-pilot-${{ github.sha }}-${{ github.run_attempt }}
+          path: results/p01-pilot/
+          if-no-files-found: error
+          retention-days: 90
+
   build:
     name: Validate and build documentation
     runs-on: ubuntu-24.04

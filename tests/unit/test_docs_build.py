@@ -72,7 +72,12 @@ class DocsBuildTests(unittest.TestCase):
         )
         self.assertEqual(workflow.count(release_gate), 3)
         self.assertIn("needs: [tests, build]", workflow)
-        self.assertEqual(workflow.count("persist-credentials: false"), 2)
+        self.assertEqual(workflow.count("uses: actions/checkout@"), 3)
+        self.assertEqual(workflow.count("persist-credentials: false"), 3)
+        pilot = workflow.split("\n  pilot:\n", 1)[1].split("\n  build:\n", 1)[0]
+        self.assertIn("needs: [tests]", pilot)
+        self.assertIn("persist-credentials: false", pilot)
+        self.assertIn("actions/upload-artifact@", pilot)
 
 
 if __name__ == "__main__":

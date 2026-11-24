@@ -9,7 +9,7 @@ import math
 from pathlib import Path
 import random
 
-from .benchmark import run_benchmark
+from .benchmark import FUZZY_METHODS, run_benchmark
 from .viewpoints import METHODS
 
 CONDITIONS = ("nominal", "occluded")
@@ -29,10 +29,12 @@ def _file(root: Path, relative: str) -> Path:
     return path
 
 
-def _check_hash(root: Path, record: dict) -> Path:
+def _check_hash(root: Path, record: dict, *, directory: Path | None = None) -> Path:
     if not isinstance(record, dict) or not isinstance(record.get("sha256"), str):
         raise ValueError("invalid manifest hash record")
     path = _file(root, record.get("path"))
+    if directory is not None and not path.is_relative_to(directory):
+        raise ValueError("manifest path outside pilot directory")
     if _sha(path.read_bytes()) != record["sha256"]:
         raise ValueError("manifest SHA-256 mismatch")
     return path
@@ -221,3 +223,419 @@ def analyze_pilot(manifest_path: Path, reference: str = "fixed_order",
         "source": report["source"],
     }
     return summary
+
+
+FACTORIAL_CELLS = tuple(
+    f"o_{occlusion}__i_reference__c_{clutter}"
+    for occlusion in ("none", "moderate", "strong")
+    for clutter in ("none", "dense")
+)
+FACTORIAL_METHODS = METHODS + FUZZY_METHODS
+
+
+def _reject_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON: {value}")
+
+
+def _finite_float(value: str) -> float:
+    result = float(value)
+    if not math.isfinite(result):
+        _reject_constant(value)
+    return result
+
+
+def analyze_factorial_pilot(manifest_path: Path) -> dict:
+    """Run only the reference-brightness pilot and retain all benchmark reports."""
+    raw = manifest_path.read_bytes()
+    manifest = json.loads(raw, object_pairs_hook=_strict_pairs,
+                          parse_constant=_reject_constant, parse_float=_finite_float)
+    if not isinstance(manifest, dict):
+        raise ValueError("invalid factorial manifest")
+    if (manifest.get("design"), manifest.get("study_id"),
+            manifest.get("stage"), manifest.get("evidence_type")) != (
+            "sampled_factorial_v1", "01", "exploratory_not_confirmatory",
+            "simulation"):
+        raise ValueError("expected exploratory study01 factorial manifest")
+    root = manifest_path.resolve().parent
+    partitions = manifest["partitions"]
+    if (not isinstance(partitions, dict)
+            or set(partitions) != {"development", "pilot", "holdout"}
+            or any(not isinstance(split, list) or not split
+                   or any(not isinstance(f, str) or not f.strip() for f in split)
+                   for split in partitions.values())):
+        raise ValueError("invalid partitions")
+    families = partitions["pilot"]
+    all_families = [f for split in partitions.values() for f in split]
+    if not families or len(set(all_families)) != len(all_families):
+        raise ValueError("duplicate or missing partition families")
+    repeats = manifest["replicates_per_family"]
+    if type(repeats) is not int or not 1 <= repeats <= 4:
+        raise ValueError("invalid replicate count")
+    expected = {(f, r, c) for f in families for r in range(repeats)
+                for c in FACTORIAL_CELLS}
+    records = {}
+    ids = set()
+    if not isinstance(manifest.get("scenes"), list):
+        raise ValueError("invalid factorial scenes")
+    for row in manifest["scenes"]:
+        if (not isinstance(row, dict)
+                or any(not isinstance(row.get(field), str) or not row[field].strip()
+                       for field in ("family", "scene_id", "pair_id", "cell_id", "partition"))
+                or type(row.get("replicate")) is not int):
+            raise ValueError("invalid factorial scene identifiers")
+        if row["partition"] != "pilot":
+            if row["family"] in families:
+                raise ValueError("pilot family appears outside pilot partition")
+            continue
+        if row["cell_id"] not in FACTORIAL_CELLS:
+            continue
+        key = (row["family"], row["replicate"], row["cell_id"])
+        if key not in expected or key in records or row["scene_id"] in ids:
+            raise ValueError("duplicate or unexpected factorial scene")
+        expected_factors = dict(zip(
+            ("occlusion", "illumination", "clutter"),
+            (row["cell_id"].split("__")[0][2:], "reference",
+             row["cell_id"].split("__")[2][2:])))
+        if row["factors"] != expected_factors:
+            raise ValueError("factor metadata mismatch")
+        _check_hash(root, row, directory=root / "scenes" / "pilot")
+        records[key] = row
+        ids.add(row["scene_id"])
+    if set(records) != expected:
+        raise ValueError("incomplete factorial scene matrix")
+    for f in families:
+        for r in range(repeats):
+            block = [records[f, r, c] for c in FACTORIAL_CELLS]
+            for field in ("pair_id", "paired_seed", "geometry_patch_count"):
+                if len({row[field] for row in block}) != 1:
+                    raise ValueError("inconsistent paired scene metadata")
+    reports = {}
+    observed = {}
+    for cell in FACTORIAL_CELLS:
+        suite_record = manifest["suites"]["pilot"][cell]
+        suite = _check_hash(root, suite_record, directory=root / "suites" / "pilot")
+        # Validate suite membership before running any policy.
+        declared = {row["scene_id"]: row for key, row in records.items()
+                    if key[2] == cell}
+        suite_data = json.loads(suite.read_bytes(), object_pairs_hook=_strict_pairs,
+                                parse_constant=_reject_constant, parse_float=_finite_float)
+        paths = [(suite.parent / entry).resolve() for entry in suite_data["scenes"]]
+        expected_paths = {_file(root, row["path"]) for row in declared.values()}
+        if len(paths) != len(expected_paths) or set(paths) != expected_paths:
+            raise ValueError("suite membership differs from pilot manifest")
+        report = run_benchmark(suite, fuzzy_pilot=True)
+        if (report["suite_sha256"] != suite_record["sha256"]
+                or report["visibility_access"] != "known_geometry_oracle"
+                or report["stage"] != "exploratory_not_confirmatory"
+                or tuple(report["methods"]) != FACTORIAL_METHODS):
+            raise ValueError("incompatible factorial benchmark report")
+        if len(report["scenes"]) != len(declared) or {
+            row["scene_id"]: row["sha256"] for row in report["scenes"]
+        } != {k: v["sha256"] for k, v in declared.items()}:
+            raise ValueError("report scene provenance mismatch")
+        for row in report["trials"]:
+            meta = declared.get(row["scene_id"])
+            if meta is None or row["scene_sha256"] != meta["sha256"]:
+                raise ValueError("trial provenance mismatch")
+            key = (meta["family"], meta["replicate"], cell, row["method"])
+            if key in observed or row["method"] not in FACTORIAL_METHODS:
+                raise ValueError("duplicate or unexpected factorial trial")
+            coverage = _number(row["sampled_surface_coverage"], "coverage")
+            elapsed = _number(row["elapsed_time_s"], "elapsed")
+            distance = _number(row["travel_distance_m"], "distance")
+            status, reason = row["status"], row["failure_reason"]
+            if not 0 <= coverage <= 1 or min(elapsed, distance) < 0:
+                raise ValueError("invalid factorial trial metrics")
+            if not ((status == "completed" and reason is None
+                     and math.isclose(coverage, 1.0, abs_tol=1e-8))
+                    or (status == "algorithm_failure"
+                        and isinstance(reason, str) and reason)):
+                raise ValueError("invalid factorial trial outcome")
+            observed[key] = row
+        reports[cell] = report
+    if set(observed) != {(*key, m) for key in expected
+                         for m in FACTORIAL_METHODS}:
+        raise ValueError("incomplete factorial trial matrix")
+
+    def mean(values):
+        values = list(values)
+        return math.fsum(values) / len(values)
+
+    method_cells = []
+    family_results = []
+    for method in FACTORIAL_METHODS:
+        for cell in FACTORIAL_CELLS:
+            rows = [observed[f, r, cell, method] for f in families
+                    for r in range(repeats)]
+            method_cells.append({
+                "method": method, "cell": cell, "trials": len(rows),
+                "success_fraction": mean(row["status"] == "completed" for row in rows),
+                "mean_coverage": mean(row["sampled_surface_coverage"] for row in rows),
+                "mean_elapsed_time_s": mean(row["elapsed_time_s"] for row in rows),
+                "mean_distance_m": mean(row["travel_distance_m"] for row in rows),
+                "failures": dict(Counter(row["failure_reason"] for row in rows
+                                         if row["failure_reason"] is not None)),
+            })
+        for f in families:
+            successes = [mean(observed[f, r, cell, method]["status"] == "completed"
+                              for r in range(repeats)) for cell in FACTORIAL_CELLS]
+            challenge = mean(successes[1:])
+            family_results.append({"family": f, "method": method,
+                                   "nominal_success": successes[0],
+                                   "challenge_success": challenge,
+                                   "loss": successes[0] - challenge})
+    by_key = {(row["family"], row["method"]): row for row in family_results}
+    contrasts = []
+    for reference in FACTORIAL_METHODS:
+        if reference == "fuzzy_budget":
+            continue
+        effects = [by_key[f, reference]["loss"] - by_key[f, "fuzzy_budget"]["loss"]
+                   for f in families]
+        contrasts.append({"reference": reference, "candidate": "fuzzy_budget",
+                          "mean_loss_difference": mean(effects),
+                          "family_effects": dict(zip(families, effects))})
+    return {"schema_version": "1.0.0", "study_id": "01",
+            "stage": "exploratory_not_confirmatory", "partition": "pilot",
+            "evidence_type": "simulation", "visibility_access": "known_geometry_oracle",
+            "independent_unit": "geometry_family", "families": len(families),
+            "trial_count": len(observed), "illumination": "reference_only",
+            "effect_direction": "reference_loss_minus_candidate_loss",
+            "uncertainty": "descriptive_only",
+            "method_cells": method_cells, "family_results": family_results,
+            "contrasts": contrasts, "manifest_sha256": _sha(raw),
+            "reports": reports}
+
+
+CALIBRATION_BUDGETS_S = (2, 3, 4, 6, 8, 16)
+CALIBRATION_FOV_DEG = (30, 45, 60, 90)
+
+
+def calibrate_factorial_pilot(manifest_path: Path) -> dict:
+    """Sweep common settings on verified pilot scenes, never select a winner."""
+    from dataclasses import replace
+
+    from .adapters.simulator import load_scene
+    from .benchmark import evaluate_simulation_policy
+
+    raw = manifest_path.read_bytes()
+    baseline = analyze_factorial_pilot(manifest_path)
+    if _sha(raw) != baseline["manifest_sha256"]:
+        raise ValueError("manifest changed during calibration")
+    manifest = json.loads(raw, object_pairs_hook=_strict_pairs)
+    root = manifest_path.resolve().parent
+    scenes = []
+    for record in manifest["scenes"]:
+        if (record["partition"] != "pilot"
+                or record["cell_id"] not in FACTORIAL_CELLS):
+            continue
+        path = _check_hash(root, record, directory=root / "scenes" / "pilot")
+        scene, scene_raw = load_scene(path)
+        if _sha(scene_raw) != record["sha256"]:
+            raise ValueError("scene changed during calibration")
+        scenes.append((record, scene))
+    if len(scenes) * len(FACTORIAL_METHODS) != baseline["trial_count"]:
+        raise ValueError("incomplete calibration matrix")
+
+    from .oracle import diagnose_trials, summarize_oracle
+
+    configurations = []
+    for budget in CALIBRATION_BUDGETS_S:
+        for fov in CALIBRATION_FOV_DEG:
+            trials = []
+            oracle_cases = []
+            for meta, original in scenes:
+                scene = replace(
+                    original,
+                    camera=replace(original.camera,
+                                   horizontal_fov_rad=math.radians(fov)),
+                    motion=replace(original.motion, max_time_s=float(budget)),
+                )
+                for method in FACTORIAL_METHODS:
+                    trial = evaluate_simulation_policy(
+                        scene, method, trace_decisions=method in FUZZY_METHODS)
+                    trials.append(dict(trial, family=meta["family"],
+                                       replicate=meta["replicate"],
+                                       cell=meta["cell_id"],
+                                       scene_sha256=meta["sha256"]))
+                oracle_cases.append(dict(
+                    diagnose_trials(scene, trials[-len(FACTORIAL_METHODS):]),
+                    family=meta["family"], replicate=meta["replicate"],
+                    cell=meta["cell_id"], scene_sha256=meta["sha256"]))
+            success = lambda row: row["status"] == "completed"
+            fraction = lambda rows: sum(map(success, rows)) / len(rows)
+            cells = []
+            for method in FACTORIAL_METHODS:
+                for cell in FACTORIAL_CELLS:
+                    rows = [r for r in trials if r["method"] == method
+                            and r["cell"] == cell]
+                    cells.append({"method": method, "cell": cell,
+                                  "trials": len(rows),
+                                  "success_fraction": fraction(rows)})
+            families = {}
+            for family in manifest["partitions"]["pilot"]:
+                families[family] = fraction(
+                    [r for r in trials if r["family"] == family])
+            paired = {}
+            for row in trials:
+                if row["method"] in FUZZY_METHODS:
+                    paired.setdefault(row["scene_id"], {})[row["method"]] = row
+            divergent = sum(
+                [e["candidate_id"] for e in pair["fuzzy_budget"]["observations"]]
+                != [e["candidate_id"] for e in pair["fixed_weight"]["observations"]]
+                for pair in paired.values()
+            )
+            decisions = [d for row in trials for d in row.get("decisions", [])]
+            configurations.append({
+                "decision_diagnostics": {
+                    "states": len(decisions),
+                    "competitive_states": sum(len(d["candidates"]) > 1 for d in decisions),
+                    "winner_disagreements": sum(d["adaptive_winner"] != d["fixed_winner"]
+                                                for d in decisions),
+                    "rank_disagreements": sum(d["adaptive_rank"] != d["fixed_rank"]
+                                              for d in decisions),
+                },
+                "budget_s": budget, "fov_deg": fov,
+                "oracle_cases": oracle_cases,
+                "oracle_summary": summarize_oracle(oracle_cases),
+                "trial_count": len(trials), "success_fraction": fraction(trials),
+                "nominal_success": fraction([r for r in trials
+                                             if r["cell"] == FACTORIAL_CELLS[0]]),
+                "challenge_success": fraction([r for r in trials
+                                               if r["cell"] != FACTORIAL_CELLS[0]]),
+                "family_success": families,
+                "family_success_sd": math.sqrt(math.fsum(
+                    (v - math.fsum(families.values()) / len(families)) ** 2
+                    for v in families.values()) / len(families)),
+                "method_cells": cells,
+                "failures": dict(Counter(r["failure_reason"] for r in trials
+                                         if r["failure_reason"] is not None)),
+                "fuzzy_sequence_disagreements": divergent,
+                "fuzzy_pairs": len(paired), "trials": trials,
+            })
+    return {
+        "schema_version": "1.0.0", "study_id": "01",
+        "stage": "exploratory_not_confirmatory", "partition": "pilot",
+        "evidence_type": "simulation", "visibility_access": "known_geometry_oracle",
+        "independent_unit": "geometry_family",
+        "manifest_sha256": baseline["manifest_sha256"],
+        "families": baseline["families"],
+        "trial_count": sum(c["trial_count"] for c in configurations),
+        "selection": "none_report_full_grid",
+        "configurations": configurations,
+        "oracle_summary": summarize_oracle([case for c in configurations
+                                            for case in c["oracle_cases"]]),
+        "mechanism_fixtures": fuzzy_tradeoff_fixtures(),
+        "tradeoff_population": exploratory_tradeoff_population(),
+    }
+
+
+def fuzzy_tradeoff_fixtures() -> dict:
+    """Hand-constructed mechanism checks, not sampled population evidence."""
+    from dataclasses import asdict, replace
+
+    from .adapters.simulator import CameraModel, MotionModel, PlanarScene, SurfacePatch
+    from .benchmark import evaluate_simulation_policy
+    from .interfaces import CameraPose
+
+    # Near view sees a only; distant view sees both a and b.
+    # At budget 2.5 s, delta gain=0.5, delta cost=0.8.
+    scene = PlanarScene(
+        "fuzzy_tradeoff_fixture",
+        CameraPose(0, 0, 0),
+        CameraModel(math.pi / 2, 0.1, 5, math.pi / 2),
+        MotionModel(1, 1, 0.1, 0.2, 2.5),
+        (),
+        (SurfacePatch("a", 3, 0, math.pi, 1),
+         SurfacePatch("b", 3, 4, math.pi, 1)),
+        (CameraPose(0, 0, 0), CameraPose(0, 2, 0)),
+    )
+    cases = []
+    for budget in (2.5, 5.0, 16.0):
+        case = replace(scene, motion=replace(scene.motion, max_time_s=budget))
+        cases.append({
+            "budget_s": budget, "scene": asdict(case),
+            "trials": [evaluate_simulation_policy(case, method, trace_decisions=True)
+                       for method in FACTORIAL_METHODS],
+        })
+    return {"evidence_type": "fixture", "stage": "exploratory_not_confirmatory",
+            "cases": cases}
+
+
+def exploratory_tradeoff_population() -> dict:
+    """Seeded, balanced stress-test families, separate from the factorial pilot."""
+    from dataclasses import asdict, replace
+
+    from .adapters.simulator import CameraModel, MotionModel, PlanarScene, SurfacePatch
+    from .benchmark import evaluate_simulation_policy
+    from .interfaces import CameraPose
+
+    from .oracle import diagnose_trials, summarize_oracle
+
+    seed = 20261124
+    rng = random.Random(seed)
+    families = []
+    # Cross geometry scale, capture overhead and relative movement budget.
+    # No selection or rejection based on a policy outcome.
+    for index in range(12):
+        scale = rng.uniform(0.85, 1.15)
+        area_a, area_b = rng.uniform(0.75, 1.25), rng.uniform(0.75, 1.25)
+        family = f"tradeoff_dev_{index + 1:03d}"
+        cases = []
+        for capture_ratio in (0.05, 0.2):
+            for budget_ratio in (1.0, 1.1, 1.5, 3.0):
+                for order in ("near_first", "far_first"):
+                    near = CameraPose(0, 0, 0)
+                    far = CameraPose(0, 2 * scale, 0)
+                    distance = 2 * scale
+                    scene = PlanarScene(
+                        f"{family}_{capture_ratio}_{budget_ratio}_{order}",
+                        near, CameraModel(math.pi / 2, 0.1, 5 * scale, math.pi / 2),
+                        MotionModel(1, 1, 0.1, capture_ratio * distance,
+                                    budget_ratio * distance),
+                        (),
+                        (SurfacePatch("a", 3 * scale, 0, math.pi, area_a),
+                         SurfacePatch("b", 3 * scale, 4 * scale, math.pi, area_b)),
+                        (near, far) if order == "near_first" else (far, near),
+                    )
+                    trials = [evaluate_simulation_policy(
+                        scene, method, trace_decisions=method in FUZZY_METHODS)
+                        for method in FACTORIAL_METHODS]
+                    cases.append({"capture_ratio": capture_ratio,
+                                  "budget_ratio": budget_ratio, "order": order,
+                                  "scene": asdict(scene), "trials": trials,
+                                  "oracle": diagnose_trials(scene, trials)})
+        families.append({"family": family, "cases": cases})
+    cases = [case for family in families for case in family["cases"]]
+    trials = [row for case in cases for row in case["trials"]]
+    decisions = [d for row in trials for d in row.get("decisions", [])]
+    pairs = []
+    for case in cases:
+        by_method = {row["method"]: row for row in case["trials"]}
+        a, b = (by_method[m] for m in FUZZY_METHODS)
+        pairs.append({
+            "sequence_differs": [e["candidate_id"] for e in a["observations"]]
+            != [e["candidate_id"] for e in b["observations"]],
+            "adaptive_success": a["status"] == "completed",
+            "fixed_success": b["status"] == "completed",
+        })
+    return {
+        "schema_version": "1.0.0", "evidence_type": "simulation",
+        "stage": "exploratory_not_confirmatory", "partition": "development_stress",
+        "design": "scaled_two_view_tradeoff_v1", "seed": seed,
+        "independent_unit": "synthetic_geometry_family",
+        "family_count": len(families), "case_count": len(cases),
+        "trial_count": len(trials),
+        "decision_states": len(decisions),
+        "competitive_states": sum(len(d["candidates"]) > 1 for d in decisions),
+        "winner_disagreements": sum(d["adaptive_winner"] != d["fixed_winner"]
+                                    for d in decisions),
+        "sequence_disagreements": sum(p["sequence_differs"] for p in pairs),
+        "paired_success_counts": {
+            "both": sum(p["adaptive_success"] and p["fixed_success"] for p in pairs),
+            "adaptive_only": sum(p["adaptive_success"] and not p["fixed_success"] for p in pairs),
+            "fixed_only": sum(p["fixed_success"] and not p["adaptive_success"] for p in pairs),
+            "neither": sum(not p["adaptive_success"] and not p["fixed_success"] for p in pairs),
+        },
+        "families": families,
+        "oracle_summary": summarize_oracle([c["oracle"] for c in cases]),
+    }
