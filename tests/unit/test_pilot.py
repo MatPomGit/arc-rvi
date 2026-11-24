@@ -277,5 +277,33 @@ class FactorialFuzzyPilotTests(unittest.TestCase):
             self.assertEqual(result["configurations"][-1]["success_fraction"], 1.0)
 
 
+class FuzzyMechanismTests(unittest.TestCase):
+    def test_tradeoff_fixture_and_trace_parity(self):
+        from rvi.pilot import fuzzy_tradeoff_fixtures
+        result = fuzzy_tradeoff_fixtures()
+        self.assertEqual(result["evidence_type"], "fixture")
+        trials = {r["method"]: r for r in result["cases"][0]["trials"]}
+        adaptive = trials["fuzzy_budget"]["decisions"][0]
+        fixed = trials["fixed_weight"]["decisions"][0]
+        self.assertEqual(adaptive["adaptive_winner"], "view_000002")
+        self.assertEqual(adaptive["fixed_winner"], "view_000001")
+        self.assertEqual(adaptive["selected"], "view_000002")
+        self.assertEqual(fixed["selected"], "view_000001")
+        self.assertEqual(adaptive["candidates"], fixed["candidates"])
+        self.assertEqual(trials["fuzzy_budget"]["status"], "completed")
+        self.assertEqual(trials["fixed_weight"]["failure_reason"],
+                         "time_budget_exceeded")
+
+    def test_sugeno_sensitivity_and_crossing(self):
+        from rvi.benchmark import fuzzy_view_score
+        for u in (0.0, 0.25, 0.5, 0.75, 1.0):
+            self.assertAlmostEqual(
+                fuzzy_view_score(0.5, 0.08, u),
+                0.8 * 0.5 + 0.2 * 0.92 + 0.4 * u * (0.92 - 0.5))
+        crossing = 2 - 2.5 * 0.8 / 1.3
+        self.assertAlmostEqual(fuzzy_view_score(1, 0.88, crossing),
+                               fuzzy_view_score(0.5, 0.08, crossing))
+
+
 if __name__ == "__main__":
     unittest.main()
