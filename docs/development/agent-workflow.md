@@ -31,6 +31,10 @@ verified, exact SHA recorded, required review accepted, changes merged and
 deployment independently verified if applicable. Issues and temporary leases
 must reflect the final state; abandoned work cannot be called complete.
 
+Before closing a research stage, verify its deliverables have been retained
+under the [research artifact retention contract](../reproducibility.md#research-artifact-retention).
+Record the evidence path, exact commit and any retention blocker in the handoff.
+
 ## Integration and deployment
 
 - Use PRs with purpose, scope, linked Issue, risk, tests, remaining gaps and

@@ -1,0 +1,2481 @@
+{
+  "summary": {
+    "base_scenes": 64,
+    "instances": 192,
+    "structurally_feasible": 42,
+    "budget_feasible": 84,
+    "order_sensitive": 63,
+    "minimum_views_hist": {
+      "None": 22,
+      "4": 20,
+      "6": 18,
+      "5": 4
+    },
+    "by_fov": {
+      "18": {
+        "mean_jaccard": 0.002232142857142857,
+        "structurally_feasible": 10
+      },
+      "55": {
+        "mean_jaccard": 0.0646577380952381,
+        "structurally_feasible": 32
+      }
+    },
+    "by_obstacle": {
+      "False": {
+        "mean_blocked": 0.0
+      },
+      "True": {
+        "mean_blocked": 0.23392857142857143
+      }
+    },
+    "by_ratio": {
+      "0.8": {
+        "feasible": 0,
+        "order_sensitive": 0
+      },
+      "1.05": {
+        "feasible": 42,
+        "order_sensitive": 42
+      },
+      "1.4": {
+        "feasible": 42,
+        "order_sensitive": 21
+      }
+    }
+  },
+  "rows": [
+    {
+      "family": 1,
+      "n": 6,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_001_n6_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.6666666666666666,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 41.117945174589295,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 53.96730304164844,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 71.95640405553125,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 1,
+      "n": 6,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_001_n6_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 0.6666666666666666,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 36.4418020222636,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 47.82986515422098,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 63.773153538961296,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 1,
+      "n": 6,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_001_n6_f55_o0",
+      "min_full_time_s": 18.241572730313425,
+      "minimum_views": 4,
+      "mean_jaccard": 0.06666666666666667,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.593258184250741,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 19.1536513668291,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 25.538201822438793,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 5,
+          "dead_end_fraction": 0.16666666666666666
+        }
+      ]
+    },
+    {
+      "family": 1,
+      "n": 6,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_001_n6_f55_o1",
+      "min_full_time_s": 18.241572730313425,
+      "minimum_views": 4,
+      "mean_jaccard": 0.06666666666666667,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.593258184250741,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 19.1536513668291,
+          "full_feasible": true,
+          "first_immediate": 4,
+          "first_full": 1,
+          "dead_end_fraction": 0.75
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 25.538201822438793,
+          "full_feasible": true,
+          "first_immediate": 4,
+          "first_full": 4,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 1,
+      "n": 8,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_001_n8_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.6666666666666666,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 54.82392689945239,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 71.95640405553127,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 95.94187207404167,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 1,
+      "n": 8,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_001_n8_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.21428571428571427,
+      "coverage_union": 0.6666666666666666,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 48.58906936301814,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 63.77315353896131,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 85.03087138528174,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 1,
+      "n": 8,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_001_n8_f55_o0",
+      "min_full_time_s": 15.480847406301848,
+      "minimum_views": 4,
+      "mean_jaccard": 0.09523809523809523,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 12.38467792504148,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 16.254889776616942,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 21.673186368822584,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 7,
+          "dead_end_fraction": 0.125
+        }
+      ]
+    },
+    {
+      "family": 1,
+      "n": 8,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_001_n8_f55_o1",
+      "min_full_time_s": 15.480847406301848,
+      "minimum_views": 4,
+      "mean_jaccard": 0.09523809523809523,
+      "blocked_edge_fraction": 0.21428571428571427,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 12.38467792504148,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 16.254889776616942,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 21.673186368822584,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 5,
+          "dead_end_fraction": 0.16666666666666666
+        }
+      ]
+    },
+    {
+      "family": 2,
+      "n": 6,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_002_n6_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.6666666666666666,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 39.41971160520983,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 51.738371481837895,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 68.9844953091172,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 2,
+      "n": 6,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_002_n6_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 0.6666666666666666,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 32.14946974370789,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 42.1961790386166,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 56.2615720514888,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 2,
+      "n": 6,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_002_n6_f55_o0",
+      "min_full_time_s": 20.269589109242638,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.215671287394112,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 21.28306856470477,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 28.377424752939692,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 6,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 2,
+      "n": 6,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_002_n6_f55_o1",
+      "min_full_time_s": 20.269589109242638,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.215671287394112,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 21.28306856470477,
+          "full_feasible": true,
+          "first_immediate": 4,
+          "first_full": 1,
+          "dead_end_fraction": 0.75
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 28.377424752939692,
+          "full_feasible": true,
+          "first_immediate": 4,
+          "first_full": 4,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 2,
+      "n": 8,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_002_n8_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.6666666666666666,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 52.68850336371843,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 69.15366066488043,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 92.20488088650724,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 2,
+      "n": 8,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_002_n8_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 0.6666666666666666,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 43.180308505521964,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 56.674154913497574,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 75.56553988466342,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 2,
+      "n": 8,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_002_n8_f55_o0",
+      "min_full_time_s": 18.779214307667605,
+      "minimum_views": 6,
+      "mean_jaccard": 0.07142857142857142,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 15.023371446134085,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 19.718175023050986,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 26.290900030734644,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 8,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 2,
+      "n": 8,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_002_n8_f55_o1",
+      "min_full_time_s": 18.779214307667605,
+      "minimum_views": 6,
+      "mean_jaccard": 0.07142857142857142,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 15.023371446134085,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 19.718175023050986,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 26.290900030734644,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 6,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 3,
+      "n": 6,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_003_n6_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 41.993566471769356,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 55.116555994197284,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 73.48874132559637,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 3,
+      "n": 6,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_003_n6_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 39.90260041935657,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 52.3721630504055,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 69.82955073387399,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 3,
+      "n": 6,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_003_n6_f55_o0",
+      "min_full_time_s": 18.230884052491977,
+      "minimum_views": 4,
+      "mean_jaccard": 0.06666666666666667,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.584707241993582,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 19.142428255116577,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 25.523237673488765,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 5,
+          "dead_end_fraction": 0.16666666666666666
+        }
+      ]
+    },
+    {
+      "family": 3,
+      "n": 6,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_003_n6_f55_o1",
+      "min_full_time_s": 18.230884052491977,
+      "minimum_views": 4,
+      "mean_jaccard": 0.06666666666666667,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.584707241993582,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 19.142428255116577,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 1,
+          "dead_end_fraction": 0.8
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 25.523237673488765,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 4,
+          "dead_end_fraction": 0.2
+        }
+      ]
+    },
+    {
+      "family": 3,
+      "n": 8,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_003_n8_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 55.99142196235914,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 73.48874132559638,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 97.9849884341285,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 3,
+      "n": 8,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_003_n8_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 53.20346722580876,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 69.82955073387399,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 93.10606764516531,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 3,
+      "n": 8,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_003_n8_f55_o0",
+      "min_full_time_s": 16.551584562722777,
+      "minimum_views": 4,
+      "mean_jaccard": 0.11904761904761905,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 13.241267650178223,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 17.379163790858918,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 23.172218387811885,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 6,
+          "dead_end_fraction": 0.25
+        }
+      ]
+    },
+    {
+      "family": 3,
+      "n": 8,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_003_n8_f55_o1",
+      "min_full_time_s": 16.551584562722777,
+      "minimum_views": 4,
+      "mean_jaccard": 0.11904761904761905,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 13.241267650178223,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 17.379163790858918,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 1,
+          "dead_end_fraction": 0.8571428571428571
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 23.172218387811885,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 6,
+          "dead_end_fraction": 0.14285714285714285
+        }
+      ]
+    },
+    {
+      "family": 4,
+      "n": 6,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_004_n6_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 40.782216768303364,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 53.52665950839817,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 71.36887934453088,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 4,
+      "n": 6,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_004_n6_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 38.8730049654809,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 51.02081901719369,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 68.02775868959158,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 4,
+      "n": 6,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_004_n6_f55_o0",
+      "min_full_time_s": 21.182299214099864,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.94583937127989,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 22.24141417480486,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 2,
+          "dead_end_fraction": 0.6666666666666666
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.655218899739808,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 6,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 4,
+      "n": 6,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_004_n6_f55_o1",
+      "min_full_time_s": 21.182299214099864,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.94583937127989,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 22.24141417480486,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 2,
+          "dead_end_fraction": 0.6
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.655218899739808,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 5,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 4,
+      "n": 8,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_004_n8_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 54.71860994816424,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 71.81817555696557,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 95.7575674092874,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 4,
+      "n": 8,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_004_n8_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 51.83067328730787,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 68.02775868959158,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 90.70367825278876,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 4,
+      "n": 8,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_004_n8_f55_o0",
+      "min_full_time_s": 17.786632305037497,
+      "minimum_views": 4,
+      "mean_jaccard": 0.07142857142857142,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.229305844029998,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.675963920289373,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.901285227052494,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 5,
+          "dead_end_fraction": 0.375
+        }
+      ]
+    },
+    {
+      "family": 4,
+      "n": 8,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_004_n8_f55_o1",
+      "min_full_time_s": 17.786632305037497,
+      "minimum_views": 4,
+      "mean_jaccard": 0.07142857142857142,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.229305844029998,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.675963920289373,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 1,
+          "dead_end_fraction": 0.8571428571428571
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.901285227052494,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 5,
+          "dead_end_fraction": 0.2857142857142857
+        }
+      ]
+    },
+    {
+      "family": 5,
+      "n": 6,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_005_n6_f18_o0",
+      "min_full_time_s": 21.100191652912457,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.880153322329967,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 22.15520123555808,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.540268314077437,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 6,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 5,
+      "n": 6,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_005_n6_f18_o1",
+      "min_full_time_s": 21.100191652912457,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.880153322329967,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 22.15520123555808,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 1,
+          "dead_end_fraction": 0.8
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.540268314077437,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 5,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 5,
+      "n": 6,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_005_n6_f55_o0",
+      "min_full_time_s": 18.602993080027737,
+      "minimum_views": 4,
+      "mean_jaccard": 0.06666666666666667,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.882394464022191,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 19.533142734029123,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 2,
+          "dead_end_fraction": 0.6666666666666666
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 26.04419031203883,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 5,
+          "dead_end_fraction": 0.16666666666666666
+        }
+      ]
+    },
+    {
+      "family": 5,
+      "n": 6,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_005_n6_f55_o1",
+      "min_full_time_s": 18.602993080027737,
+      "minimum_views": 4,
+      "mean_jaccard": 0.06666666666666667,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.882394464022191,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 19.533142734029123,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 2,
+          "dead_end_fraction": 0.6
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 26.04419031203883,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 4,
+          "dead_end_fraction": 0.2
+        }
+      ]
+    },
+    {
+      "family": 5,
+      "n": 8,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_005_n8_f18_o0",
+      "min_full_time_s": 21.100191652912457,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.880153322329967,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 22.15520123555808,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.540268314077437,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 8,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 5,
+      "n": 8,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_005_n8_f18_o1",
+      "min_full_time_s": 21.100191652912457,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.880153322329967,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 22.15520123555808,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 1,
+          "dead_end_fraction": 0.8571428571428571
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.540268314077437,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 7,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 5,
+      "n": 8,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_005_n8_f55_o0",
+      "min_full_time_s": 17.760717415908516,
+      "minimum_views": 4,
+      "mean_jaccard": 0.13690476190476192,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.208573932726814,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.648753286703943,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 2,
+          "dead_end_fraction": 0.75
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.86500438227192,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 7,
+          "dead_end_fraction": 0.125
+        }
+      ]
+    },
+    {
+      "family": 5,
+      "n": 8,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_005_n8_f55_o1",
+      "min_full_time_s": 17.760717415908516,
+      "minimum_views": 4,
+      "mean_jaccard": 0.13690476190476192,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.208573932726814,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.648753286703943,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 2,
+          "dead_end_fraction": 0.7142857142857143
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.86500438227192,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 6,
+          "dead_end_fraction": 0.14285714285714285
+        }
+      ]
+    },
+    {
+      "family": 6,
+      "n": 6,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_006_n6_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 42.06062054045147,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 55.20456445934255,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 73.60608594579006,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 6,
+      "n": 6,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_006_n6_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 39.79023726785561,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 52.224686414060486,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 69.6329152187473,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 6,
+      "n": 6,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_006_n6_f55_o0",
+      "min_full_time_s": 18.038984587222735,
+      "minimum_views": 5,
+      "mean_jaccard": 0.03333333333333333,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.43118766977819,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.940933816583872,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 25.254578422111827,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 3,
+          "dead_end_fraction": 0.5
+        }
+      ]
+    },
+    {
+      "family": 6,
+      "n": 6,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_006_n6_f55_o1",
+      "min_full_time_s": 18.038984587222735,
+      "minimum_views": 5,
+      "mean_jaccard": 0.03333333333333333,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.43118766977819,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.940933816583872,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 1,
+          "dead_end_fraction": 0.8
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 25.254578422111827,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 3,
+          "dead_end_fraction": 0.4
+        }
+      ]
+    },
+    {
+      "family": 6,
+      "n": 8,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_006_n8_f18_o0",
+      "min_full_time_s": 21.7140453589512,
+      "minimum_views": 6,
+      "mean_jaccard": 0.03571428571428571,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 17.37123628716096,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 22.79974762689876,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 2,
+          "dead_end_fraction": 0.75
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 30.399663502531677,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 8,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 6,
+      "n": 8,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_006_n8_f18_o1",
+      "min_full_time_s": 21.7140453589512,
+      "minimum_views": 6,
+      "mean_jaccard": 0.03571428571428571,
+      "blocked_edge_fraction": 0.25,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 17.37123628716096,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 22.79974762689876,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 2,
+          "dead_end_fraction": 0.7142857142857143
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 30.399663502531677,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 7,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 6,
+      "n": 8,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_006_n8_f55_o0",
+      "min_full_time_s": 17.24547420101738,
+      "minimum_views": 4,
+      "mean_jaccard": 0.10119047619047619,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 13.796379360813905,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.10774791106825,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.14366388142433,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 5,
+          "dead_end_fraction": 0.375
+        }
+      ]
+    },
+    {
+      "family": 6,
+      "n": 8,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_006_n8_f55_o1",
+      "min_full_time_s": 17.24547420101738,
+      "minimum_views": 4,
+      "mean_jaccard": 0.10119047619047619,
+      "blocked_edge_fraction": 0.25,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 13.796379360813905,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.10774791106825,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 1,
+          "dead_end_fraction": 0.8571428571428571
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.14366388142433,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 5,
+          "dead_end_fraction": 0.2857142857142857
+        }
+      ]
+    },
+    {
+      "family": 7,
+      "n": 6,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_007_n6_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 40.64791714829128,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 53.3503912571323,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 71.13385500950973,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 7,
+      "n": 6,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_007_n6_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 38.23109501418154,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 50.178312206113276,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 66.90441627481769,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 7,
+      "n": 6,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_007_n6_f55_o0",
+      "min_full_time_s": 17.976635708180613,
+      "minimum_views": 5,
+      "mean_jaccard": 0.03333333333333333,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.38130856654449,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.875467493589642,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 25.167289991452858,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 5,
+          "dead_end_fraction": 0.16666666666666666
+        }
+      ]
+    },
+    {
+      "family": 7,
+      "n": 6,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_007_n6_f55_o1",
+      "min_full_time_s": 17.976635708180613,
+      "minimum_views": 5,
+      "mean_jaccard": 0.03333333333333333,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.38130856654449,
+          "full_feasible": false,
+          "first_immediate": 5,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.875467493589642,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 1,
+          "dead_end_fraction": 0.8
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 25.167289991452858,
+          "full_feasible": true,
+          "first_immediate": 5,
+          "first_full": 5,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 7,
+      "n": 8,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_007_n8_f18_o0",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 54.19722286438837,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 71.13385500950973,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 94.84514001267964,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 7,
+      "n": 8,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_007_n8_f18_o1",
+      "min_full_time_s": null,
+      "minimum_views": null,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 0.8333333333333334,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 50.97479335224205,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 66.90441627481769,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 89.20588836642358,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        }
+      ]
+    },
+    {
+      "family": 7,
+      "n": 8,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_007_n8_f55_o0",
+      "min_full_time_s": 17.620303658755816,
+      "minimum_views": 4,
+      "mean_jaccard": 0.10119047619047619,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.096242927004653,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.501318841693607,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.668425122258142,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 6,
+          "dead_end_fraction": 0.25
+        }
+      ]
+    },
+    {
+      "family": 7,
+      "n": 8,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_007_n8_f55_o1",
+      "min_full_time_s": 17.620303658755816,
+      "minimum_views": 4,
+      "mean_jaccard": 0.10119047619047619,
+      "blocked_edge_fraction": 0.2857142857142857,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.096242927004653,
+          "full_feasible": false,
+          "first_immediate": 7,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.501318841693607,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 1,
+          "dead_end_fraction": 0.8571428571428571
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.668425122258142,
+          "full_feasible": true,
+          "first_immediate": 7,
+          "first_full": 6,
+          "dead_end_fraction": 0.14285714285714285
+        }
+      ]
+    },
+    {
+      "family": 8,
+      "n": 6,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_008_n6_f18_o0",
+      "min_full_time_s": 20.915978243917447,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.73278259513396,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 21.96177715611332,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.282369541484425,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 6,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 8,
+      "n": 6,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_008_n6_f18_o1",
+      "min_full_time_s": 20.915978243917447,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.73278259513396,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 21.96177715611332,
+          "full_feasible": true,
+          "first_immediate": 4,
+          "first_full": 1,
+          "dead_end_fraction": 0.75
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.282369541484425,
+          "full_feasible": true,
+          "first_immediate": 4,
+          "first_full": 4,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 8,
+      "n": 6,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_008_n6_f55_o0",
+      "min_full_time_s": 20.915978243917447,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.73278259513396,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 21.96177715611332,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.282369541484425,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 6,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 8,
+      "n": 6,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_008_n6_f55_o1",
+      "min_full_time_s": 20.915978243917447,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.2,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.73278259513396,
+          "full_feasible": false,
+          "first_immediate": 4,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 21.96177715611332,
+          "full_feasible": true,
+          "first_immediate": 4,
+          "first_full": 1,
+          "dead_end_fraction": 0.75
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.282369541484425,
+          "full_feasible": true,
+          "first_immediate": 4,
+          "first_full": 4,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 8,
+      "n": 8,
+      "fov": 18,
+      "obstacle": false,
+      "scene_id": "decision_dev_008_n8_f18_o0",
+      "min_full_time_s": 20.915978243917447,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.73278259513396,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 21.96177715611332,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.282369541484425,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 8,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 8,
+      "n": 8,
+      "fov": 18,
+      "obstacle": true,
+      "scene_id": "decision_dev_008_n8_f18_o1",
+      "min_full_time_s": 20.915978243917447,
+      "minimum_views": 6,
+      "mean_jaccard": 0.0,
+      "blocked_edge_fraction": 0.25,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 16.73278259513396,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 21.96177715611332,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 29.282369541484425,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 6,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    },
+    {
+      "family": 8,
+      "n": 8,
+      "fov": 55,
+      "obstacle": false,
+      "scene_id": "decision_dev_008_n8_f55_o0",
+      "min_full_time_s": 17.68343669436883,
+      "minimum_views": 4,
+      "mean_jaccard": 0.07142857142857142,
+      "blocked_edge_fraction": 0.0,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.146749355495064,
+          "full_feasible": false,
+          "first_immediate": 8,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.567608529087273,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 1,
+          "dead_end_fraction": 0.875
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.75681137211636,
+          "full_feasible": true,
+          "first_immediate": 8,
+          "first_full": 6,
+          "dead_end_fraction": 0.25
+        }
+      ]
+    },
+    {
+      "family": 8,
+      "n": 8,
+      "fov": 55,
+      "obstacle": true,
+      "scene_id": "decision_dev_008_n8_f55_o1",
+      "min_full_time_s": 17.68343669436883,
+      "minimum_views": 4,
+      "mean_jaccard": 0.07142857142857142,
+      "blocked_edge_fraction": 0.25,
+      "coverage_union": 1.0,
+      "cases": [
+        {
+          "ratio": 0.8,
+          "budget_s": 14.146749355495064,
+          "full_feasible": false,
+          "first_immediate": 6,
+          "first_full": 0,
+          "dead_end_fraction": null
+        },
+        {
+          "ratio": 1.05,
+          "budget_s": 18.567608529087273,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 1,
+          "dead_end_fraction": 0.8333333333333334
+        },
+        {
+          "ratio": 1.4,
+          "budget_s": 24.75681137211636,
+          "full_feasible": true,
+          "first_immediate": 6,
+          "first_full": 6,
+          "dead_end_fraction": 0.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Reproducibility contract
 
-Version: 1.3.0
+Version: 1.4.0 (2026-11-24)
 
 ## Run and trial records
 
@@ -30,6 +30,44 @@ A source revision alone is insufficient for a modified working tree. Archive the
 and its hash, or rerun from a clean revision for confirmation.
 Do not normalize timestamps, units or missing values silently during analysis.
 Missing measurements use explicit null values and reason codes, never NaN or fabricated zeros.
+
+## Research artifact retention
+
+Author directive, effective 2026-11-24. Applies to all ARC-RVI studies,
+including work performed in an external analysis environment or chat.
+
+1. Commit every shareable research script, analysis report, result table,
+   figure, machine-readable result and independent audit output needed to
+   reproduce or assess a completed stage. Chat attachments, temporary
+   workspaces and expiring CI artifacts are not sufficient retention.
+2. Keep canonical source code, manuscript figures and documentation in their
+   established locations. Archive independent evidence and supplementary
+   results in `research/evidence/<study-id>/<stage-id>/` (for example,
+   `research/evidence/p01/rvi-r03-r06/`). Use a distinct run or revision
+   subdirectory for subsequent executions; never overwrite historical results.
+3. Preserve original bytes, failed trials and negative findings. Include
+   `SHA256SUMS` and a `PROVENANCE.txt` or equivalent manifest for each
+   evidence bundle. Record source SHA, tree state, input hashes, commands,
+   environment, seeds, evidence class, partition, run/artifact identifiers,
+   outcome and limitations. Mark unavailable fields explicitly, not by inference.
+4. Verify the bundle before committing: check SHA-256 against original bytes,
+   confirm complete file membership, and verify the final Git tree or
+   retrieved files. Record the PR and exact commit. Link the evidence in the
+   stage report or relevant Issue; identify pending CI/review/merge.
+5. Never commit secrets, participant information, restricted licensed data,
+   private recordings or sealed holdout data. Keep large or restricted raw
+   datasets in approved persistent storage; retain a non-sensitive manifest,
+   checksum, access conditions and durable retrieval reference in Git.
+   If permitted storage is unavailable, report the retention gate as BLOCKED.
+   Do not disclose protected data in a manifest.
+6. Exclude raw evidence bundles from the generated documentation website.
+   Publish summaries and appropriately authorized figures through canonical
+   documentation, not duplicate evidence packages.
+
+For each research stage, the completion gate requires verified retention
+of its deliverables (or a documented blocker), in addition to the existing
+research, testing and review gates. A committed artifact is not itself
+evidence of validation, independent review, confirmation or deployment.
 
 ## Outcome vocabulary
 

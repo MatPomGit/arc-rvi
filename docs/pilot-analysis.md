@@ -54,9 +54,7 @@ family level and retains paired method/condition comparisons.
 - Before any confirmation, independently define the sampling population,
   frozen primary contrast, success thresholds, sufficient cluster count,
   calibration and full crossed challenge factors.
-- Retain raw benchmark reports externally if needed for later audit. The
-  summary records a hash of the transient benchmark report and its source
-  provenance; that hash does not by itself archive the report.
+- Retain benchmark reports under the [research artifact retention contract](reproducibility.md#research-artifact-retention). A hash without retrievable source bytes is not an archive.
 
 See experiments/exp01_benchmark/protocol.md and
 experiments/analysis/README.md for the prospective scientific plan.
@@ -201,3 +199,46 @@ An independent prototype audit using the same specified factors yielded
 not estimates of natural scene prevalence or evidence for a particular
 heuristic. The canonical implementation must be verified on fresh CI;
 the earlier calibration and stress populations remain separate.
+
+
+## RVI-R06: stronger non-fuzzy reference policies
+
+    rvi decision-compare --population results/decision-population.json --output results/decision-comparison.json
+
+The input is the complete RVI-R05 development grid. The comparison checks
+the canonical scene hashes, factor assignments, geometry and budget,
+recomputes the exact oracle and preserves all 192 cases. The original five
+policies are unchanged. Four additional known-geometry variants use area
+rather than patch count for gain: feasible greedy (maximum immediate area),
+gain per cost (maximum immediate area per elapsed second), and receding
+horizon 2/3 (maximum final covered area among all feasible prefixes within
+the horizon, then minimum elapsed time, shortest prefix, candidate order).
+The two greedy variants break ties by lower time and then candidate order;
+gain per cost prefers positive-gain zero-duration actions. Lookahead permits
+zero-gain transit if its prefix adds coverage, and executes only the first
+action. No policy calls the exact evaluator or sees its solution. Planning
+uses the same simulator transition and collision/time semantics; rejected
+predictions are not executed. Planning CPU time is not charged to the
+simulated mission; report predicted transition counts separately, not as
+wall-clock latency. The older policies retain their original count-based
+gain and failure semantics, so comparisons do not isolate a single feature.
+
+The retrospective independent comparison on verified artifact 14941045859
+(population SHA-256 e8cffba110dd20e81f90fd2df7d8f3eb037092663ae4f4ac604eafd790a723c3)
+found 70/84 feasible completions for gain per cost, 62 for each of
+greedy distance, fixed weight and fuzzy budget, 56 for horizon 3, 41 for
+horizon 2 and 17 for feasible greedy. All 108 structurally/budget infeasible
+instances remain in coverage summaries. Gain per cost has 14 avoidable
+failures, 13 at 1.05 times optimum, and mean coverage gap 1.67 percentage
+points over all 192 cases. These are descriptive development results,
+not independent trials or a confirmatory comparison. The strong baseline
+and residual failure analysis should precede any new fuzzy contribution.
+
+
+## Retention of independent exploratory audits
+
+Apply the canonical [research artifact retention contract](reproducibility.md#research-artifact-retention).
+P01 independent evidence is kept under `research/evidence/p01/`.
+The RVI-R03 through RVI-R06 historical bundle is in
+`research/evidence/p01/rvi-r03-r06/`, with `SHA256SUMS` and `PROVENANCE.txt`.
+Keep future stage outputs in distinct versioned locations.

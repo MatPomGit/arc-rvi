@@ -1,0 +1,36 @@
+MSC-RVI-P01 | Independent exploratory audit evidence | 2026-11-24
+
+Scope: RVI-R03 through RVI-R06. The six files are exact byte-for-byte
+copies of the independently executed audit scripts and their outputs.
+They are development/pilot simulation evidence, not confirmatory data,
+not a physical experiment, and not a substitute for canonical CI.
+
+R03-R04: source checkout 62004a720b76a167a3c48fc76b5aafadce10b584,
+CI 45412033425, artifact 14929105602.
+Archive SHA-256: 11bece25d64128638f7bc0e16f3d2175b18a3974590b5068fa41fd012b692555
+5280 paired policy trials, 97 verified archive file checksums.
+
+R05: independent structural prototype, seed 20261125, 192 cases.
+Canonical implementation head b067e580877b562081b522e3a4fb4facaad6a825.
+CI 45434788504, artifact 14941045859, checkout ac0e5bc95bbfcfa2a4743fa8b15a556a004689f4.
+
+R06: independent comparison on the R05 artifact above, 1728 trials.
+Archive SHA-256: 3b3c9d4f5da790be44748d28eeee915561d6480996ae25027396618e15adb8c7
+Population JSON SHA-256: e8cffba110dd20e81f90fd2df7d8f3eb037092663ae4f4ac604eafd790a723c3
+PR #148 artifact 14942622078 also contains the byte-identical population.
+Canonical R06 implementation head e87f7376a6346db9a0f835b15b2b44cf5302ebcb.
+
+Verification: sha256sum --check SHA256SUMS
+Run scripts with Python 3.11+ from this directory:
+  python rvi_oracle_audit.py <artifact-14929105602.zip> <new-output.json>
+  python rvi_r06_audit.py <artifact-14941045859.zip> <new-output.json>
+The archived R05 script writes to /mnt/data/rvi_r05_structural_audit.json;
+adjust that destination in a temporary copy for local replay. Keep archived
+originals immutable and do not overwrite evidence outputs. The historical
+scripts use assertions, so do not run Python with -O.
+The source ZIP files are CI artifacts, not included in this commit.
+
+Retention directive: subsequent P01 independent audit scripts and result
+files belong in versioned stage-specific subdirectories of research/evidence/p01/
+with checksums and source provenance. Do not publish private or holdout data;
+do not copy the raw audit archive into the generated documentation website.

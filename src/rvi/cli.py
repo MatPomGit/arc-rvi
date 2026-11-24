@@ -10,6 +10,7 @@ from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
 from .conditions import generate_conditions
 from .decision_population import generate_decision_population
+from .decision_comparison import compare_decision_population
 from .collision import load_collision_fixture, inspect_collision_proxies
 from .experiment import run_experiment
 from .localization import run_localization_fixture, run_sensor_localization
@@ -78,6 +79,10 @@ def make_parser() -> argparse.ArgumentParser:
     decision = sub.add_parser("decision-population",
                               help="generate development-only structural P01 scenes")
     decision.add_argument("--output", required=True, type=Path)
+    comparison = sub.add_parser("decision-compare",
+                                help="compare policies on the RVI-R05 development grid")
+    comparison.add_argument("--population", required=True, type=Path)
+    comparison.add_argument("--output", required=True, type=Path)
     precision = sub.add_parser("precision", help="assumption-only independent-family sample size sensitivity")
     precision.add_argument("--spec", required=True, type=Path)
     precision.add_argument("--output", required=True, type=Path)
@@ -155,7 +160,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if arguments.command in ("benchmark", "simulate", "pilot", "precision",
                                  "power-mc", "robot-model", "stance",
-                                 "decision-population"):
+                                 "decision-population", "decision-compare"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
             if arguments.command == "stance":
@@ -239,6 +244,8 @@ def main(argv: list[str] | None = None) -> int:
                                          arguments.comparator, seed=arguments.seed))
             elif arguments.command == "decision-population":
                 payload = generate_decision_population()
+            elif arguments.command == "decision-compare":
+                payload = compare_decision_population(arguments.population)
             elif arguments.command == "precision":
                 payload = plan_family_sample(arguments.spec, arguments.pilot_summary)
             elif arguments.command == "power-mc":
