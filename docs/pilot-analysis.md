@@ -117,3 +117,19 @@ view covers two; the tight budget produces a deliberately constructed
 rank reversal. These fixtures are software checks, not sampled evidence
 of comparative effectiveness, and are excluded from calibration denominators.
 No holdout or frozen protocol change is involved.
+
+
+## Separate tradeoff stress population
+
+The calibration artifact also contains a development-only stress population
+with seed 20261124: 12 scaled two-view geometry families crossed with two
+relative capture overheads, four relative motion budgets and two route orders.
+All five policies receive the same 192 cases (960 trials). No case is rejected
+or selected according to a policy outcome. The population is deliberately
+enriched for coverage/cost conflicts and is not representative of general
+inspection geometry. Report it separately from the 4320 factorial trials.
+The original 2.5 s mechanism fixture allows both policies to complete:
+their predicted elapsed times are 2.2 and 2.4 seconds. A decision reversal
+does not itself imply a success difference. Report paired success categories,
+including fixed-only and neither, and all raw traces. The stress population
+does not change any existing partition or confirmation protocol.
