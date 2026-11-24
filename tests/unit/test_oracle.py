@@ -26,6 +26,8 @@ class ExactOracleTests(unittest.TestCase):
         self.assertTrue(result["full_feasible"])
         self.assertEqual(result["full_route"], [2])
         self.assertAlmostEqual(result["full_min_time_s"], 2.2)
+        self.assertEqual(result["first_full_min_times_s"][0], None)
+        self.assertAlmostEqual(result["first_full_min_times_s"][1], 2.2)
         tight = replace(scene, motion=replace(scene.motion, max_time_s=2))
         result = exact_oracle(tight)
         self.assertFalse(result["full_feasible"])

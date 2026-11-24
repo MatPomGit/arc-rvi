@@ -27,6 +27,7 @@ def exact_oracle(scene: PlanarScene) -> dict:
     total_area = fsum(areas.values())
     best = (0.0, 0.0, ())
     full = None
+    first_times = [None] * len(scene.route)
     prefixes = 0
 
     def visit(state, covered, used, route):
@@ -40,6 +41,9 @@ def exact_oracle(scene: PlanarScene) -> dict:
             key = (state.elapsed_time_s, route)
             if full is None or key < full:
                 full = key
+            index = route[0] - 1
+            if first_times[index] is None or key[0] < first_times[index]:
+                first_times[index] = key[0]
             return
         for index, pose in enumerate(scene.route):
             if index in used:
@@ -59,6 +63,7 @@ def exact_oracle(scene: PlanarScene) -> dict:
         "optimal_route": list(best[2]),
         "full_min_time_s": None if full is None else full[0],
         "full_route": None if full is None else list(full[1]),
+        "first_full_min_times_s": first_times,
         "prefixes": prefixes,
     }
 

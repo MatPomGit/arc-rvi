@@ -9,6 +9,7 @@ from pathlib import Path
 from .adapters.simulator import run_simulation
 from .benchmark import run_benchmark
 from .conditions import generate_conditions
+from .decision_population import generate_decision_population
 from .collision import load_collision_fixture, inspect_collision_proxies
 from .experiment import run_experiment
 from .localization import run_localization_fixture, run_sensor_localization
@@ -74,6 +75,9 @@ def make_parser() -> argparse.ArgumentParser:
     population = sub.add_parser("population", help="sample exploratory geometry families for study01")
     population.add_argument("--spec", required=True, type=Path)
     population.add_argument("--output-dir", required=True, type=Path)
+    decision = sub.add_parser("decision-population",
+                              help="generate development-only structural P01 scenes")
+    decision.add_argument("--output", required=True, type=Path)
     precision = sub.add_parser("precision", help="assumption-only independent-family sample size sensitivity")
     precision.add_argument("--spec", required=True, type=Path)
     precision.add_argument("--output", required=True, type=Path)
@@ -150,7 +154,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Saved {len(manifest['scenes'])} exploratory scenes to {arguments.output_dir}")
             return 0
         if arguments.command in ("benchmark", "simulate", "pilot", "precision",
-                                 "power-mc", "robot-model", "stance"):
+                                 "power-mc", "robot-model", "stance",
+                                 "decision-population"):
             if arguments.output.exists():
                 raise ValueError("output already exists; choose a new path")
             if arguments.command == "stance":
@@ -232,6 +237,8 @@ def main(argv: list[str] | None = None) -> int:
                            if arguments.factorial_fuzzy else
                            analyze_pilot(arguments.manifest, arguments.reference,
                                          arguments.comparator, seed=arguments.seed))
+            elif arguments.command == "decision-population":
+                payload = generate_decision_population()
             elif arguments.command == "precision":
                 payload = plan_family_sample(arguments.spec, arguments.pilot_summary)
             elif arguments.command == "power-mc":

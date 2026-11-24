@@ -164,3 +164,40 @@ has zero avoidable completion failures but nonzero partial-coverage gaps
 for some policies. These are exploratory finite-model diagnostics, not
 confirmatory inference. No protocol, policy parameters or holdout is changed.
 The new implementation requires fresh CI and separate technical review.
+
+
+## RVI-R05: policy-independent decision-structure population
+
+    rvi decision-population --output results/decision-population.json
+
+This separate development-only population draws eight latent radial
+geometry families (seed 20261125). Each has six unequal-area outward-facing
+patches, independently jittered camera poses and a fixed randomized view
+order. Cross nested six/eight-view candidate sets, 18/55 degree FoV,
+and absence/presence of a central circular obstacle. Retain every base
+scene and all three budgets (0.8, 1.05, 1.4 times minimum full-route time).
+The 100 s reference budget is nonbinding by construction for at most eight
+distinct visits. When complete coverage is structurally impossible, use
+candidate count times the longest accepted direct edge as a labelled
+fallback budget reference, not a ratio to an optimum. All 64 base scenes
+and 192 budget cases are retained; no policy is executed during selection
+or generation, and no new holdout is accessed or created.
+
+Measure minimum number of covering views without motion, mean pairwise
+Jaccard similarity (exclude empty unions), visible fraction, blocked directed
+candidate-to-candidate transitions, and exact optimum with and without a
+tight budget. For each budget-feasible case, first-action dead-end fraction
+is the proportion of immediately admissible first actions that cannot start
+any full-completion route. Report null for infeasible cases, not zero.
+This is order dependence induced by geometry and timing, not an explicit
+precedence constraint. Candidate routes permit zero-gain transit and no
+revisits, exactly as the finite reference evaluator. The full report stores
+each loadable scene, canonical JSON SHA-256, optimal routes, per-first-view
+minimum completion times, and descriptive summaries by family and factor.
+
+An independent prototype audit using the same specified factors yielded
+42/64 structurally feasible base scenes, 84/192 budget-feasible cases and
+63/84 order-sensitive feasible cases. These are development diagnostics,
+not estimates of natural scene prevalence or evidence for a particular
+heuristic. The canonical implementation must be verified on fresh CI;
+the earlier calibration and stress populations remain separate.
