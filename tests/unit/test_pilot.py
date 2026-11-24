@@ -150,10 +150,6 @@ class PilotAnalysisTests(unittest.TestCase):
             self.assertEqual(output.read_bytes(), previous)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class FactorialFuzzyPilotTests(unittest.TestCase):
     def test_complete_matrix_and_no_holdout_access(self):
         from rvi.population import generate_population
@@ -190,3 +186,74 @@ class FactorialFuzzyPilotTests(unittest.TestCase):
             path.write_text(json.dumps(manifest))
             with self.assertRaisesRegex(ValueError, "incomplete factorial scene"):
                 analyze_factorial_pilot(path)
+
+
+    def test_malformed_factorial_identifiers_and_nonfinite_json(self):
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_factorial_pilot
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            path = root / "manifest.json"
+            raw = path.read_text()
+            for value in (True, 0.0, "0"):
+                with self.subTest(replicate=value):
+                    manifest = json.loads(raw)
+                    row = next(r for r in manifest["scenes"]
+                               if r["partition"] == "pilot")
+                    row["replicate"] = value
+                    path.write_text(json.dumps(manifest))
+                    with self.assertRaisesRegex(ValueError, "identifiers"):
+                        analyze_factorial_pilot(path)
+            manifest = json.loads(raw)
+            manifest["partitions"]["pilot"][0] = 123
+            path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, "partitions"):
+                analyze_factorial_pilot(path)
+            for token in ("NaN", "Infinity", "-Infinity", "1e999"):
+                with self.subTest(token=token):
+                    path.write_text('{"invalid":' + token + "," + raw.lstrip()[1:])
+                    with self.assertRaisesRegex(ValueError, "non-finite JSON"):
+                        analyze_factorial_pilot(path)
+
+    def test_partition_path_rejected_before_read(self):
+        from unittest.mock import patch
+        from rvi.population import generate_population
+        from rvi.pilot import analyze_factorial_pilot
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "population"
+            generate_population(
+                ROOT / "simulation/conditions/study01_factorial_pilot.json", root)
+            path = root / "manifest.json"
+            raw = path.read_text()
+            for kind in ("scenes", "suites"):
+                with self.subTest(kind=kind):
+                    manifest = json.loads(raw)
+                    if kind == "scenes":
+                        record = next(r for r in manifest["scenes"]
+                                      if r["partition"] == "pilot"
+                                      and r["factors"]["illumination"] == "reference")
+                        holdout = next(r for r in manifest["scenes"]
+                                       if r["partition"] == "holdout")
+                    else:
+                        cell = "o_none__i_reference__c_none"
+                        record = manifest["suites"]["pilot"][cell]
+                        holdout = manifest["suites"]["holdout"][cell]
+                    record.update(path=holdout["path"], sha256=holdout["sha256"])
+                    path.write_text(json.dumps(manifest))
+                    forbidden = (root / holdout["path"]).resolve()
+                    original = Path.read_bytes
+
+                    def guarded_read(target):
+                        if target.resolve() == forbidden:
+                            self.fail("holdout bytes were read")
+                        return original(target)
+
+                    with patch.object(Path, "read_bytes", guarded_read):
+                        with self.assertRaisesRegex(ValueError, "outside pilot"):
+                            analyze_factorial_pilot(path)
+
+
+if __name__ == "__main__":
+    unittest.main()
