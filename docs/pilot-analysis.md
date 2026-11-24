@@ -54,9 +54,7 @@ family level and retains paired method/condition comparisons.
 - Before any confirmation, independently define the sampling population,
   frozen primary contrast, success thresholds, sufficient cluster count,
   calibration and full crossed challenge factors.
-- Retain raw benchmark reports externally if needed for later audit. The
-  summary records a hash of the transient benchmark report and its source
-  provenance; that hash does not by itself archive the report.
+- Retain benchmark reports under the [research artifact retention contract](reproducibility.md#research-artifact-retention). A hash without retrievable source bytes is not an archive.
 
 See experiments/exp01_benchmark/protocol.md and
 experiments/analysis/README.md for the prospective scientific plan.
@@ -239,9 +237,8 @@ and residual failure analysis should precede any new fuzzy contribution.
 
 ## Retention of independent exploratory audits
 
-Preserve independent audit scripts and their result files in versioned
-stage-specific directories under `research/evidence/p01/`, alongside
-SHA-256 checksums and source provenance. The RVI-R03 through RVI-R06
-historical files are in `research/evidence/p01/rvi-r03-r06/`. Keep raw
-archives out of the generated website and never publish holdout or private
-information. Do not overwrite historical evidence with a new run.
+Apply the canonical [research artifact retention contract](reproducibility.md#research-artifact-retention).
+P01 independent evidence is kept under `research/evidence/p01/`.
+The RVI-R03 through RVI-R06 historical bundle is in
+`research/evidence/p01/rvi-r03-r06/`, with `SHA256SUMS` and `PROVENANCE.txt`.
+Keep future stage outputs in distinct versioned locations.

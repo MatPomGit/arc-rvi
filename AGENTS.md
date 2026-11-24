@@ -41,6 +41,7 @@ Przed zadaniem przeczytaj ten plik i właściwe lokalne `AGENTS.md`, jeśli istn
 - Odróżniaj `fixture`, `simulation` i `physical`; syntetyczny wynik nie jest walidacją fizyczną ani potwierdzeniem hipotezy.
 - Chron evaluator-only truth przed dostępem algorytmu; utrzymuj rozłączne grupy obiektów, scen i sesji między podziałami.
 - Rejestruj pełny SHA, stan drzewa, wersje, wejścia, hashe, seed, kalibrację, jednostki, niepewność i wszystkie próby nieudane.
+- Zapisuj skrypty, raporty i wyniki badań w repozytorium zgodnie z [zasadami archiwizacji](docs/reproducibility.md#research-artifact-retention); chroń dane zastrzeżone.
 - Zamrażaj pytania, estymandy, metody, progi, jednostki i reguły braków przed badaniem potwierdzającym.
 - Nie fabrykuj wyników, cytowań i akceptacji. Osiem folderów `papers/` to kandydaci, nie osiem ukończonych publikacji.
 - Przed eksperymentem przeczytaj [metodologię](docs/methodology.md), [reprodukowalność](docs/reproducibility.md), protokół `experiments/expXX_*/protocol.md` oraz [plan analizy](experiments/analysis/README.md).
