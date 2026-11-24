@@ -63,6 +63,9 @@ jobs:
           python -m rvi.cli population --spec results/p01-pilot/spec.json --output-dir results/p01-pilot/population
           python -m rvi.cli pilot --manifest results/p01-pilot/population/manifest.json --factorial-fuzzy --output results/p01-pilot/report.json
           python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/report.json").read_text()); assert r["trial_count"] == 180 and r["families"] == 6 and r["stage"] == "exploratory_not_confirmatory" and r["partition"] == "pilot"'
+          rm -rf results/p01-pilot/population/scenes/{development,holdout} results/p01-pilot/population/suites/{development,holdout}
+          python -m rvi.cli pilot --manifest results/p01-pilot/population/manifest.json --calibrate-factorial --output results/p01-pilot/calibration.json
+          python -c 'import json; from pathlib import Path; r=json.loads(Path("results/p01-pilot/calibration.json").read_text()); assert r["trial_count"] == 4320 and len(r["configurations"]) == 24'
           date -u +%FT%TZ > results/p01-pilot/end-utc.txt
       - name: Exclude non-pilot scene and suite files
         if: always()
