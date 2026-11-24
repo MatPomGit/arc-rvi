@@ -1,6 +1,6 @@
 # Study 01: Reproducible Simulation Benchmark for Autonomous Robotic Visual Inspection
 
-Protocol version: 1.3.0
+Protocol version: 1.4.1
 
 Status: prospective design, not preregistered or frozen
 
@@ -13,9 +13,11 @@ Select the reference method on development data before the confirmation split is
 Proposed hypothesis: Challenge conditions cause different success degradation across the two frozen methods.
 
 ## Design and baselines
-Use a nominal condition and a crossed challenge design: geometry family, occlusion,
-illumination and clutter. Define measurable levels in the simulator configuration,
-including visible surface fraction, light intensity and obstacle density.
+Use a nominal condition and a crossed challenge design within geometry families.
+For the current pilot, cross occlusion and clutter at reference brightness as
+specified in the ICAISC amendment below. Illumination is a conditional future
+factor, not an eligible primary factor without the specified validation.
+Define measurable levels in the simulator configuration.
 Use equal condition weights, independent scene draws and paired scenario seeds across methods.
 Reserve complete geometry families for confirmation; repeated seeds from one geometry
 remain in the same partition.
@@ -36,8 +38,10 @@ in percentage points. Negative values are possible and must be retained.
 Also report each condition separately, route length, runtime and failure category.
 
 ## Unit, analysis and acceptance
-The independent unit is a generated scene instance, grouped by geometry family.
-Seeds are paired computational replicates, not independent physical objects.
+The independent sampling and inference unit is the generated geometry family.
+Scene instances are nested within families; condition cells and paired seeds are
+within-family computational replicates, not independent families or physical objects.
+Weight independent families equally in the primary contrast.
 Estimate the paired difference in degradation with a family-clustered interval.
 Method-by-condition interactions and ranking changes are secondary analyses.
 If too few families support cluster inference, report descriptive estimates only.
@@ -94,3 +98,82 @@ measurable condition levels and family/sample counts only after model
 calibration and an independent-unit power sensitivity study. Preserve the
 current primary paired degradation contrast; do not replace it with a
 post-hoc omnibus significance test.
+
+## ICAISC 2027 pilot design amendment (prospective, 2026-11-24)
+
+Publication decision: simulation-only P01; see the existing manuscript README.
+This amendment specifies development and pilot requirements, not a frozen design.
+No physical validity or confirmation is implied.
+
+### Information parity and factor eligibility
+
+Use a primary known-geometry planning track if coverage-greedy cannot be
+implemented with the same observation-only information as all other policies.
+In that track all policies may access the same declared model geometry and
+predicted visibility; the independent evaluator scores executed acquisitions.
+Alternatively, use an observation-only track with a common observable state and
+implement all comparators against that state. Do not combine tracks or use oracle
+coverage to select actions in the observation-only track. Choose one primary
+track before confirmation. The other may be exploratory and separately labelled.
+
+The candidate fuzzy planner is developmental. Its inputs may include predicted
+marginal coverage, travel cost and a defined uncertainty proxy available to all
+policies in the selected track. Normalize inputs using development-only bounds;
+freeze membership functions, rules, defuzzification, tie-breaking and fallback
+before evaluation. Include a fixed-weight score ablation with the same inputs
+and feasible candidate set. No claim of novelty or benefit is made yet.
+
+Use the existing factor registry. The nominal cell is no occluder, reference
+brightness and no nuisance obstacle. Pilot occlusion and clutter with the existing
+modelled geometry. Brightness is currently a dimensionless proxy that does not
+change detection probability. Exclude illumination from the primary challenge
+contrast unless its observation mechanism passes independent synthetic reference
+checks before lock. Do not report lux or physical illumination robustness.
+This amendment supersedes earlier illumination-factor proposals for the current
+pilot. When excluding brightness, use only its reference level: the remaining 3 by 2
+occlusion/clutter grid has one nominal and five equally weighted challenge cells.
+Geometry strata remain balanced; record any unsupported cells before seeing outcomes.
+
+### Paired estimand and scoring
+
+For family f, method m and eligible cell c, let S(f,m,c) be mean binary mission
+success over the fixed paired scene replicates. Define L(f,m) as S(f,m,nominal)
+minus the equal-weight mean S(f,m,c) across challenge cells. The primary contrast
+is mean across independent families of L(f,reference) minus L(f,candidate).
+Positive values indicate smaller degradation for the candidate, not necessarily
+better absolute performance. Report nominal and challenge success separately to
+expose floor effects. Use percentage points
+for reporting. Pair scenarios across policies and retain all initiated eligible
+attempts. An algorithm failure, timeout, collision or inadequate valid coverage
+scores zero; infrastructure failures remain explicitly missing, with linked
+replacements and worst/best-case sensitivity bounds. Before confirmation, freeze
+an outcome- and method-independent adjudication rule based on infrastructure logs.
+Use a predeclared replacement seed schedule: repeat the complete paired method
+block for the affected family/cell, preserve original attempts and replacement
+links, and never replace an algorithm failure. Freeze retry limits and the
+analysis rule for choosing original or replacement blocks before outcomes.
+Compute sensitivity bounds by assigning unresolved binary outcomes zero or one
+in the direction that minimizes or maximizes the paired contrast, retaining the
+fixed cell and family weights. No missing cell may be silently dropped or reweighted. Report family counts and uncertainty at family
+level; replicates and cells are not independent families.
+
+### Pilot exit and confirmation lock
+
+- [ ] Verify the common candidate set, information contract, motion budget,
+  independent evaluator, coverage threshold and success rule with analytic fixtures.
+- [ ] Verify supported factor manipulations, deterministic pairing and all failure
+  categories; decide and document the primary information track.
+- [ ] Run development/pilot only, record complete cell denominators and hashes,
+  and assess family variability, floor/ceiling effects and runtime.
+- [ ] Justify smallest relevant difference and family count using sensitivity
+  analysis and small-sample Monte Carlo coverage; freeze the primary comparator,
+  contrast, multiplicity policy, stopping rule and missing-data treatment.
+- [ ] Freeze source/configuration hashes, new disjoint confirmation families,
+  seeds and analysis code before accessing outcomes. Record exact component
+  revisions, immutable hashes and explicit researcher sign-off (pending until
+  actually granted) in the protocol lock record required by issue #38.
+  The existing public holdout is not a sealed confirmation set.
+
+Confirmation remains BLOCKED until these gates and the project-wide freeze gate
+are satisfied. If the deadline prevents defensible confirmation, report only
+explicitly exploratory simulation evidence or record NO-GO.
